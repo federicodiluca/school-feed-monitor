@@ -1,6 +1,6 @@
-from bot.db import get_conn
-from bot.logger import log
-from bot.utils import local_day_bounds_utc, parse_rss_datetime
+from sfm.db import get_conn
+from sfm.logger import log
+from sfm.utils import local_day_bounds_utc, parse_rss_datetime
 
 MAX_CONTENT_LEN = 20000
 FUTURE_TOLERANCE_HOURS = 24

@@ -1,5 +1,5 @@
 """Matching keyword ↔ notizie: logica pura, senza dipendenze da DB o canali."""
-from bot.utils import find_matching_keywords, strip_html
+from sfm.utils import find_matching_keywords, strip_html
 
 
 def news_text(news):

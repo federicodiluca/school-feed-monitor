@@ -1,9 +1,9 @@
 """Onboarding 'Dove insegni?' e fonti raggruppate per area (catalogo USR/USP)."""
 import pytest
 
-from bot.catalog import group_sources, load_catalog, provinces_by_region, sources_for_area
-from bot.db_sources import add_user_source, follow_area, get_followed_source_ids, get_sources, get_user_sources, sync_config_sources, user_area
-from bot.db_user import get_user_by_email
+from sfm.catalog import group_sources, load_catalog, provinces_by_region, sources_for_area
+from sfm.db_sources import add_user_source, follow_area, get_followed_source_ids, get_sources, get_user_sources, sync_config_sources, user_area
+from sfm.db_user import get_user_by_email
 from tests.test_web import EMAIL, csrf, register
 from web import create_app, security
 
@@ -51,7 +51,7 @@ def test_provinces_by_region_and_sources_for_area():
 
 def test_follow_area_sets_follows_and_keeps_custom(catalog_db):
     register_user_id = 1
-    from bot.db_user import add_user
+    from sfm.db_user import add_user
     add_user(1)
     custom, _ = add_user_source("Il mio sito", "https://custom.example/feed/", "rss", register_user_id)
     n = follow_area(register_user_id, "Emilia-Romagna", ["Bologna", "Rimini"])

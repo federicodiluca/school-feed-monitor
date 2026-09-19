@@ -1,7 +1,7 @@
 """Avvio del server web (sviluppo). In produzione usare un WSGI server (es. gunicorn 'web:create_app()')."""
 import os
 
-from bot.env import env, env_bool
+from sfm.env import env, env_bool
 from web import create_app
 
 app = create_app()

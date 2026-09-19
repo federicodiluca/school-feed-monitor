@@ -1,5 +1,5 @@
-import bot.notifier as notifier
-from bot.matching import match_users, news_text
+import sfm.notifier as notifier
+from sfm.matching import match_users, news_text
 
 
 # --- matching (logica pura) ------------------------------------------------

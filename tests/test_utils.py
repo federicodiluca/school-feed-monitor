@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 import pytest
 
-from bot.utils import (
+from sfm.utils import (
     cleanHTMLPreview,
     escape_html,
     find_matching_keywords,
@@ -114,7 +114,7 @@ def test_parse_rss_datetime_falls_back_to_now_for_empty_or_garbage():
 
 def test_local_day_bounds_utc_converts_local_day_to_utc_range():
     from datetime import timedelta
-    from bot.utils import local_day_bounds_utc
+    from sfm.utils import local_day_bounds_utc
     now = datetime(2025, 10, 5, 1, 0, 0, tzinfo=timezone(timedelta(hours=2)))
     assert local_day_bounds_utc(now) == ("2025-10-04 22:00:00", "2025-10-05 22:00:00")
     now = datetime(2025, 10, 5, 23, 30, 0, tzinfo=timezone(timedelta(hours=-5)))
@@ -122,14 +122,14 @@ def test_local_day_bounds_utc_converts_local_day_to_utc_range():
 
 
 def test_local_day_bounds_utc_default_contains_now():
-    from bot.utils import local_day_bounds_utc
+    from sfm.utils import local_day_bounds_utc
     start, end = local_day_bounds_utc()
     now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     assert start <= now_utc < end
 
 
 def test_format_local_datetime():
-    from bot.utils import format_local_datetime
+    from sfm.utils import format_local_datetime
     expected = datetime(2025, 10, 5, 10, 0, 0, tzinfo=timezone.utc).astimezone().strftime("%d/%m/%Y %H:%M")
     assert format_local_datetime("2025-10-05 10:00:00") == expected
     assert format_local_datetime("") == ""

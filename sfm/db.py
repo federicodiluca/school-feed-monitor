@@ -1,10 +1,8 @@
 import os
 import sqlite3
 
-from bot.migrations import run_migrations
-
-# Percorso del database: sovrascrivibile con CHECKFEED_DB_PATH.
-DB_PATH = os.environ.get("CHECKFEED_DB_PATH", "data/checkfeed.db")
+from sfm.migrations import run_migrations
+from sfm.settings import DB_PATH, migrate_legacy_db_file  # SFM_DB_PATH (o CHECKFEED_DB_PATH, deprecata)
 
 
 def get_conn():
@@ -14,7 +12,7 @@ def get_conn():
 
 
 # Schema "finale": i DB creati da zero nascono così; quelli vecchi vengono
-# portati a questa forma da bot/migrations.py.
+# portati a questa forma da sfm/migrations.py.
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -137,6 +135,7 @@ def init_db():
     parent = os.path.dirname(DB_PATH)
     if parent:
         os.makedirs(parent, exist_ok=True)
+    migrate_legacy_db_file()  # data/checkfeed.db -> data/sfm.db, una volta sola
 
     conn = get_conn()
     conn.execute("PRAGMA journal_mode=WAL")  # letture/scritture concorrenti (bot + web)

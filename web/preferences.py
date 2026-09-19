@@ -5,14 +5,14 @@ import secrets
 
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 
-from bot.catalog import REGIONS, group_sources, provinces_by_region
-from bot.db_sources import add_user_source, follow_area, get_source_by_url, get_sources, get_user_sources, set_user_source, user_area
-from bot.db_user import ALERT_MODES, create_link_code, set_keywords, set_preferences, unlink_telegram
-from bot.digest import default_digest_time
-from bot.logger import log
-from bot.news_fetcher import fetch_source
-from bot.source_parser import SourceError, detect_source
-from bot.utils import parse_keywords
+from sfm.catalog import REGIONS, group_sources, provinces_by_region
+from sfm.db_sources import add_user_source, follow_area, get_source_by_url, get_sources, get_user_sources, set_user_source, user_area
+from sfm.db_user import ALERT_MODES, create_link_code, set_keywords, set_preferences, unlink_telegram
+from sfm.digest import default_digest_time
+from sfm.logger import log
+from sfm.news_fetcher import fetch_source
+from sfm.source_parser import SourceError, detect_source
+from sfm.utils import parse_keywords
 from web import security
 
 bp = Blueprint("prefs", __name__)

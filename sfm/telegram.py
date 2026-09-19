@@ -1,9 +1,9 @@
 # bot/telegram.py
 import requests
 import time
-from bot.config_loader import get_config
-from bot.db_user import get_users
-from bot.logger import log
+from sfm.config_loader import get_config
+from sfm.db_user import get_users
+from sfm.logger import log
 
 CONFIG = get_config()
 TELEGRAM_TOKEN = CONFIG["telegram_token"]

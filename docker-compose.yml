@@ -1,7 +1,7 @@
 services:
-  checkfeed:
+  bot:
     build: .
-    container_name: checkfeed-bot
+    container_name: sfm-bot
     restart: unless-stopped
     volumes:
       - ./data:/usr/src/app/data
@@ -11,8 +11,8 @@ services:
       - PYTHONPATH=/usr/src/app
       - PYTHONUNBUFFERED=1
     networks:
-      - checkfeed-net
+      - sfm-net
 
 networks:
-  checkfeed-net:
+  sfm-net:
     driver: bridge

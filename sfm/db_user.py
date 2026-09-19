@@ -3,7 +3,7 @@ opzionali (un utente può avere entrambe). Le funzioni con parametro telegram_id
 sono l'API usata dai comandi Telegram; quelle con user_id servono al layer web
 e al core."""
 from datetime import datetime
-from bot.db import get_conn
+from sfm.db import get_conn
 
 ALERT_MODES = ("instant", "digest")   # instant = alert a ogni fetch; digest = solo nel report
 USER_COLUMNS = ("id, telegram_id, username, email, email_verified, keywords, active, "

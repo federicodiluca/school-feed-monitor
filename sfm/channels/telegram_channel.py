@@ -1,8 +1,8 @@
-"""Canale Telegram: formatta e invia alert e report tramite bot.telegram."""
+"""Canale Telegram: formatta e invia alert e report tramite sfm.telegram."""
 from datetime import datetime
 
-from bot.telegram import send_long_message, send_message
-from bot.utils import cleanHTMLPreview, escape_html, format_local_datetime
+from sfm.telegram import send_long_message, send_message
+from sfm.utils import cleanHTMLPreview, escape_html, format_local_datetime
 
 NAME = "telegram"
 NO_NEWS_MESSAGE = "🗓️ Nessuna notizia per oggi dalle fonti che segui."

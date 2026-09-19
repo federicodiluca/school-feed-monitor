@@ -2,12 +2,12 @@ import re
 
 import pytest
 
-import bot.digest as digest
+import sfm.digest as digest
 import web.auth as auth
-from bot import mailer, notifier
-from bot.channels import email_channel
-from bot.db_news import add_news
-from bot.db_user import consume_email_token, create_email_token, get_user_by_email
+from sfm import mailer, notifier
+from sfm.channels import email_channel
+from sfm.db_news import add_news
+from sfm.db_user import consume_email_token, create_email_token, get_user_by_email
 from tests.test_web import EMAIL, csrf, login, register
 from web import create_app, security
 
@@ -86,7 +86,7 @@ def test_resend_verification(client, outbox, monkeypatch):
     tok = csrf(client, "/account")
     r = client.post("/account/verifica/reinvia", data={"_csrf": tok}, follow_redirects=True)
     assert "già inviata da poco" in r.get_data(as_text=True) and len(outbox) == 1
-    monkeypatch.setattr("bot.db_user.EMAIL_TOKEN_RESEND_SECONDS", 0)
+    monkeypatch.setattr("sfm.db_user.EMAIL_TOKEN_RESEND_SECONDS", 0)
     r = client.post("/account/verifica/reinvia", data={"_csrf": tok}, follow_redirects=True)
     assert "Email di conferma inviata" in r.get_data(as_text=True) and len(outbox) == 2
     client.get(_link(outbox[1]))

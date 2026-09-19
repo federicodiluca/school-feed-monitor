@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from bot.config_loader import load_config
+from sfm.config_loader import load_config
 
 
 def write(tmp_path, cfg):

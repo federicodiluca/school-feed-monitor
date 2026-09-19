@@ -1,6 +1,6 @@
 """Setup condiviso dei test.
 
-I moduli `bot.*` leggono config, DB e cartella log a import-time, quindi
+I moduli `sfm.*` leggono config, DB e cartella log a import-time, quindi
 impostiamo le variabili d'ambiente PRIMA di importarli.
 """
 import json
@@ -9,7 +9,7 @@ import tempfile
 
 import pytest
 
-_SESSION_DIR = tempfile.mkdtemp(prefix="checkfeed-tests-")
+_SESSION_DIR = tempfile.mkdtemp(prefix="sfm-tests-")
 _CONFIG_PATH = os.path.join(_SESSION_DIR, "config.json")
 
 TEST_CONFIG = {
@@ -29,18 +29,18 @@ TEST_CONFIG = {
 with open(_CONFIG_PATH, "w", encoding="utf-8") as f:
     json.dump(TEST_CONFIG, f)
 
-os.environ["CHECKFEED_CONFIG"] = _CONFIG_PATH
-os.environ["CHECKFEED_DB_PATH"] = os.path.join(_SESSION_DIR, "test.db")
-os.environ["CHECKFEED_LOG_DIR"] = os.path.join(_SESSION_DIR, "logs")
-os.environ["CHECKFEED_ENV_FILE"] = os.path.join(_SESSION_DIR, "no.env")  # i test non leggono il .env reale
+os.environ["SFM_CONFIG"] = _CONFIG_PATH
+os.environ["SFM_DB_PATH"] = os.path.join(_SESSION_DIR, "test.db")
+os.environ["SFM_LOG_DIR"] = os.path.join(_SESSION_DIR, "logs")
+os.environ["SFM_ENV_FILE"] = os.path.join(_SESSION_DIR, "no.env")  # i test non leggono il .env reale
 
 # Solo ora è sicuro importare i moduli del bot
-import bot.db as db  # noqa: E402
-import bot.telegram as telegram  # noqa: E402
-import bot.telegram_commands as telegram_commands  # noqa: E402
-import bot.channels.telegram_channel as telegram_channel  # noqa: E402
-import bot.source_parser as source_parser  # noqa: E402
-from bot.db_sources import sync_config_sources  # noqa: E402
+import sfm.db as db  # noqa: E402
+import sfm.telegram as telegram  # noqa: E402
+import sfm.telegram_commands as telegram_commands  # noqa: E402
+import sfm.channels.telegram_channel as telegram_channel  # noqa: E402
+import sfm.source_parser as source_parser  # noqa: E402
+from sfm.db_sources import sync_config_sources  # noqa: E402
 
 
 class FakeResponse:
@@ -116,7 +116,7 @@ def sent_messages(monkeypatch):
         messages.append({"chat_id": chat_id, "text": text, "parse_mode": parse_mode, "reply_markup": reply_markup})
         return {"ok": True, "result": {}}
 
-    # send_long_message di bot.telegram chiama send_message dello stesso modulo
+    # send_long_message di sfm.telegram chiama send_message dello stesso modulo
     monkeypatch.setattr(telegram, "send_message", fake_send)
     monkeypatch.setattr(telegram_commands, "send_message", fake_send)
     monkeypatch.setattr(telegram_channel, "send_message", fake_send)

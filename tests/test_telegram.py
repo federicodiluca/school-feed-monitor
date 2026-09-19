@@ -1,5 +1,5 @@
-import bot.telegram as telegram
-from bot.db_user import add_user, deactivate_user
+import sfm.telegram as telegram
+from sfm.db_user import add_user, deactivate_user
 from tests.conftest import FakeResponse
 
 

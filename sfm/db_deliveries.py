@@ -1,6 +1,6 @@
 """Log invii (tabella deliveries): dedup multi-canale.
 Una notizia va a un utente al più una volta per (canale, tipo)."""
-from bot.db import get_conn
+from sfm.db import get_conn
 
 KINDS = ("alert", "digest")
 

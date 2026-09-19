@@ -1,8 +1,7 @@
 import os
 from datetime import timedelta, datetime
 
-# Cartella dei log: sovrascrivibile con CHECKFEED_LOG_DIR.
-LOG_DIR = os.environ.get("CHECKFEED_LOG_DIR", "data/logs")
+from sfm.settings import LOG_DIR  # SFM_LOG_DIR (o CHECKFEED_LOG_DIR, deprecata)  # noqa: E402
 
 
 def log(message: str):

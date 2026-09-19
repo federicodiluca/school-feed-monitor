@@ -1,7 +1,7 @@
 """Verifica un elenco di URL con il parser reale (detect_source) e stampa cosa trova.
 
     python scripts/check_sources.py URL [URL ...]
-    python scripts/check_sources.py --catalog          # tutte le voci di bot/catalog/italy.json
+    python scripts/check_sources.py --catalog          # tutte le voci di sfm/catalog/italy.json
     python scripts/check_sources.py --file elenco.txt  # un URL per riga (# = commento)
 
 Per ogni URL: tipo rilevato (rss/html), URL effettiva (feed scoperto), numero di notizie,
@@ -13,7 +13,7 @@ import sys
 sys.stdout.reconfigure(errors="replace")  # console Windows cp1252
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from bot.source_parser import SourceError, detect_source  # noqa: E402
+from sfm.source_parser import SourceError, detect_source  # noqa: E402
 
 
 def check(url, label=None):
@@ -34,7 +34,7 @@ def check(url, label=None):
 def main(argv):
     urls = []
     if "--catalog" in argv:
-        from bot.catalog import load_catalog
+        from sfm.catalog import load_catalog
         urls = [(e["url"], f"{e['name']} [{e['kind']} {e.get('region') or ''} {e.get('province') or ''}]") for e in load_catalog()]
     elif "--file" in argv:
         path = argv[argv.index("--file") + 1]

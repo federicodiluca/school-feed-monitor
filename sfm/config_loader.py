@@ -1,16 +1,14 @@
 import json
 import os
 
-# Percorso del file di configurazione: sovrascrivibile con la variabile
-# d'ambiente CHECKFEED_CONFIG (utile per test e deploy alternativi).
-CONFIG_FILE = os.environ.get("CHECKFEED_CONFIG", "config.json")
+from sfm.settings import CONFIG_FILE  # SFM_CONFIG (o CHECKFEED_CONFIG, deprecata)
 
 REQUIRED_KEYS = ("telegram_token",)
 SITE_TYPES = ("rss", "html")  # rss = feed RSS/Atom; html = pagina "lista notizie" da scrapare
 SITE_KINDS = ("usr", "usp", "mim", "other")
 
 DEFAULTS = {
-    "machine_name": "CheckFeed",
+    "machine_name": "School Feed Monitor",
     "daily_report_time": "18:00",
     "polling_minutes": 10,
     "data_retention_days": 7,
@@ -58,7 +56,7 @@ def load_config(path=None):
     # Catalogo fonti italiane (USR/USP/MIM): "catalog": "italy" | false
     catalog = cfg.get("catalog", "italy")
     if catalog:
-        from bot.catalog import load_catalog, merge_sites
+        from sfm.catalog import load_catalog, merge_sites
         cfg["sites"] = merge_sites(cfg["sites"], load_catalog(str(catalog)))
     return cfg
 

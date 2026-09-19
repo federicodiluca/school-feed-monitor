@@ -1,7 +1,7 @@
 import os
 from datetime import datetime, timedelta
 
-import bot.logger as logger
+import sfm.logger as logger
 
 
 def test_log_writes_daily_file(tmp_path, monkeypatch):

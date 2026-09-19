@@ -2,10 +2,10 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from bot.db_news import add_news, search_news
-from bot.db_sources import set_user_source, sync_config_sources
-from bot.db_user import get_user_by_email, set_keywords
-from bot.utils import slugify
+from sfm.db_news import add_news, search_news
+from sfm.db_sources import set_user_source, sync_config_sources
+from sfm.db_user import get_user_by_email, set_keywords
+from sfm.utils import slugify
 from tests.test_web import EMAIL, csrf, register
 from web import create_app, security
 

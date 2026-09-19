@@ -2,11 +2,11 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-import bot.news_fetcher as news_fetcher
-import bot.telegram_commands as tc
-import bot.watchdog as watchdog
-from bot import mailer
-from bot.db_health import (
+import sfm.news_fetcher as news_fetcher
+import sfm.telegram_commands as tc
+import sfm.watchdog as watchdog
+from sfm import mailer
+from sfm.db_health import (
     get_job_runs,
     get_open_incidents,
     get_source_health,
@@ -15,7 +15,7 @@ from bot.db_health import (
     record_source_failure,
     record_source_success,
 )
-from bot.db_user import add_user
+from sfm.db_user import add_user
 from tests.fixtures import rss
 
 UNO = "https://example.org/uno/feed/"

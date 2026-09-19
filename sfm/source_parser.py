@@ -13,9 +13,9 @@ import feedparser
 import requests
 from bs4 import BeautifulSoup
 
-from bot.utils import strip_html
+from sfm.utils import strip_html
 
-USER_AGENT = "Mozilla/5.0 (compatible; CheckFeed-Bot/1.0)"
+USER_AGENT = "Mozilla/5.0 (compatible; SchoolFeedMonitor/1.0; +https://github.com/federicodiluca/school-feed-monitor)"
 FETCH_TIMEOUT = 20
 MIN_HTML_ITEMS = 3  # sotto questa soglia una pagina HTML non è considerata una lista di notizie
 

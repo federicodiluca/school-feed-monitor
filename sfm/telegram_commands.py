@@ -1,6 +1,6 @@
 from threading import Thread
-from bot.telegram import TELEGRAM_TOKEN, answer_callback_query, edit_message_text, send_long_message, send_message
-from bot.db_user import (
+from sfm.telegram import TELEGRAM_TOKEN, answer_callback_query, edit_message_text, send_long_message, send_message
+from sfm.db_user import (
     activate_user,
     add_user,
     consume_link_code,
@@ -11,9 +11,9 @@ from bot.db_user import (
     update_keywords,
     user_id_for_telegram,
 )
-from bot.db_health import get_failing_source_ids
-from bot.db_news import get_recent_news
-from bot.db_sources import (
+from sfm.db_health import get_failing_source_ids
+from sfm.db_news import get_recent_news
+from sfm.db_sources import (
     add_user_source,
     get_followed_source_ids,
     get_source,
@@ -23,12 +23,12 @@ from bot.db_sources import (
     remove_source,
     set_user_source,
 )
-from bot.news_fetcher import fetch_news, fetch_source
-from bot.source_parser import SourceError, detect_source
-from bot.report_generator import generate_report
-from bot.logger import log
-from bot.config_loader import get_config
-from bot.utils import cleanHTMLPreview, escape_html, format_local_datetime, parse_keywords
+from sfm.news_fetcher import fetch_news, fetch_source
+from sfm.source_parser import SourceError, detect_source
+from sfm.report_generator import generate_report
+from sfm.logger import log
+from sfm.config_loader import get_config
+from sfm.utils import cleanHTMLPreview, escape_html, format_local_datetime, parse_keywords
 import requests
 import time
 

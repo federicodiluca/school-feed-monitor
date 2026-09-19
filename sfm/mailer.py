@@ -14,8 +14,8 @@ from email.utils import formatdate, make_msgid
 
 import requests
 
-from bot.env import env
-from bot.logger import log
+from sfm.env import env
+from sfm.logger import log
 
 RESEND_API_URL = "https://api.resend.com/emails"
 SMTP_TIMEOUT = 20

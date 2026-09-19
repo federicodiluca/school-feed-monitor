@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta, timezone
 
-import bot.db as db
-from bot.db_news import add_news, cleanup_old_news, get_recent_news, get_today_news
-from bot.db_user import (
+import sfm.db as db
+from sfm.db_news import add_news, cleanup_old_news, get_recent_news, get_today_news
+from sfm.db_user import (
     activate_user,
     add_user,
     deactivate_user,
@@ -138,7 +138,7 @@ def test_add_news_clamps_future_published_dates():
 
 
 def test_migration_v6_fixes_future_dates_in_existing_rows():
-    from bot.migrations import _v6_fix_future_dates
+    from sfm.migrations import _v6_fix_future_dates
     conn = db.get_conn()
     conn.execute("INSERT INTO news (title, link, source, published_at, fetched_at) VALUES "
                  "('futura', 'https://x/1', 'S', datetime('now', '+30 days'), datetime('now', '-1 day')),"

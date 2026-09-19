@@ -11,10 +11,10 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.stdout.reconfigure(errors="replace")
 
-from bot.config_loader import get_config  # noqa: E402
-from bot.db import init_db  # noqa: E402
-from bot.db_sources import get_sources, sync_config_sources  # noqa: E402
-from bot.news_fetcher import fetch_source  # noqa: E402
+from sfm.config_loader import get_config  # noqa: E402
+from sfm.db import init_db  # noqa: E402
+from sfm.db_sources import get_sources, sync_config_sources  # noqa: E402
+from sfm.news_fetcher import fetch_source  # noqa: E402
 
 
 def main(argv):

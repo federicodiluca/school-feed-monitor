@@ -1,9 +1,9 @@
-"""Canale email: costruisce alert e report (HTML + testo) e li invia con bot.mailer."""
+"""Canale email: costruisce alert e report (HTML + testo) e li invia con sfm.mailer."""
 from datetime import datetime
 
-from bot.env import env
-from bot.mailer import send_email
-from bot.utils import cleanHTMLPreview, escape_html, format_local_datetime, strip_html
+from sfm.env import env
+from sfm.mailer import send_email
+from sfm.utils import cleanHTMLPreview, escape_html, format_local_datetime, strip_html
 
 NAME = "email"
 APP_NAME = "School Feed Monitor"

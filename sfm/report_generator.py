@@ -1,9 +1,9 @@
 """Report giornaliero: wrapper di compatibilità sul modulo digest.
 `/report` su Telegram e la vecchia API generate_report() passano da qui."""
-from bot.channels.telegram_channel import NO_NEWS_MESSAGE, build_report  # noqa: F401 (compatibilità)
-from bot.db_user import get_user
-from bot.digest import run_digests, send_user_digest
-from bot.logger import log
+from sfm.channels.telegram_channel import NO_NEWS_MESSAGE, build_report  # noqa: F401 (compatibilità)
+from sfm.db_user import get_user
+from sfm.digest import run_digests, send_user_digest
+from sfm.logger import log
 
 
 def generate_report(target_chat_id=None):

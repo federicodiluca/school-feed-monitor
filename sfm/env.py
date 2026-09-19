@@ -5,7 +5,7 @@ Non sovrascrive variabili già presenti nell'ambiente. Il file .env è in
 """
 import os
 
-ENV_FILE = os.environ.get("CHECKFEED_ENV_FILE", ".env")
+from sfm.settings import ENV_FILE  # SFM_ENV_FILE (o CHECKFEED_ENV_FILE, deprecata)  # noqa: E402
 _loaded = False
 
 

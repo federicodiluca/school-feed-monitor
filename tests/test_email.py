@@ -3,10 +3,10 @@ import smtplib
 
 import pytest
 
-import bot.mailer as mailer
-import bot.notifier as notifier
-from bot.channels import email_channel
-from bot.env import load_env
+import sfm.mailer as mailer
+import sfm.notifier as notifier
+from sfm.channels import email_channel
+from sfm.env import load_env
 from tests.conftest import FakeResponse
 
 

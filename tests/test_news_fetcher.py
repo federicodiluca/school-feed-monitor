@@ -1,8 +1,8 @@
-import bot.channels.telegram_channel as telegram_channel
-import bot.news_fetcher as news_fetcher
-from bot.db_news import get_recent_news
-from bot.db_sources import add_user_source, get_source, set_user_source
-from bot.db_user import add_user, deactivate_user, update_keywords
+import sfm.channels.telegram_channel as telegram_channel
+import sfm.news_fetcher as news_fetcher
+from sfm.db_news import get_recent_news
+from sfm.db_sources import add_user_source, get_source, set_user_source
+from sfm.db_user import add_user, deactivate_user, update_keywords
 from tests.fixtures import html_list_page, rss
 
 UNO = "https://example.org/uno/feed/"

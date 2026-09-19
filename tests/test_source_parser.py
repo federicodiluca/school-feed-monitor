@@ -1,6 +1,6 @@
 import pytest
 
-import bot.source_parser as sp
+import sfm.source_parser as sp
 from tests.fixtures import html_list_page, rss
 
 HTML_CT = "text/html; charset=UTF-8"
@@ -171,7 +171,7 @@ def test_fetch_url_uses_timeout_and_user_agent(monkeypatch):
     monkeypatch.setattr("requests.get", fake_get)
     assert sp.fetch_url("https://www.example.org/") == (b"ok", "text/plain")
     assert calls["timeout"] == sp.FETCH_TIMEOUT
-    assert "CheckFeed" in calls["headers"]["User-Agent"]
+    assert "SchoolFeedMonitor" in calls["headers"]["User-Agent"]
 
 
 # --- date di pubblicazione: mai dal titolo, mai nel futuro --------------------------

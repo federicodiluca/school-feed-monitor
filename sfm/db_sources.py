@@ -1,4 +1,4 @@
-from bot.db import get_conn
+from sfm.db import get_conn
 
 
 def _row_to_source(row):
@@ -203,7 +203,7 @@ def follow_area(user_id, region, provinces=()):
     """Imposta le fonti seguite dall'utente in base all'area (regione + province):
     segue nazionali + USR + USP dell'area, smette di seguire USR/USP di altre aree,
     non tocca le fonti custom ('other'). Ritorna il numero di fonti seguite."""
-    from bot.catalog import sources_for_area
+    from sfm.catalog import sources_for_area
     sources = get_sources()
     chosen = {s["id"] for s in sources_for_area(sources, region, provinces)}
     conn = get_conn()
@@ -219,7 +219,7 @@ def follow_area(user_id, region, provinces=()):
 
 def user_area(user_id):
     """(regione, [province]) dedotte dalle fonti USR/USP seguite, oppure (None, [])."""
-    from bot.catalog import provinces_of
+    from sfm.catalog import provinces_of
     followed = [s for s in get_user_sources(user_id) if s["followed"] and s["kind"] in ("usr", "usp")]
     regions = sorted({s["region"] for s in followed if s.get("region")})
     if not regions:

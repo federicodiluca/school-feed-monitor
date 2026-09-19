@@ -85,7 +85,7 @@ Esempio base:
 Solo `telegram_token` è obbligatorio; gli altri campi hanno un default.
 
 **Catalogo fonti italiane** (`"catalog": "italy"`, attivo per default; `false` per disattivarlo): il bot include
-automaticamente le fonti di [bot/catalog/italy.json](bot/catalog/italy.json) — notizie del MIM, tutti gli USR
+automaticamente le fonti di [sfm/catalog/italy.json](sfm/catalog/italy.json) — notizie del MIM, tutti gli USR
 regionali e gli USP provinciali (102 fonti verificate; alcune province mancano ancora, vedi TODO.md). USR e USP sono *opt-in* (`default_follow: false`): ogni utente sceglie
 la sua regione/provincia. Ogni voce ha `kind` (`usr`/`usp`/`mim`/`other`), `region` e `province`; gli stessi campi
 si possono usare anche nelle `sites` di `config.json`. Per verificare che tutte le fonti siano leggibili:
@@ -96,9 +96,12 @@ python scripts/check_sources.py --catalog
 
 **Variabili d'ambiente (opzionali):**
 
-* `CHECKFEED_CONFIG` → percorso del file di configurazione (default `config.json`)
-* `CHECKFEED_DB_PATH` → percorso del database SQLite (default `data/checkfeed.db`)
-* `CHECKFEED_LOG_DIR` → cartella dei log (default `data/logs`)
+* `SFM_CONFIG` → percorso del file di configurazione (default `config.json`)
+* `SFM_DB_PATH` → percorso del database SQLite (default `data/sfm.db`; un vecchio `data/checkfeed.db` viene spostato automaticamente)
+* `SFM_LOG_DIR` → cartella dei log (default `data/logs`)
+* `SFM_ENV_FILE` → percorso del file `.env` (default `.env`)
+
+Le vecchie variabili `CHECKFEED_*` funzionano ancora (con un avviso) ma sono deprecate.
 
 ### 3️⃣ Email (opzionale)
 
@@ -121,7 +124,7 @@ python scripts/send_test_email.py tua@email.it digest   # report di prova
 
 ## 👥 Multi–utente con SQLite
 
-Il bot ora salva gli utenti in **`data/checkfeed.db`**.
+Il bot salva gli utenti in **`data/sfm.db`**.
 
 Ogni utente che invia `/start` viene registrato automaticamente e può:
 
@@ -321,7 +324,7 @@ data/logs/2025-10-05.log
 * 🧹 Pulizia log e notizie vecchie ogni giorno
 * 💾 Dati persistenti in `data/`
 * 🧩 Deduplica feed per evitare duplicati
-* 📁 Database utenti in `data/checkfeed.db`
+* 📁 Database in `data/sfm.db`
 
 ---
 

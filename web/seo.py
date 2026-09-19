@@ -1,7 +1,7 @@
 """SEO: canonical, robots.txt, sitemap.xml. Le pagine pubbliche sono renderizzate lato server."""
 from flask import Response, current_app, request, url_for
 
-from bot.db_sources import get_sources
+from sfm.db_sources import get_sources
 
 # Pagine pubbliche indicizzabili: (endpoint, priorità, changefreq)
 PUBLIC_PAGES = [

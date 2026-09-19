@@ -4,10 +4,10 @@ from datetime import date, datetime, timedelta
 
 from flask import Blueprint, abort, redirect, render_template, request, url_for
 
-from bot.db_news import search_news
-from bot.db_sources import get_followed_source_ids, get_source, get_sources
-from bot.digest import annotate, build_user_digest
-from bot.utils import slugify
+from sfm.db_news import search_news
+from sfm.db_sources import get_followed_source_ids, get_source, get_sources
+from sfm.digest import annotate, build_user_digest
+from sfm.utils import slugify
 from web import security
 
 bp = Blueprint("news", __name__)

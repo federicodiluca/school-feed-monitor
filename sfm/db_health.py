@@ -1,7 +1,7 @@
 """Stato di salute delle fonti e heartbeat dei job schedulati (per il watchdog)."""
 from datetime import datetime, timezone
 
-from bot.db import get_conn
+from sfm.db import get_conn
 
 
 def utcnow_str(now=None):

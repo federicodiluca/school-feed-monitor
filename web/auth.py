@@ -5,9 +5,9 @@ import secrets
 from flask import Blueprint, abort, current_app, flash, jsonify, redirect, render_template, request, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from bot import mailer
-from bot.channels.email_channel import format_verification
-from bot.db_user import (
+from sfm import mailer
+from sfm.channels.email_channel import format_verification
+from sfm.db_user import (
     consume_email_token,
     create_email_token,
     create_web_user,
@@ -21,7 +21,7 @@ from bot.db_user import (
     set_email_verified,
     set_password_hash,
 )
-from bot.logger import log
+from sfm.logger import log
 from web import security
 
 bp = Blueprint("auth", __name__)

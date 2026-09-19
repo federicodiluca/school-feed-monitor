@@ -6,10 +6,10 @@ from urllib.parse import urlparse
 
 import pytest
 
-from bot.catalog import REGIONS, load_catalog, merge_sites
-from bot.config_loader import load_config
-from bot.db_sources import get_sources, sync_config_sources
-from bot.source_parser import parse_html_articles
+from sfm.catalog import REGIONS, load_catalog, merge_sites
+from sfm.config_loader import load_config
+from sfm.db_sources import get_sources, sync_config_sources
+from sfm.source_parser import parse_html_articles
 
 FIXTURES = os.path.join(os.path.dirname(__file__), "fixtures_html")
 

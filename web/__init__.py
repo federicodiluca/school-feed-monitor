@@ -13,12 +13,12 @@ import secrets
 
 from flask import Flask, render_template, request
 
-from bot.db import init_db
-from bot.config_loader import get_config
-from bot.db_news import search_news
-from bot.db_sources import sync_config_sources
-from bot.env import env, env_bool
-from bot.utils import format_local_datetime, strip_html
+from sfm.db import init_db
+from sfm.config_loader import get_config
+from sfm.db_news import search_news
+from sfm.db_sources import sync_config_sources
+from sfm.env import env, env_bool
+from sfm.utils import format_local_datetime, strip_html
 from web import google_auth, seo, security
 from web.auth import bp as auth_bp
 from web.news import bp as news_bp, source_url

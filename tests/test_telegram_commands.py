@@ -1,8 +1,8 @@
 import pytest
 
-import bot.db as db
-import bot.telegram_commands as tc
-from bot.db_user import add_user, get_user, update_keywords
+import sfm.db as db
+import sfm.telegram_commands as tc
+from sfm.db_user import add_user, get_user, update_keywords
 
 
 def update(text, chat_id=1, username="alice", update_id=1):
@@ -268,7 +268,7 @@ def test_handle_commands_polls_with_timeout_and_advances_offset(monkeypatch):
 
 # --- fonti ----------------------------------------------------------------
 
-from bot.db_sources import get_followed_source_ids, get_source, get_sources  # noqa: E402
+from sfm.db_sources import get_followed_source_ids, get_source, get_sources  # noqa: E402
 from tests.fixtures import html_list_page, rss  # noqa: E402
 
 

@@ -5,7 +5,7 @@ from functools import wraps
 
 from flask import abort, g, redirect, request, session, url_for
 
-from bot.db_user import get_user_by_id
+from sfm.db_user import get_user_by_id
 
 CSRF_KEY = "_csrf"
 LOGIN_MAX_FAILURES = 5          # tentativi falliti per IP+email...

@@ -1,8 +1,8 @@
-import bot.db as db
-import bot.report_generator as report_generator
-from bot.utils import format_local_datetime
-from bot.db_sources import set_user_source
-from bot.db_user import add_user, deactivate_user
+import sfm.db as db
+import sfm.report_generator as report_generator
+from sfm.utils import format_local_datetime
+from sfm.db_sources import set_user_source
+from sfm.db_user import add_user, deactivate_user
 
 
 def insert_today(title, link, content="", source="S", source_id=1):

@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from bot.db_user import get_user_by_email, get_user_by_id, get_users
+from sfm.db_user import get_user_by_email, get_user_by_id, get_users
 from web import create_app
 from web import security
 
@@ -191,8 +191,8 @@ def test_export_data_json(client):
 def test_delete_account_requires_confirmation_and_removes_everything(client):
     register(client)
     uid = get_user_by_email(EMAIL)["id"]
-    from bot.db_deliveries import record_delivery
-    from bot.db_sources import set_user_source
+    from sfm.db_deliveries import record_delivery
+    from sfm.db_sources import set_user_source
     set_user_source(uid, 1, False)
     record_delivery(uid, 1, "email", "digest")
     tok = csrf(client, "/account")
@@ -203,7 +203,7 @@ def test_delete_account_requires_confirmation_and_removes_everything(client):
     r = client.post("/account/elimina", data={"_csrf": tok, "confirm": "ELIMINA"}, follow_redirects=True)
     assert "cancellati" in r.get_data(as_text=True)
     assert get_user_by_id(uid) is None
-    from bot.db import get_conn
+    from sfm.db import get_conn
     conn = get_conn()
     assert conn.execute("SELECT COUNT(*) FROM user_sources WHERE user_id=?", (uid,)).fetchone()[0] == 0
     assert conn.execute("SELECT COUNT(*) FROM deliveries WHERE user_id=?", (uid,)).fetchone()[0] == 0

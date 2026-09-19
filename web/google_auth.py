@@ -13,7 +13,7 @@ import secrets
 from authlib.integrations.flask_client import OAuth
 from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
 
-from bot.db_user import create_web_user, get_user_by_email, get_user_by_google_sub, set_email_verified, set_google_sub
+from sfm.db_user import create_web_user, get_user_by_email, get_user_by_google_sub, set_email_verified, set_google_sub
 from web import security
 
 bp = Blueprint("google", __name__)

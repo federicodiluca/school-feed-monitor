@@ -7,15 +7,15 @@ Se il bot era fermo all'orario previsto, il digest parte al primo giro utile.
 """
 from datetime import datetime
 
-from bot import notifier
-from bot.config_loader import get_config
-from bot.db_deliveries import delivered_news_ids, record_delivery
-from bot.db_news import get_today_news
-from bot.db_sources import get_followed_source_ids
-from bot.db_user import get_users, set_last_digest_date
-from bot.logger import log
-from bot.matching import news_text
-from bot.utils import find_matching_keywords
+from sfm import notifier
+from sfm.config_loader import get_config
+from sfm.db_deliveries import delivered_news_ids, record_delivery
+from sfm.db_news import get_today_news
+from sfm.db_sources import get_followed_source_ids
+from sfm.db_user import get_users, set_last_digest_date
+from sfm.logger import log
+from sfm.matching import news_text
+from sfm.utils import find_matching_keywords
 
 
 def annotate(news_list, user, alerted_ids=None):

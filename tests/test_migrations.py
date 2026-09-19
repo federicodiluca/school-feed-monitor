@@ -1,10 +1,10 @@
 """Migrazione dei DB creati dalle versioni precedenti (utente = telegram_id)."""
 import sqlite3
 
-import bot.db as db
-from bot.db_deliveries import cleanup_old_deliveries, delivered_news_ids, record_delivery
-from bot.db_sources import get_followed_source_ids, get_followers_map, get_source
-from bot.db_user import (
+import sfm.db as db
+from sfm.db_deliveries import cleanup_old_deliveries, delivered_news_ids, record_delivery
+from sfm.db_sources import get_followed_source_ids, get_followers_map, get_source
+from sfm.db_user import (
     create_web_user,
     get_user,
     get_user_by_email,
@@ -15,7 +15,7 @@ from bot.db_user import (
     set_preferences,
     user_id_for_telegram,
 )
-from bot.migrations import MIGRATIONS, column_exists, get_version
+from sfm.migrations import MIGRATIONS, column_exists, get_version
 
 LATEST = MIGRATIONS[-1][0]
 
@@ -173,3 +173,28 @@ def test_link_telegram_and_preferences():
     set_keywords(user["id"], [" A23 ", "", "trasferimenti"])
     assert get_user_by_id(user["id"])["keywords"] == ["A23", "trasferimenti"]
     assert [u["id"] for u in get_users()] == [1, 2]
+
+
+# --- impostazioni: nomi nuovi SFM_*, vecchi CHECKFEED_* ancora accettati -----------
+
+def test_env_setting_prefers_new_name_and_falls_back_to_legacy(monkeypatch, capsys):
+    from sfm.settings import env_setting
+    monkeypatch.delenv("SFM_FOO", raising=False); monkeypatch.delenv("CHECKFEED_FOO", raising=False)
+    assert env_setting("FOO", "dflt") == "dflt"
+    monkeypatch.setenv("CHECKFEED_FOO", "old")
+    assert env_setting("FOO", "dflt") == "old" and "deprecata" in capsys.readouterr().err
+    monkeypatch.setenv("SFM_FOO", "new")
+    assert env_setting("FOO", "dflt") == "new"
+
+
+def test_legacy_db_file_is_moved_to_new_default(tmp_path, monkeypatch):
+    import sfm.settings as settings
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "data").mkdir()
+    (tmp_path / "data" / "checkfeed.db").write_bytes(b"x")
+    (tmp_path / "data" / "checkfeed.db-wal").write_bytes(b"y")
+    monkeypatch.setattr(settings, "DB_PATH", settings.DEFAULT_DB_PATH)
+    assert settings.migrate_legacy_db_file() is True
+    assert (tmp_path / "data" / "sfm.db").read_bytes() == b"x" and (tmp_path / "data" / "sfm.db-wal").exists()
+    assert not (tmp_path / "data" / "checkfeed.db").exists()
+    assert settings.migrate_legacy_db_file() is False   # niente da fare la seconda volta

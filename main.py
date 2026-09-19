@@ -1,14 +1,14 @@
-from bot.config_loader import get_config
-from bot.db import init_db
-from bot.db_news import cleanup_old_news
-from bot.db_sources import get_source, sync_config_sources
-from bot.news_fetcher import fetch_news, fetch_source
-from bot.digest import run_digests
-from bot.watchdog import JOB_DIGEST, JOB_FETCH, run_watchdog, tracked
-from bot.logger import log, cleanup_logs
-from bot.telegram_commands import start_telegram_listener, build_help_message
-from bot.telegram import send_message
-from bot.utils import escape_html
+from sfm.config_loader import get_config
+from sfm.db import init_db
+from sfm.db_news import cleanup_old_news
+from sfm.db_sources import get_source, sync_config_sources
+from sfm.news_fetcher import fetch_news, fetch_source
+from sfm.digest import run_digests
+from sfm.watchdog import JOB_DIGEST, JOB_FETCH, run_watchdog, tracked
+from sfm.logger import log, cleanup_logs
+from sfm.telegram_commands import start_telegram_listener, build_help_message
+from sfm.telegram import send_message
+from sfm.utils import escape_html
 import schedule
 import time
 import traceback

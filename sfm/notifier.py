@@ -1,8 +1,8 @@
 """Dispatcher delle notifiche: decide su quali canali raggiungere un utente e
 delega l'invio al modulo del canale. Il core (fetch/match/report) parla solo
 con questo modulo, mai direttamente con Telegram o altri canali."""
-from bot.channels import email_channel, telegram_channel
-from bot.logger import log
+from sfm.channels import email_channel, telegram_channel
+from sfm.logger import log
 
 # Registro dei canali disponibili: nome -> modulo con send_alert / send_digest.
 CHANNELS = {

@@ -34,9 +34,9 @@ di default, alert immediato opzionale).
 - [ ] Reset password ("password dimenticata") via email — tabella token già pronta
 - [ ] Pubblicità in pagina (solo quando ci sarà trazione)
 - [ ] Deploy (Hetzner + Coolify valutato; oppure free tier Google)
-- [ ] **Database**: SQLite (WAL) va bene finché bot e web stanno sullo stesso host con disco persistente (VPS/Coolify). Se l'hosting è serverless o multi-host → Postgres, oppure Litestream/Turso per replicare SQLite. Decidere insieme all'hosting; nel frattempo tenere l'SQL specifico SQLite concentrato in `bot/db*.py`
+- [ ] **Database**: SQLite (WAL) va bene finché bot e web stanno sullo stesso host con disco persistente (VPS/Coolify). Se l'hosting è serverless o multi-host → Postgres, oppure Litestream/Turso per replicare SQLite. Decidere insieme all'hosting; nel frattempo tenere l'SQL specifico SQLite concentrato in `sfm/db*.py`
 - [x] Rename del repo → `school-feed-monitor` (fatto)
-- [ ] Rename degli identificatori interni (`CHECKFEED_*`, `data/checkfeed.db`, container Docker, package `bot/`) — con migrazione/compatibilità per `.env` e deploy esistenti
+- [x] Rename degli identificatori interni: `SFM_*` (le `CHECKFEED_*` restano lette con avviso), `data/sfm.db` (spostamento automatico), package `sfm/`, container `sfm-bot` (19/09/2026)
 
 ## Fuori scope (deciso)
 

@@ -20,9 +20,9 @@ from datetime import datetime, timedelta, timezone
 
 import requests
 
-from bot import mailer
-from bot.config_loader import get_config
-from bot.db_health import (
+from sfm import mailer
+from sfm.config_loader import get_config
+from sfm.db_health import (
     close_incident,
     get_job_runs,
     get_open_incidents,
@@ -31,11 +31,11 @@ from bot.db_health import (
     record_job_end,
     record_job_start,
 )
-from bot.db_sources import get_sources
-from bot.env import env
-from bot.logger import log
-from bot import telegram
-from bot.utils import escape_html
+from sfm.db_sources import get_sources
+from sfm.env import env
+from sfm.logger import log
+from sfm import telegram
+from sfm.utils import escape_html
 
 JOB_FETCH = "fetch_news"
 JOB_DIGEST = "run_digests"

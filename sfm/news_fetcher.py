@@ -1,12 +1,12 @@
-from bot import notifier
-from bot.db_deliveries import record_delivery
-from bot.db_health import record_source_failure, record_source_success
-from bot.db_news import add_news
-from bot.db_sources import get_followers_map, get_sources
-from bot.db_user import get_users
-from bot.logger import log
-from bot.matching import match_users
-from bot.source_parser import SourceError, read_source
+from sfm import notifier
+from sfm.db_deliveries import record_delivery
+from sfm.db_health import record_source_failure, record_source_success
+from sfm.db_news import add_news
+from sfm.db_sources import get_followers_map, get_sources
+from sfm.db_user import get_users
+from sfm.logger import log
+from sfm.matching import match_users
+from sfm.source_parser import SourceError, read_source
 
 
 def wants_instant_alerts(user):

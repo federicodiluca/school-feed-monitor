@@ -7,9 +7,9 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # eseguibile da ovunque
 
-from bot.channels.email_channel import format_alert, format_digest
-from bot.env import env
-from bot.mailer import EmailError, is_enabled, send_email
+from sfm.channels.email_channel import format_alert, format_digest
+from sfm.env import env
+from sfm.mailer import EmailError, is_enabled, send_email
 
 SAMPLE = {
     "title": "Email di prova da School Feed Monitor",

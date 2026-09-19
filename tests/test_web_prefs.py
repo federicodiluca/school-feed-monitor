@@ -2,10 +2,10 @@ import re
 
 import pytest
 
-import bot.telegram_commands as tc
-from bot.db_deliveries import delivered_news_ids, record_delivery
-from bot.db_sources import get_followed_source_ids, get_source_by_url, get_user_sources, set_user_source
-from bot.db_user import add_user, consume_link_code, get_user, get_user_by_email, get_users, update_keywords
+import sfm.telegram_commands as tc
+from sfm.db_deliveries import delivered_news_ids, record_delivery
+from sfm.db_sources import get_followed_source_ids, get_source_by_url, get_user_sources, set_user_source
+from sfm.db_user import add_user, consume_link_code, get_user, get_user_by_email, get_users, update_keywords
 from tests.fixtures import rss
 from tests.test_web import EMAIL, PASSWORD, csrf, login, register
 from web import create_app, google_auth, security

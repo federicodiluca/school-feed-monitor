@@ -1,6 +1,6 @@
-import bot.db as db
-from bot.db_news import add_news, get_recent_news
-from bot.db_sources import (
+import sfm.db as db
+from sfm.db_news import add_news, get_recent_news
+from sfm.db_sources import (
     add_user_source,
     get_followed_source_ids,
     get_followers_map,
@@ -12,7 +12,7 @@ from bot.db_sources import (
     set_user_source,
     sync_config_sources,
 )
-from bot.db_user import add_user, get_users
+from sfm.db_user import add_user, get_users
 
 # conftest sincronizza già le due fonti di TEST_CONFIG (id 1 e 2)
 
