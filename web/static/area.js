@@ -1,16 +1,17 @@
-// "Dove insegni?": mostra solo le province della regione scelta (senza JS restano tutte visibili).
+// "Dove insegni?": mostra le province solo delle regioni spuntate (senza JS restano tutte visibili).
 (function () {
-  var select = document.getElementById("region");
-  if (!select) return;
+  var boxes = document.querySelectorAll('input[name="regions"]');
+  if (!boxes.length) return;
   function update() {
-    var r = select.value;
+    var chosen = {};
+    boxes.forEach(function (b) { if (b.checked) chosen[b.value] = true; });
     document.querySelectorAll("fieldset.provinces").forEach(function (fs) {
-      var mine = fs.getAttribute("data-region") === r;
-      fs.hidden = !mine;
-      if (!mine) fs.querySelectorAll("input[type=checkbox]").forEach(function (c) { c.checked = false; });
+      var on = !!chosen[fs.getAttribute("data-region")];
+      fs.hidden = !on;
+      if (!on) fs.querySelectorAll("input[type=checkbox]").forEach(function (c) { c.checked = false; });
     });
-    document.querySelectorAll(".region-note").forEach(function (n) { n.hidden = n.getAttribute("data-note") !== r; });
+    document.querySelectorAll(".region-note").forEach(function (n) { n.hidden = !chosen[n.getAttribute("data-note")]; });
   }
-  select.addEventListener("change", update);
+  boxes.forEach(function (b) { b.addEventListener("change", update); });
   update();
 })();

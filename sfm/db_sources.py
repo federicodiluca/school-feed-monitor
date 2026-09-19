@@ -199,13 +199,13 @@ def get_followers_map(users):
     return out
 
 
-def follow_area(user_id, region, provinces=()):
-    """Imposta le fonti seguite dall'utente in base all'area (regione + province):
-    segue nazionali + USR + USP dell'area, smette di seguire USR/USP di altre aree,
-    non tocca le fonti custom ('other'). Ritorna il numero di fonti seguite."""
-    from sfm.catalog import sources_for_area
+def follow_areas(user_id, areas):
+    """Imposta le fonti seguite in base alle aree ({regione: [province]}): segue nazionali +
+    USR + USP delle aree, smette di seguire USR/USP di altre regioni, non tocca le fonti
+    custom ('other'). Ritorna il numero di fonti seguite."""
+    from sfm.catalog import sources_for_areas
     sources = get_sources()
-    chosen = {s["id"] for s in sources_for_area(sources, region, provinces)}
+    chosen = {s["id"] for s in sources_for_areas(sources, areas)}
     conn = get_conn()
     cur = conn.cursor()
     for s in sources:
@@ -217,13 +217,28 @@ def follow_area(user_id, region, provinces=()):
     return len(chosen)
 
 
-def user_area(user_id):
-    """(regione, [province]) dedotte dalle fonti USR/USP seguite, oppure (None, [])."""
+def follow_area(user_id, region, provinces=()):
+    """Scorciatoia per una sola area."""
+    return follow_areas(user_id, {region: list(provinces)})
+
+
+def user_areas(user_id):
+    """{regione: [province]} dedotte dalle fonti USR/USP seguite (ordinate per regione)."""
     from sfm.catalog import provinces_of
     followed = [s for s in get_user_sources(user_id) if s["followed"] and s["kind"] in ("usr", "usp")]
-    regions = sorted({s["region"] for s in followed if s.get("region")})
-    if not regions:
+    out = {}
+    for s in followed:
+        if s.get("region"):
+            out.setdefault(s["region"], set())
+            if s["kind"] == "usp":
+                out[s["region"]].update(provinces_of(s))
+    return {r: sorted(ps) for r, ps in sorted(out.items())}
+
+
+def user_area(user_id):
+    """(prima regione, [province]) — compatibilità; usa user_areas per più regioni."""
+    areas = user_areas(user_id)
+    if not areas:
         return None, []
-    region = regions[0]
-    provinces = sorted({p for s in followed if s["kind"] == "usp" and s.get("region") == region for p in provinces_of(s)})
-    return region, provinces
+    region = next(iter(areas))
+    return region, areas[region]

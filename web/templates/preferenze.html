@@ -27,9 +27,10 @@
   <fieldset id="fonti">
     <legend>Fonti seguite</legend>
     <p class="area-strip">
-      {% if area_region %}<strong>La tua area:</strong> {{ area_region }}{% if area_provinces %} · {{ area_provinces | join(', ') }}{% endif %}
+      {% if areas %}<strong>Le tue aree:</strong>
+        {% for r, ps in areas.items() %}{{ r }}{% if ps %} · {{ ps | join(', ') }}{% endif %}{% if not loop.last %}; {% endif %}{% endfor %}
       {% else %}<strong>Nessuna area impostata.</strong>{% endif %}
-      <a class="button" href="{{ url_for('prefs.area') }}">{% if area_region %}Cambia area{% else %}Scegli regione e province{% endif %}</a>
+      <a class="button" href="{{ url_for('prefs.area') }}">{% if areas %}Cambia aree{% else %}Scegli regioni e province{% endif %}</a>
     </p>
     {% if sources %}
     <label for="sources-search" class="visually-hidden">Cerca una fonte</label>

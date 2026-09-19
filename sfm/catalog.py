@@ -101,19 +101,25 @@ def provinces_by_region(sources):
     return {r: sorted(ps) for r, ps in sorted(out.items())}
 
 
-def sources_for_area(sources, region, provinces=()):
-    """Fonti da seguire per un'area: nazionali (MIM 'default'), USR della regione e
-    USP che coprono almeno una delle province indicate (tutte le USP della regione se
-    non ne viene indicata nessuna)."""
-    provinces = {p for p in provinces if p}
+def sources_for_areas(sources, areas):
+    """Fonti da seguire per una o più aree. areas = {regione: [province...]} (lista vuota =
+    tutta la regione). Sempre incluse le nazionali (MIM 'default'); per ogni regione l'USR
+    e gli USP che coprono almeno una delle province indicate."""
+    areas = {r: {p for p in (ps or []) if p} for r, ps in areas.items()}
     chosen = []
     for s in sources:
-        kind = s.get("kind")
+        kind, region = s.get("kind"), s.get("region")
         if kind == "mim" and s.get("default_follow", True):
             chosen.append(s)
-        elif kind == "usr" and s.get("region") == region:
+        elif kind == "usr" and region in areas:
             chosen.append(s)
-        elif kind == "usp" and s.get("region") == region:
-            if not provinces or provinces & set(provinces_of(s)):
+        elif kind == "usp" and region in areas:
+            wanted = areas[region]
+            if not wanted or wanted & set(provinces_of(s)):
                 chosen.append(s)
     return chosen
+
+
+def sources_for_area(sources, region, provinces=()):
+    """Scorciatoia per una sola area."""
+    return sources_for_areas(sources, {region: list(provinces)})

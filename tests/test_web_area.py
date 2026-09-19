@@ -2,7 +2,7 @@
 import pytest
 
 from sfm.catalog import group_sources, load_catalog, provinces_by_region, sources_for_area
-from sfm.db_sources import add_user_source, follow_area, get_followed_source_ids, get_sources, get_user_sources, sync_config_sources, user_area
+from sfm.db_sources import add_user_source, follow_area, follow_areas, get_followed_source_ids, get_sources, get_user_sources, sync_config_sources, user_area, user_areas
 from sfm.db_user import get_user_by_email
 from tests.test_web import EMAIL, csrf, register
 from web import create_app, security
@@ -67,6 +67,12 @@ def test_follow_area_sets_follows_and_keeps_custom(catalog_db):
     assert catalog_db["USP Bologna"]["id"] not in get_followed_source_ids(register_user_id)
     assert catalog_db["USP Verona"]["id"] in get_followed_source_ids(register_user_id)
 
+    # più regioni: dove insegno + dove miro
+    n = follow_areas(register_user_id, {"Marche": ["Pesaro e Urbino"], "Emilia-Romagna": ["Rimini"]})
+    assert n == 5   # MIM + USR Marche + USP PU + USR ER + USP RN
+    assert user_areas(register_user_id) == {"Emilia-Romagna": ["Rimini"], "Marche": ["Pesaro e Urbino"]}
+    assert catalog_db["USP Verona"]["id"] not in get_followed_source_ids(register_user_id)
+
 
 # --- web -----------------------------------------------------------------------------
 
@@ -75,8 +81,8 @@ def test_registration_leads_to_area_onboarding(app, catalog_db):
     r = register(c, follow=False)
     assert "/preferenze/area?benvenuto=1" in r.headers["Location"]
     html = c.get("/preferenze/area?benvenuto=1").get_data(as_text=True)
-    assert "Iniziamo: dove insegni?" in html and '<option value="Emilia-Romagna"' in html
-    assert 'data-region="Piemonte"' in html and 'value="Asti"' in html and "Salta" in html
+    assert "Iniziamo: dove insegni?" in html and 'name="regions" value="Emilia-Romagna"' in html
+    assert 'data-region="Piemonte"' in html and 'value="Piemonte|Asti"' in html and "Salta" in html
     assert 'content="noindex, nofollow"' in html
 
 
@@ -84,10 +90,10 @@ def test_save_area_and_grouped_preferences(app, catalog_db):
     c = app.test_client()
     register(c)
     tok = csrf(c, "/preferenze/area")
-    r = c.post("/preferenze/area", data={"_csrf": tok, "region": "Marte"}, follow_redirects=True)
-    assert "Scegli la tua regione" in r.get_data(as_text=True)
+    r = c.post("/preferenze/area", data={"_csrf": tok, "regions": ["Marte"]}, follow_redirects=True)
+    assert "almeno una regione" in r.get_data(as_text=True)
 
-    r = c.post("/preferenze/area", data={"_csrf": tok, "region": "Sicilia", "provinces": ["Enna"]}, follow_redirects=True)
+    r = c.post("/preferenze/area", data={"_csrf": tok, "regions": ["Sicilia"], "provinces": ["Sicilia|Enna", "Lazio|Roma"]}, follow_redirects=True)
     html = r.get_data(as_text=True)
     assert "Area impostata: Sicilia (Enna)" in html and "segui 3 fonti" in html
     user = get_user_by_email(EMAIL)
@@ -96,12 +102,13 @@ def test_save_area_and_grouped_preferences(app, catalog_db):
 
     # pagina preferenze: strip area, gruppi, gruppo Sicilia aperto, provincia mostrata
     # l'ufficio copre due province: l'area dedotta le mostra entrambe
-    assert "La tua area:" in html and "Sicilia · Caltanissetta, Enna" in html
+    assert "Le tue aree:" in html and "Sicilia · Caltanissetta, Enna" in html
     assert 'class="source-group" open' in html and "<span>Sicilia</span>" in html and "<span>Nazionali</span>" in html
     assert "(Caltanissetta, Enna)" in html and 'id="sources-search"' in html
     # la form dell'area mostra la selezione corrente
     html = c.get("/preferenze/area").get_data(as_text=True)
-    assert '<option value="Sicilia" selected' in html and 'value="Enna" checked' in html and 'value="Caltanissetta" checked' in html
+    assert 'value="Sicilia" data-region="Sicilia" checked' in html and 'value="Sicilia|Enna" checked' in html and 'value="Sicilia|Caltanissetta" checked' in html
+    assert 'value="Lazio" data-region="Lazio" checked' not in html
 
 
 def test_preferences_save_still_works_with_catalog(app, catalog_db):

@@ -226,7 +226,8 @@ form.danger { border-top: 1px solid var(--border); margin-top: var(--space-4); p
 
 /* ---------- fonti per area -------------------------------------------- */
 .auth.wide { max-width: 720px; }
-.area-form select { width: 100%; }
+.sources.regions { columns: 3; }
+@media (max-width: 600px) { .sources.regions { columns: 2; } }
 .area-strip { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); margin: 0 0 var(--space-3); }
 .area-strip .button { margin: 0; padding: 6px 12px; font-size: .9rem; }
 #sources-search { margin-bottom: var(--space-3); }

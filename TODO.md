@@ -14,6 +14,7 @@ di default, alert immediato opzionale).
 - [x] 5. Isolamento fallimenti per fonte + watchdog (fonte muta da troppe ore / job fermo → avviso all'admin)
 - [x] 6a. Web base (Flask SSR): registrazione, login, account, consenso/revoca/export/cancellazione (GDPR), SEO base, tema chiaro/scuro
 - [x] 6b. Preferenze (fonti, keyword, canali, frequenza, orario), aggiunta fonti, collegamento Telegram (`/link`), login Google, landing pubblica
+- [x] 6c. Onboarding "Dove insegni?" con più regioni (dove insegni + dove miri) e province per regione; fonti raggruppate per area con ricerca
 - [x] 7a. Pagine notizie: `/notizie` pubblica con filtri e pagine per fonte (SEO), `/le-mie-notizie` con recap per giorno
 - [x] 7b. Restyling UI — design system a token (chiaro/scuro), hero con anteprima, card, form e filtri coerenti (da rifinire su feedback)
 

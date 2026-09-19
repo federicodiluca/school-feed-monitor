@@ -6,7 +6,7 @@ import secrets
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 
 from sfm.catalog import REGIONS, group_sources, provinces_by_region
-from sfm.db_sources import add_user_source, follow_area, get_source_by_url, get_sources, get_user_sources, set_user_source, user_area
+from sfm.db_sources import add_user_source, follow_areas, get_source_by_url, get_sources, get_user_sources, set_user_source, user_areas
 from sfm.db_user import ALERT_MODES, create_link_code, set_keywords, set_preferences, unlink_telegram
 from sfm.digest import default_digest_time
 from sfm.logger import log
@@ -28,9 +28,8 @@ LINK_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"  # senza 0/O e 1/I
 def show():
     user = security.current_user()
     sources = get_user_sources(user["id"])
-    region, provinces = user_area(user["id"])
     return render_template("preferenze.html", user=user, sources=sources, groups=group_sources(sources),
-                           area_region=region, area_provinces=provinces,
+                           areas=user_areas(user["id"]),
                            default_time=default_digest_time(), link_code=request.args.get("codice"))
 
 
@@ -109,22 +108,26 @@ def add_source():
 @security.login_required
 def area():
     user = security.current_user()
-    region, provinces = user_area(user["id"])
     return render_template("area.html", user=user, regions=REGIONS, provinces_by_region=provinces_by_region(get_sources()),
-                           region=region, provinces=provinces, welcome=request.args.get("benvenuto") == "1")
+                           areas=user_areas(user["id"]), welcome=request.args.get("benvenuto") == "1")
 
 
 @bp.post("/preferenze/area")
 @security.login_required
 def save_area():
     user = security.current_user()
-    region = (request.form.get("region") or "").strip()
-    if region not in REGIONS:
-        flash("Scegli la tua regione.", "error")
+    regions = [r for r in request.form.getlist("regions") if r in REGIONS]
+    if not regions:
+        flash("Scegli almeno una regione.", "error")
         return redirect(url_for("prefs.area"))
-    provinces = [p for p in request.form.getlist("provinces") if p]
-    count = follow_area(user["id"], region, provinces)
-    where = region + (f" ({', '.join(provinces)})" if provinces else "")
+    # le province arrivano come "Regione|Provincia"; contano solo quelle delle regioni scelte
+    areas = {r: [] for r in regions}
+    for value in request.form.getlist("provinces"):
+        region, _, province = value.partition("|")
+        if region in areas and province:
+            areas[region].append(province)
+    count = follow_areas(user["id"], areas)
+    where = "; ".join(r + (f" ({', '.join(ps)})" if ps else "") for r, ps in areas.items())
     flash(f"Area impostata: {where}. Ora segui {count} fonti; puoi rifinire la scelta qui sotto.", "success")
     return redirect(url_for("prefs.show") + "#fonti")
 
