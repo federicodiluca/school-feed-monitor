@@ -124,3 +124,29 @@ def test_cleanup_old_news_uses_fetched_at():
     conn.close()
     assert cleanup_old_news(days=7) == 1
     assert [r["title"] for r in get_recent_news()] == ["keep"]
+
+
+def test_add_news_clamps_future_published_dates():
+    from datetime import datetime, timedelta, timezone
+    future = (datetime.now(timezone.utc) + timedelta(days=10)).strftime("%a, %d %b %Y %H:%M:%S +0000")
+    add_news("Futura", "https://x/f", "S", future)
+    add_news("Domani", "https://x/t", "S", (datetime.now(timezone.utc) + timedelta(hours=3)).strftime("%a, %d %b %Y %H:%M:%S +0000"))
+    rows = {r["link"]: r["published_at"] for r in get_recent_news()}
+    now = datetime.now(timezone.utc)
+    assert abs((datetime.strptime(rows["https://x/f"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc) - now).total_seconds()) < 120
+    assert datetime.strptime(rows["https://x/t"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc) > now  # entro 24h: lasciata
+
+
+def test_migration_v6_fixes_future_dates_in_existing_rows():
+    from bot.migrations import _v6_fix_future_dates
+    conn = db.get_conn()
+    conn.execute("INSERT INTO news (title, link, source, published_at, fetched_at) VALUES "
+                 "('futura', 'https://x/1', 'S', datetime('now', '+30 days'), datetime('now', '-1 day')),"
+                 "('ok', 'https://x/2', 'S', datetime('now', '-2 days'), datetime('now', '-1 day'))")
+    conn.commit()
+    _v6_fix_future_dates(conn)
+    conn.commit()
+    rows = {r["link"]: r for r in conn.execute("SELECT link, published_at, fetched_at FROM news")}
+    conn.close()
+    assert rows["https://x/1"]["published_at"] == rows["https://x/1"]["fetched_at"]
+    assert rows["https://x/2"]["published_at"] != rows["https://x/2"]["fetched_at"]

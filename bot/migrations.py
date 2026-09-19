@@ -98,12 +98,20 @@ def _v5_source_geo(conn):
             conn.execute(f"ALTER TABLE sources ADD COLUMN {col}")
 
 
+def _v6_fix_future_dates(conn):
+    """Correzione dati: notizie salvate con published_at nel futuro (il parser HTML prendeva
+    scadenze/date di eventi dal titolo). Le riportiamo alla data di fetch."""
+    conn.execute("UPDATE news SET published_at = fetched_at "
+                 "WHERE datetime(published_at) > datetime('now', '+1 day')")
+
+
 MIGRATIONS = [
     (1, _v1_multi_channel),
     (2, _v2_digest_guard),
     (3, _v3_consent),
     (4, _v4_google),
     (5, _v5_source_geo),
+    (6, _v6_fix_future_dates),
 ]
 
 

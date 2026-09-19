@@ -6,7 +6,7 @@ Ogni funzione di parsing ritorna una lista di entry normalizzate:
     {"title": str, "link": str, "published": str, "content": str}
 """
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from urllib.parse import urljoin, urlparse
 
 import feedparser
@@ -175,6 +175,42 @@ def _candidate_blocks(soup):
 
 
 MIN_TEASER_LEN = 40
+_DATE_CLASS_HINTS = ("date", "data", "time", "pubbl", "revision", "revis")
+FUTURE_TOLERANCE_DAYS = 1  # le date di pubblicazione non stanno nel futuro (fuso/orologi a parte)
+
+
+def _not_future(iso):
+    if not iso:
+        return None
+    try:
+        dt = datetime.fromisoformat(iso)
+    except ValueError:
+        return None
+    if dt > datetime.now() + timedelta(days=FUTURE_TOLERANCE_DAYS):
+        return None  # scadenza/evento futuro, non data di pubblicazione
+    return iso
+
+
+def _block_date(block, heading):
+    """Data di pubblicazione di un blocco notizia. In ordine: <time>, elementi con classe
+    "date/data/...", poi il testo del blocco SENZA il titolo (i titoli contengono spesso
+    scadenze o date di eventi). Le date future vengono scartate. None se non trovata."""
+    time_tag = block.find("time")
+    if time_tag is not None:
+        found = _not_future(parse_italian_date(time_tag.get("datetime") or time_tag.get_text(" ", strip=True)))
+        if found:
+            return found
+    for node in block.find_all(True, class_=True):
+        classes = " ".join(node.get("class") or []).lower()
+        if any(h in classes for h in _DATE_CLASS_HINTS) and node is not heading and heading not in node.parents:
+            found = _not_future(parse_italian_date(node.get_text(" ", strip=True)))
+            if found:
+                return found
+    title_text = heading.get_text(" ", strip=True) if heading is not None else ""
+    text = block.get_text(" ", strip=True)
+    if title_text:
+        text = text.replace(title_text, " ")
+    return _not_future(parse_italian_date(text))
 
 
 def _teaser_text(block, title):
@@ -216,12 +252,7 @@ def parse_html_articles(html_data, base_url):
             continue
         seen.add(link)
 
-        published = None
-        time_tag = block.find("time")
-        if time_tag is not None:
-            published = parse_italian_date(time_tag.get("datetime") or time_tag.get_text(" ", strip=True))
-        if not published:
-            published = parse_italian_date(block.get_text(" ", strip=True))
+        published = _block_date(block, heading)
 
         paragraphs = []
         for p in block.find_all("p"):

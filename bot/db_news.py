@@ -3,6 +3,21 @@ from bot.logger import log
 from bot.utils import local_day_bounds_utc, parse_rss_datetime
 
 MAX_CONTENT_LEN = 20000
+FUTURE_TOLERANCE_HOURS = 24
+
+
+def clamp_future(published_utc, now=None):
+    """Una data di pubblicazione nel futuro (scadenze scambiate per date, orologi sballati)
+    viene riportata a 'adesso': altrimenti resterebbe in cima all'elenco per giorni."""
+    from datetime import datetime, timedelta, timezone
+    now = now or datetime.now(timezone.utc)
+    try:
+        dt = datetime.strptime(published_utc, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+    except (TypeError, ValueError):
+        return published_utc
+    if dt > now + timedelta(hours=FUTURE_TOLERANCE_HOURS):
+        return now.strftime("%Y-%m-%d %H:%M:%S")
+    return published_utc
 
 
 def _source_filter(source_ids):
@@ -25,7 +40,7 @@ def add_news(title, link, source, published_at, content="", source_id=None):
     conn = get_conn()
     cur = conn.cursor()
     try:
-        published_at = parse_rss_datetime(published_at)  # formato SQLite UTC standard
+        published_at = clamp_future(parse_rss_datetime(published_at))  # formato SQLite UTC standard
         cur.execute("""
         INSERT OR IGNORE INTO news (title, link, source, published_at, content, source_id)
         VALUES (?, ?, ?, ?, ?, ?)

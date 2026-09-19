@@ -172,3 +172,44 @@ def test_fetch_url_uses_timeout_and_user_agent(monkeypatch):
     assert sp.fetch_url("https://www.example.org/") == (b"ok", "text/plain")
     assert calls["timeout"] == sp.FETCH_TIMEOUT
     assert "CheckFeed" in calls["headers"]["User-Agent"]
+
+
+# --- date di pubblicazione: mai dal titolo, mai nel futuro --------------------------
+
+def _page(block_html):
+    return f"<html><head><title>T</title></head><body>{block_html}</body></html>".encode("utf-8")
+
+
+def test_html_date_ignores_title_and_prefers_dated_element():
+    html = _page("""
+    <article><h3><a href="/a">Evento del 24 settembre 2099 per docenti</a></h3>
+      <span class="article_data">10 settembre 2026</span><p>testo</p></article>
+    <article><h3><a href="/c">Notizia con data solo nel titolo del 1 gennaio 2099</a></h3><p>corpo senza date</p></article>
+    <article><h3><a href="/d">Notizia con time</a></h3><time datetime="2026-09-11T08:00:00">ieri</time><p>entro il 5 ottobre 2099</p></article>
+    """)
+    items, _ = sp.parse_html_articles(html, "https://x.example/")
+    by_link = {i["link"]: i["published"] for i in items}
+    assert by_link["https://x.example/a"].startswith("2026-09-10")   # elemento con classe "data", non il titolo
+    assert by_link["https://x.example/c"] == ""                       # solo una data futura nel titolo → nessuna data
+    assert by_link["https://x.example/d"].startswith("2026-09-11")   # <time> vince sulla scadenza nel corpo
+
+
+def test_html_date_from_revision_line_not_title_deadline():
+    # pagine senza <article> (es. USR Liguria): link che avvolge il titolo, data in una riga "Ultima revisione"
+    html = _page("""
+    <div class="media-body"><a href="/b"><h2>Scadenza domande 30 dicembre 2099</h2></a>
+      <p><span class="small">Ultima revisione il 12-09-2026</span></p></div>
+    <div class="media-body"><a href="/c"><h2>Altro avviso pubblicato oggi</h2></a>
+      <p><span class="small">Ultima revisione il 13-09-2026</span></p></div>
+    <div class="media-body"><a href="/d"><h2>Terzo avviso in elenco</h2></a>
+      <p><span class="small">Ultima revisione il 13-09-2026</span></p></div>
+    """)
+    items, _ = sp.parse_html_articles(html, "https://x.example/")
+    by_link = {i["link"]: i["published"] for i in items}
+    assert by_link["https://x.example/b"].startswith("2026-09-12")   # non la scadenza nel titolo
+
+
+def test_html_future_date_in_body_is_discarded():
+    html = _page('<article><h3><a href="/a">Bando borse di studio</a></h3><p>Domande entro il 31 dicembre 2099</p></article>')
+    items, _ = sp.parse_html_articles(html, "https://x.example/")
+    assert items[0]["published"] == ""
