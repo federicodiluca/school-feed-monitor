@@ -805,5 +805,88 @@
   "kind": "usp",
   "region": "Friuli-Venezia Giulia",
   "province": "Trieste"
+ },
+ {
+  "name": "USP L'Aquila",
+  "url": "https://lnx.csalaquila.it/wp/feed/",
+  "type": "rss",
+  "kind": "usp",
+  "region": "Abruzzo",
+  "province": "L'Aquila"
+ },
+ {
+  "name": "USP Ascoli Piceno e Fermo",
+  "url": "https://www.uspascolipiceno.it/wordpress/feed/",
+  "type": "rss",
+  "kind": "usp",
+  "region": "Marche",
+  "province": [
+   "Ascoli Piceno",
+   "Fermo"
+  ]
+ },
+ {
+  "name": "USP Macerata",
+  "url": "https://www.uspmc.sinp.net/tutte-le-notizie/",
+  "type": "html",
+  "kind": "usp",
+  "region": "Marche",
+  "province": "Macerata"
+ },
+ {
+  "name": "USP Pisa",
+  "url": "https://www.usp-pi.it/feed/",
+  "type": "rss",
+  "kind": "usp",
+  "region": "Toscana",
+  "province": "Pisa"
+ },
+ {
+  "name": "USP Grosseto",
+  "url": "https://www.ufficioscolasticogrosseto.it/uff7/index.php/novita?format=feed&type=rss",
+  "type": "rss",
+  "kind": "usp",
+  "region": "Toscana",
+  "province": "Grosseto"
+ },
+ {
+  "name": "USP Pistoia",
+  "url": "https://www.ufficioscolasticoprovinciale.pistoia.it/feed/",
+  "type": "rss",
+  "kind": "usp",
+  "region": "Toscana",
+  "province": "Pistoia"
+ },
+ {
+  "name": "USP Genova",
+  "url": "https://www.istruzionegenova.gov.it/archivio-news",
+  "type": "html",
+  "kind": "usp",
+  "region": "Liguria",
+  "province": "Genova"
+ },
+ {
+  "name": "USP Imperia",
+  "url": "https://www.istruzioneimperia.gov.it/archivio-news",
+  "type": "html",
+  "kind": "usp",
+  "region": "Liguria",
+  "province": "Imperia"
+ },
+ {
+  "name": "USP La Spezia",
+  "url": "https://www.istruzionelaspezia.gov.it/archivio-news",
+  "type": "html",
+  "kind": "usp",
+  "region": "Liguria",
+  "province": "La Spezia"
+ },
+ {
+  "name": "USP Savona",
+  "url": "https://www.istruzionesavona.gov.it/archivio-news",
+  "type": "html",
+  "kind": "usp",
+  "region": "Liguria",
+  "province": "Savona"
  }
 ]

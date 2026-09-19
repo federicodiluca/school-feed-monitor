@@ -86,7 +86,7 @@ Solo `telegram_token` è obbligatorio; gli altri campi hanno un default.
 
 **Catalogo fonti italiane** (`"catalog": "italy"`, attivo per default; `false` per disattivarlo): il bot include
 automaticamente le fonti di [sfm/catalog/italy.json](sfm/catalog/italy.json) — notizie del MIM, tutti gli USR
-regionali e gli USP provinciali (102 fonti verificate; alcune province mancano ancora, vedi TODO.md). USR e USP sono *opt-in* (`default_follow: false`): ogni utente sceglie
+regionali e gli USP provinciali (112 fonti verificate; poche province mancano ancora, vedi TODO.md). USR e USP sono *opt-in* (`default_follow: false`): ogni utente sceglie
 la sua regione/provincia. Ogni voce ha `kind` (`usr`/`usp`/`mim`/`other`), `region` e `province`; gli stessi campi
 si possono usare anche nelle `sites` di `config.json`. Per verificare che tutte le fonti siano leggibili:
 

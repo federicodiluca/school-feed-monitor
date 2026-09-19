@@ -29,7 +29,7 @@ di default, alert immediato opzionale).
 
 ## Dopo l'MVP
 
-- [ ] **Catalogo completo fonti italiane — requisito di base prima dell'apertura al pubblico** — stato al 14/09/2026: **102/102 fonti verificate** = MIM (2) + **18/18 USR** + **81 USP** che coprono ~85 province su 107. Mancano ancora (siti senza feed/lista leggibile, blocco anti-bot o da trovare): Campania → Benevento (403), Caserta (feed vuoto), Salerno (eZ Publish); Puglia → Lecce; Lazio → Viterbo; Abruzzo → L'Aquila; Marche → Macerata, Ascoli Piceno-Fermo; Toscana → Pisa, Grosseto, Pistoia (SSL); Liguria → Genova, Imperia, Savona, La Spezia (sito vecchio fermo al 2023, nuovo istruzioneliguria.gov.it da esplorare); Friuli-VG → Udine, Gorizia, Pordenone (liste vuote lato server); Trentino-Alto Adige e Valle d'Aosta (nessun USR)
+- [ ] **Catalogo completo fonti italiane — requisito di base prima dell'apertura al pubblico** — stato al 19/09/2026: **112/112 fonti verificate** = MIM (2) + **18/18 USR** + **91 USP** (~97 province su 107). Non recuperabili al momento, con motivo: Benevento (pagina anti-bot: serve un browser), Salerno (elenco caricato via JavaScript), Caserta (sito nuovo con 1 sola notizia), Lecce (solo archivio documenti senza date), Viterbo (sito in errore), UAT Udine/Gorizia/Pordenone (liste vuote lato server; le notizie passano dall'USR FVG), Trentino-Alto Adige e Valle d'Aosta (nessun USR). Da ricontrollare ogni tanto con `scripts/check_sources.py`
 - [x] Verifica email (double opt-in) prima di attivare il canale email
 - [ ] Reset password ("password dimenticata") via email — tabella token già pronta
 - [ ] Pubblicità in pagina (solo quando ci sarà trazione)
