@@ -214,7 +214,7 @@ def consume_link_code(code):
 
 # --- token email (verifica indirizzo) ---------------------------------------
 
-EMAIL_TOKEN_TTL_HOURS = 48
+EMAIL_TOKEN_TTL_HOURS = {"verify": 48, "reset": 1}
 EMAIL_TOKEN_RESEND_SECONDS = 60
 
 
@@ -231,7 +231,7 @@ def create_email_token(user_id, token, purpose="verify"):
     conn.execute("DELETE FROM email_tokens WHERE (user_id=? AND purpose=?) OR datetime(expires_at) < datetime('now')",
                  (user_id, purpose))
     conn.execute("INSERT INTO email_tokens (token, user_id, purpose, expires_at) VALUES (?, ?, ?, datetime('now', ?))",
-                 (token, user_id, purpose, f"+{EMAIL_TOKEN_TTL_HOURS} hours"))
+                 (token, user_id, purpose, f"+{EMAIL_TOKEN_TTL_HOURS.get(purpose, 48)} hours"))
     conn.commit()
     conn.close()
     return True

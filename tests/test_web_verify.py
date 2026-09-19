@@ -127,3 +127,50 @@ def test_verification_email_content():
     subject, html, text = email_channel.format_verification("https://sfm.example/verifica-email/abc")
     assert "Conferma" in subject and 'href="https://sfm.example/verifica-email/abc"' in html
     assert "https://sfm.example/verifica-email/abc" in text and "48 ore" in text
+
+
+# --- password dimenticata --------------------------------------------------------------
+
+def _reset_link(mail):
+    m = re.search(r"https://sfm\.example/reimposta-password/[A-Za-z0-9_-]+", mail["text"])
+    assert m
+    return m.group(0).replace("https://sfm.example", "")
+
+
+def test_forgot_password_flow(client, outbox):
+    register(client)
+    client.post("/esci", data={"_csrf": csrf(client, "/")})
+    outbox.clear()
+
+    html = client.get("/accedi").get_data(as_text=True)
+    assert "Password dimenticata?" in html
+    tok = csrf(client, "/password-dimenticata")
+    r = client.post("/password-dimenticata", data={"_csrf": tok, "email": "nessuno@scuola.it"}, follow_redirects=True)
+    assert "indirizzo è registrato" in r.get_data(as_text=True) and outbox == []   # nessuna rivelazione
+
+    r = client.post("/password-dimenticata", data={"_csrf": tok, "email": EMAIL}, follow_redirects=True)
+    assert "indirizzo è registrato" in r.get_data(as_text=True)
+    assert len(outbox) == 1 and "Reimposta" in outbox[0]["subject"] and "1 ora" in outbox[0]["text"]
+    link = _reset_link(outbox[0])
+
+    tok = csrf(client, link)
+    r = client.post(link, data={"_csrf": tok, "new": "corta"})
+    assert r.status_code == 400
+    r = client.post(link, data={"_csrf": tok, "new": "nuovissima-password-1"}, follow_redirects=True)
+    assert "Password aggiornata" in r.get_data(as_text=True)
+    assert client.get("/account").status_code == 200                       # loggato
+    assert get_user_by_email(EMAIL)["email_verified"] is True              # ha ricevuto l'email → verificata
+
+    client.post("/esci", data={"_csrf": csrf(client, "/")})
+    assert login(client, password="nuovissima-password-1").status_code == 302
+    r = client.post(link, data={"_csrf": csrf(client, link), "new": "altra-password-lunga"}, follow_redirects=True)
+    assert "non valido o scaduto" in r.get_data(as_text=True)                # usa-e-getta
+
+
+def test_reset_token_has_short_ttl():
+    from sfm.db import get_conn
+    assert create_email_token(1, "r1", "reset") is True
+    conn = get_conn()
+    row = conn.execute("SELECT (julianday(expires_at) - julianday(created_at)) * 24 AS hours FROM email_tokens WHERE token='r1'").fetchone()
+    conn.close()
+    assert 0.9 < row["hours"] < 1.1

@@ -6,7 +6,7 @@ from flask import Blueprint, abort, current_app, flash, jsonify, redirect, rende
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from sfm import mailer
-from sfm.channels.email_channel import format_verification
+from sfm.channels.email_channel import format_password_reset, format_verification
 from sfm.db_user import (
     consume_email_token,
     create_email_token,
@@ -15,6 +15,7 @@ from sfm.db_user import (
     export_user_data,
     get_password_hash,
     get_user_by_email,
+    get_user_by_id,
     revoke_consent,
     set_active,
     set_consent,
@@ -89,6 +90,58 @@ def resend_verification():
         flash(f"Email di conferma inviata a {user['email']}. Controlla anche lo spam.", "success")
     else:
         flash("Email già inviata da poco o servizio email non disponibile: riprova tra un minuto.", "error")
+    return redirect(url_for("auth.account"))
+
+
+# --- password dimenticata -------------------------------------------------------
+
+@bp.route("/password-dimenticata", methods=["GET", "POST"])
+def forgot_password():
+    if security.current_user():
+        return redirect(url_for("auth.account"))
+    if request.method == "GET":
+        return render_template("password_dimenticata.html")
+    email = (request.form.get("email") or "").strip().lower()
+    if security.login_blocked(email):
+        abort(429)
+    user = get_user_by_email(email) if _valid_email(email) else None
+    if user:
+        token = secrets.token_urlsafe(32)
+        if create_email_token(user["id"], token, "reset"):
+            base = current_app.config.get("BASE_URL") or request.url_root.rstrip("/")
+            link = f"{base}{url_for('auth.reset_password', token=token)}"
+            subject, html, text = format_password_reset(link)
+            try:
+                if not mailer.send_email(user["email"], subject, html, text):
+                    log(f"✉️ [email disabilitata] link di reset per {user['email']}: {link}")
+            except mailer.EmailError as e:
+                log(f"❌ Email di reset non inviata a {user['email']}: {e}")
+    else:
+        security.record_login_failure(email)  # limita l'enumerazione degli indirizzi
+    # Stesso messaggio in ogni caso: non riveliamo se l'email è registrata.
+    flash("Se l'indirizzo è registrato riceverai un'email con il link per reimpostare la password (controlla anche lo spam).", "info")
+    return redirect(url_for("auth.login"))
+
+
+@bp.route("/reimposta-password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    if request.method == "GET":
+        return render_template("reimposta_password.html", token=token)
+    new = request.form.get("new") or ""
+    problem = _password_problem(new)
+    if problem:
+        flash(problem, "error")
+        return render_template("reimposta_password.html", token=token), 400
+    user_id = consume_email_token(token, "reset")
+    user = get_user_by_id(user_id) if user_id else None
+    if not user:
+        flash("Link non valido o scaduto. Richiedi un nuovo link.", "error")
+        return redirect(url_for("auth.forgot_password"))
+    set_password_hash(user["id"], generate_password_hash(new))
+    if user["email"] and not user["email_verified"]:
+        set_email_verified(user["id"], True)  # ha ricevuto l'email: l'indirizzo è suo
+    security.login_user(user)
+    flash("Password aggiornata: sei dentro.", "success")
     return redirect(url_for("auth.account"))
 
 

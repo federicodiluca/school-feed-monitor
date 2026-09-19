@@ -114,6 +114,19 @@ def format_verification(link):
     return subject, html, text
 
 
+def format_password_reset(link):
+    """Email per reimpostare la password. Ritorna (subject, html, text)."""
+    subject = f"[{APP_NAME}] Reimposta la tua password"
+    html = (f'<div style="{_STYLE}"><h2 style="margin:0 0 16px">Reimposta la password</h2>'
+            f"<p>Hai chiesto di reimpostare la password del tuo account {APP_NAME}. Il link vale 1 ora:</p>"
+            f'<p><a href="{escape_html(link)}" style="display:inline-block;padding:10px 16px;background:#1e3a8a;color:#fff;'
+            f'text-decoration:none;border-radius:6px">Scegli una nuova password</a></p>'
+            f'<p style="color:#777;font-size:13px">Se non sei stato tu, ignora questa email: la password resta invariata.</p></div>')
+    text = (f"Hai chiesto di reimpostare la password del tuo account {APP_NAME}. Apri questo link (valido 1 ora):\n"
+            f"{link}\n\nSe non sei stato tu, ignora questa email.\n")
+    return subject, html, text
+
+
 # --- interfaccia canale ---------------------------------------------------
 
 def send_alert(user, news, matched_keywords):
