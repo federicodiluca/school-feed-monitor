@@ -2,6 +2,7 @@ name: Verifica catalogo fonti
 
 # Ogni lunedì alle 06:30 UTC rilegge tutte le fonti del catalogo con il parser reale.
 # Se una non è più leggibile il job fallisce e GitHub avvisa via email il proprietario del repo.
+# Nota: i runner GitHub stanno negli USA; qualche sito italiano blocca gli IP esteri (falso allarme).
 on:
   schedule:
     - cron: "30 6 * * 1"
@@ -19,7 +20,9 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt
       - name: Verifica tutte le fonti
-        run: python scripts/check_sources.py --catalog | tee check.log
+        run: |
+          set -o pipefail
+          python scripts/check_sources.py --catalog | tee check.log
         env:
           PYTHONIOENCODING: utf-8
       - name: Riepilogo
