@@ -4,7 +4,7 @@ from sfm.db_news import cleanup_old_news
 from sfm.db_sources import get_source, sync_config_sources
 from sfm.news_fetcher import fetch_news, fetch_source
 from sfm.digest import run_digests
-from sfm.watchdog import JOB_DIGEST, JOB_FETCH, run_watchdog, tracked
+from sfm.watchdog import JOB_DIGEST, JOB_FETCH, run_watchdog, tracked, weekly_summary
 from sfm.logger import log, cleanup_logs
 from sfm.telegram_commands import start_telegram_listener, build_help_message
 from sfm.telegram import send_message
@@ -38,6 +38,7 @@ for sid in new_source_ids:
 schedule.every(POLLING_MINUTES).minutes.do(tracked(JOB_FETCH, fetch_news))
 schedule.every(1).minutes.do(tracked(JOB_DIGEST, run_digests))  # digest all'orario di ogni utente (default DAILY_REPORT_TIME)
 schedule.every(30).minutes.do(tracked("watchdog", run_watchdog))  # avvisa l'admin se fonti o job si rompono
+schedule.every().monday.at("08:00").do(tracked("weekly_summary", weekly_summary))
 schedule.every().day.at("20:00").do(lambda: cleanup_logs(CLEANUP_DAYS))
 schedule.every().day.at("20:30").do(lambda: cleanup_old_news(CLEANUP_DAYS))  # N.B. si fa riferimento alla data di fetch
 

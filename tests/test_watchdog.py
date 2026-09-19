@@ -157,3 +157,46 @@ def test_notify_admin_email_and_no_admin(admin_env, sent_messages, monkeypatch):
 
     monkeypatch.setattr(mailer, "send_email", lambda *a, **k: (_ for _ in ()).throw(mailer.EmailError("down")))
     assert watchdog.notify_admin("Watchdog", ["x"]) == []
+
+
+# --- deriva del dominio e riepilogo settimanale ---------------------------------------
+
+def test_site_of_registrable_domain():
+    assert watchdog.site_of("https://bo.istruzioneer.gov.it/feed/") == "istruzioneer.gov.it"
+    assert watchdog.site_of("https://www.usr.sicilia.it/x") == "sicilia.it"
+    assert watchdog.site_of("https://uspmc.sinp.net/") == "sinp.net"
+    assert watchdog.site_of("https://www.mim.gov.it/web/abruzzo") == "mim.gov.it"
+    assert watchdog.site_of("nonsense") == ""
+
+
+def test_source_drift_detects_foreign_links(admin_env):
+    from sfm.db_news import add_news
+    src = {"id": 1, "url": "https://www.istruzionemolise.it/feed/", "name": "USR Molise"}
+    assert watchdog.source_drift(src, news=[]) is False                            # troppo poche
+    for i in range(6):
+        add_news(f"n{i}", f"https://www.antropologie.it/{i}", "USR Molise", "", source_id=1)
+    add_news("ok", "https://www.istruzionemolise.it/vera", "USR Molise", "", source_id=1)
+    assert watchdog.source_drift(src) is True
+    problems = watchdog.find_problems(NOW)
+    assert "source:1:drift" in problems and "altro sito" in problems["source:1:drift"]
+
+
+def test_source_drift_allows_subdomains_and_minority(admin_env):
+    from sfm.db_news import add_news
+    src = {"id": 2, "url": "https://www.istruzioneer.gov.it/tutte-le-notizie/feed/", "name": "USR ER"}
+    for i in range(4):
+        add_news(f"n{i}", f"https://bo.istruzioneer.gov.it/{i}", "x", "", source_id=2)
+    add_news("ext", "https://www.mim.gov.it/doc", "x", "", source_id=2)
+    assert watchdog.source_drift(src) is False
+
+
+def test_weekly_summary_reports_counts(admin_env, sent_messages):
+    add_user(1)
+    record_source_success(1, 10, 1, now=NOW)
+    for _ in range(3):
+        record_source_failure(2, "HTTP 500", now=NOW)
+    lines = watchdog.weekly_summary(NOW)
+    assert lines[0].startswith("Fonti attive: 2") and "in errore: 1" in lines[0]
+    assert "Utenti: 1 (1 attivi" in lines[2]
+    assert any("In errore: Feed Due" in l for l in lines)
+    assert sent_messages and "Riepilogo settimanale" in sent_messages[-1]["text"]

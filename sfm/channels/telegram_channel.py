@@ -36,6 +36,10 @@ def build_report(news_list):
         kws = n.get("matched_keywords") or []
         icon = "🔔" if kws else "🗞️"
         hint = f" · <b>{escape_html(', '.join(kws))}</b>" if kws else ""
+        if n.get("already_alerted"):
+            hint += " · <i>già segnalata</i>"
+        if n.get("already_alerted"):
+            hint += " · <i>già segnalata</i>"
         lines.append(f"{icon} <a href=\"{link}\">{source}</a> — {published}{hint}\n<b>{title}</b>\n<i>{preview}</i>\n")
 
     return "\n".join(lines).strip()

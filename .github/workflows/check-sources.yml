@@ -1,0 +1,28 @@
+name: Verifica catalogo fonti
+
+# Ogni lunedì alle 06:30 UTC rilegge tutte le fonti del catalogo con il parser reale.
+# Se una non è più leggibile il job fallisce e GitHub avvisa via email il proprietario del repo.
+on:
+  schedule:
+    - cron: "30 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Verifica tutte le fonti
+        run: python scripts/check_sources.py --catalog | tee check.log
+        env:
+          PYTHONIOENCODING: utf-8
+      - name: Riepilogo
+        if: always()
+        run: |
+          { echo "## Fonti non leggibili"; grep -A2 -E "^(KO|ERR)" check.log || echo "Nessuna 🎉"; echo; tail -1 check.log; } >> "$GITHUB_STEP_SUMMARY"

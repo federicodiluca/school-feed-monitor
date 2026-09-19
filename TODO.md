@@ -33,6 +33,10 @@ di default, alert immediato opzionale).
 - [ ] **Catalogo completo fonti italiane — requisito di base prima dell'apertura al pubblico** — stato al 19/09/2026: **112/112 fonti verificate** = MIM (2) + **18/18 USR** + **91 USP** (~97 province su 107). Non recuperabili al momento, con motivo: Benevento (pagina anti-bot: serve un browser), Salerno (elenco caricato via JavaScript), Caserta (sito nuovo con 1 sola notizia), Lecce (solo archivio documenti senza date), Viterbo (sito in errore), UAT Udine/Gorizia/Pordenone (liste vuote lato server; le notizie passano dall'USR FVG), Trentino-Alto Adige e Valle d'Aosta (nessun USR). Da ricontrollare ogni tanto con `scripts/check_sources.py`
 - [x] Verifica email (double opt-in) prima di attivare il canale email
 - [x] Reset password ("password dimenticata") via email
+- [x] Controllo periodico del catalogo: watchdog rileva fonti in errore/silenziose/con dominio "deviato"; riepilogo settimanale all'admin (lunedì 8:00); GitHub Actions riverifica le 112 fonti ogni lunedì e i test a ogni push
+- [x] Badge "già segnalata" nel digest (email e Telegram)
+- [x] Controllo periodico del catalogo: watchdog rileva fonti in errore/silenziose/con dominio "deviato"; riepilogo settimanale all'admin (lunedì 8:00); GitHub Actions riverifica le 112 fonti ogni lunedì e i test a ogni push
+- [x] Badge "già segnalata" nel digest (email e Telegram)
 - [ ] Pubblicità in pagina (solo quando ci sarà trazione)
 - [ ] Deploy (Hetzner + Coolify valutato; oppure free tier Google)
 - [ ] **Database**: SQLite (WAL) va bene finché bot e web stanno sullo stesso host con disco persistente (VPS/Coolify). Se l'hosting è serverless o multi-host → Postgres, oppure Litestream/Turso per replicare SQLite. Decidere insieme all'hosting; nel frattempo tenere l'SQL specifico SQLite concentrato in `sfm/db*.py`

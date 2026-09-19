@@ -17,6 +17,7 @@ del proprio processo.
 """
 import traceback
 from datetime import datetime, timedelta, timezone
+from urllib.parse import urlparse
 
 import requests
 
@@ -31,7 +32,9 @@ from sfm.db_health import (
     record_job_end,
     record_job_start,
 )
+from sfm.db_news import get_recent_news, search_news
 from sfm.db_sources import get_sources
+from sfm.db_user import get_users
 from sfm.env import env
 from sfm.logger import log
 from sfm import telegram
@@ -93,6 +96,30 @@ def ping_healthcheck():
 
 # --- controlli ------------------------------------------------------------
 
+_SECOND_LEVEL = {"gov", "edu", "com", "org", "net", "co"}
+DRIFT_SAMPLE = 10
+
+
+def site_of(url):
+    """Dominio 'registrabile' di una URL: bo.istruzioneer.gov.it -> istruzioneer.gov.it,
+    www.usr.sicilia.it -> sicilia.it, uspmc.sinp.net -> sinp.net."""
+    host = (urlparse(url).hostname or "").lower()
+    labels = host.split(".")
+    if len(labels) >= 3 and labels[-2] in _SECOND_LEVEL:
+        return ".".join(labels[-3:])
+    return ".".join(labels[-2:])
+
+
+def source_drift(source, news=None):
+    """True se la maggioranza delle ultime notizie della fonte punta a un altro dominio:
+    tipico di un dominio scaduto/venduto o di un feed che ha cambiato natura."""
+    news = news if news is not None else get_recent_news(limit=DRIFT_SAMPLE, source_ids={source["id"]})
+    if len(news) < 3:
+        return False
+    expected = site_of(source["url"])
+    foreign = sum(1 for n in news if site_of(n.get("link") or "") != expected)
+    return foreign * 2 > len(news)
+
 def _parse_utc(value):
     if not value:
         return None
@@ -115,10 +142,15 @@ def find_problems(now=None):
 
     health = {h["source_id"]: h for h in get_source_health()}
     for source in get_sources():
+        name = source["name"]
+        if source_drift(source):
+            problems[f"source:{source['id']}:drift"] = (
+                f"la fonte «{name}» pubblica notizie che puntano a un altro sito "
+                f"(atteso {site_of(source['url'])}): dominio scaduto o feed cambiato?"
+            )
         h = health.get(source["id"])
         if not h:
             continue
-        name = source["name"]
         if h["consecutive_failures"] >= th["failures"]:
             problems[f"source:{source['id']}:failing"] = (
                 f"la fonte «{name}» fallisce da {h['consecutive_failures']} letture consecutive: {h.get('last_error') or '?'}"
@@ -177,6 +209,33 @@ def notify_admin(subject, lines):
     if not used:
         log(f"🐶 Watchdog (nessun admin configurato): {subject}\n{text}")
     return used
+
+
+def weekly_summary(now=None):
+    """Riepilogo settimanale all'admin: stato fonti, notizie raccolte, utenti."""
+    now = now or datetime.now(timezone.utc)
+    sources = get_sources()
+    health = {h["source_id"]: h for h in get_source_health()}
+    th = thresholds()
+    failing = [s["name"] for s in sources if health.get(s["id"], {}).get("consecutive_failures", 0) >= th["failures"]]
+    silent = [s["name"] for s in sources
+              if s["id"] in health and health[s["id"]].get("consecutive_failures", 0) < th["failures"]
+              and (_hours_ago(health[s["id"]].get("last_new_item_at") or health[s["id"]].get("first_seen_at"), now) or 0) >= th["silence_hours"]]
+    never = [s["name"] for s in sources if s["id"] not in health]
+    _, n_news = search_news(days=7, page=1, per_page=1)
+    users = get_users(active_only=False)
+    active = sum(1 for u in users if u["active"])
+    lines = [
+        f"Fonti attive: {len(sources)} — in errore: {len(failing)}, silenziose da {th['silence_hours']}h: {len(silent)}, mai lette: {len(never)}",
+        f"Notizie raccolte negli ultimi 7 giorni: {n_news}",
+        f"Utenti: {len(users)} ({active} attivi; {sum(1 for u in users if u.get('email'))} con email, {sum(1 for u in users if u.get('telegram_id'))} con Telegram)",
+    ]
+    if failing:
+        lines.append("In errore: " + ", ".join(failing[:15]) + (" …" if len(failing) > 15 else ""))
+    if silent:
+        lines.append("Silenziose: " + ", ".join(silent[:15]) + (" …" if len(silent) > 15 else ""))
+    notify_admin("📊 Riepilogo settimanale", lines)
+    return lines
 
 
 def run_watchdog(now=None):

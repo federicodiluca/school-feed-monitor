@@ -239,6 +239,12 @@ Ogni 30 minuti il watchdog avvisa l'amministratore (`ADMIN_TELEGRAM_ID` e/o `ADM
 * il fetch non gira da `WATCHDOG_JOB_STALE_MINUTES` minuti (default 3 × `polling_minutes`) o l'ultima esecuzione di un job è fallita.
 
 Quando il problema rientra arriva un secondo avviso. In `/sources` le fonti in errore sono marcate con ⚠️.
+Il watchdog segnala anche le fonti le cui notizie puntano a un altro dominio (dominio scaduto o feed cambiato) e
+ogni lunedì alle 8:00 manda un riepilogo (fonti, notizie della settimana, utenti). In più, un workflow GitHub Actions
+riverifica tutte le fonti del catalogo ogni lunedì e avvisa via email se qualcuna non è più leggibile.
+Il watchdog segnala anche le fonti le cui notizie puntano a un altro dominio (dominio scaduto o feed cambiato) e
+ogni lunedì alle 8:00 manda un riepilogo (fonti, notizie della settimana, utenti). In più, un workflow GitHub Actions
+riverifica tutte le fonti del catalogo ogni lunedì e avvisa via email se qualcuna non è più leggibile.
 Un watchdog interno non può accorgersi se muore l'intero processo: per quello imposta `HEALTHCHECK_PING_URL`
 (es. [healthchecks.io](https://healthchecks.io), gratuito) e il bot lo "pinga" a ogni fetch riuscito.
 

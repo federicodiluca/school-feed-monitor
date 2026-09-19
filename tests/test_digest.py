@@ -161,3 +161,16 @@ def test_web_user_digest_goes_by_email_only(monkeypatch, sent_messages):
     assert digest.run_digests(force=True) == 1
     assert emails == ["prof@scuola.it"] and sent_messages == []
     assert delivered_news_ids(user["id"], kind="digest") == {1}
+
+
+def test_digest_marks_already_alerted_items(sent_messages, monkeypatch):
+    captured = {}
+    monkeypatch.setattr(email_channel, "send_email", lambda to, subject, html, text=None: captured.update(html=html, text=text) or True)
+    add_user(9); update_keywords(9, ["docenti"])
+    from sfm.db import get_conn
+    conn = get_conn(); conn.execute("UPDATE users SET email='a@b.it', notify_email=1, email_verified=1 WHERE id=1"); conn.commit(); conn.close()
+    nid = insert_today("Concorso docenti", "https://x/1")
+    from sfm.db_deliveries import record_delivery
+    record_delivery(1, nid, "telegram", "alert")
+    digest.send_user_digest(get_user_by_id(1))
+    assert "già segnalata" in sent_messages[0]["text"] and "già segnalata" in captured["html"] and "già segnalata" in captured["text"]

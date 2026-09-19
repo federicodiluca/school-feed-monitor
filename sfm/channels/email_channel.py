@@ -42,6 +42,8 @@ def _item_html(n):
     when = f" — {published}" if published else ""
     kws = n.get("matched_keywords") or []
     hint = f' · <b style="color:#b45309">🔔 {escape_html(", ".join(kws))}</b>' if kws else ""
+    if n.get("already_alerted"):
+        hint += ' · <span style="color:#999">già segnalata</span>'
     box = "border-left:3px solid #f59e0b;padding-left:10px;" if kws else ""
     return (f'<p style="margin:0 0 16px;{box}"><span style="color:#777;font-size:13px">{source}{when}{hint}</span><br>'
             f'<a href="{link}" style="font-weight:600;color:#1a56db">{title}</a><br>'
@@ -55,6 +57,8 @@ def _item_text(n):
     when = f" — {published}" if published else ""
     kws = n.get("matched_keywords") or []
     hint = f" · parole chiave: {', '.join(kws)}" if kws else ""
+    if n.get("already_alerted"):
+        hint += " · già segnalata"
     preview = strip_html(n.get("content") or "")[:PREVIEW_LEN]
     return f"[{source}{when}{hint}]\n{title}\n{n.get('link') or ''}\n{preview}\n"
 
