@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Chi siamo e contatti — {{ app_name }}{% endblock %}
+{% block description %}{{ app_name }} è un progetto indipendente di un insegnante-sviluppatore: raccoglie le notizie di USR, USP e Ministero e le filtra per te. Chi lo fa, perché, e come contattarci.{% endblock %}
+{% block content %}
+<article class="prose">
+<h1>Chi siamo</h1>
+
+<p class="lead">{{ app_name }} è un progetto <strong>indipendente e senza scopo di lucro</strong>, nato da un bisogno concreto:
+smettere di aprire ogni giorno i siti dell'Ufficio Scolastico Provinciale, dell'USR e del Ministero per non perdersi
+graduatorie, convocazioni, trasferimenti e circolari.</p>
+
+<h2>Chi c'è dietro</h2>
+<p>Mi chiamo <strong>Federico Di Luca</strong>: insegno informatica e sviluppo software, tra Pesaro e Rimini.
+Da precario ho vissuto in prima persona la fatica di stare dietro a decine di siti scolastici diversi, ognuno con la sua
+struttura e i suoi tempi; da sviluppatore ho pensato che un programma potesse farlo al posto mio. Prima è nato un bot
+Telegram per me e per qualche collega, poi — visto che funzionava — questo sito, per chi Telegram non lo usa.</p>
+<p>Il progetto lo porto avanti nel tempo libero. Se vuoi sapere altro su di me:
+<a href="https://federicodiluca.github.io" rel="noopener" target="_blank">federicodiluca.github.io</a>.</p>
+
+<h2>Come funziona, in due righe</h2>
+<p>Il servizio legge a intervalli regolari i siti pubblici degli Uffici Scolastici Regionali e Provinciali e del
+Ministero (oltre 100 fonti, verificate una per una), salva i titoli e i link delle notizie e li confronta con le parole
+chiave e le fonti scelte da ciascun utente. Non pubblica contenuti propri: ogni notizia rimanda alla pagina originale.
+Il codice è <a href="https://github.com/federicodiluca/school-feed-monitor" rel="noopener" target="_blank">pubblico
+(licenza AGPL-3.0)</a>: chiunque può leggerlo, verificarlo e proporre migliorie.</p>
+
+<h2>Cosa non è</h2>
+<ul>
+  <li>Non è un servizio del Ministero né degli Uffici Scolastici, e non è affiliato a nessun ente pubblico o sindacato.</li>
+  <li>Non è una fonte ufficiale: è un <em>aggregatore</em>. Fa sempre fede la pagina originale linkata in ogni notizia.</li>
+  <li>Non vende dati e non fa profilazione: vedi l'<a href="{{ url_for('privacy') }}">informativa sulla privacy</a>.</li>
+</ul>
+
+<h2 id="contatti">Contatti</h2>
+<p>Per segnalazioni (una fonte che manca o non funziona, un errore, un'idea), domande sul trattamento dei dati o
+qualsiasi altra cosa: <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.
+Le segnalazioni tecniche sono benvenute anche come
+<a href="https://github.com/federicodiluca/school-feed-monitor/issues" rel="noopener" target="_blank">issue su GitHub</a>.</p>
+<p class="muted">Rispondo quando posso: è un progetto gestito da una persona sola, fuori dall'orario di lavoro.</p>
+</article>
+{% endblock %}

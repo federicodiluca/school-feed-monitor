@@ -8,16 +8,19 @@
 <p class="notice"><strong>Bozza</strong>: questo testo è una prima stesura e sarà rivisto prima dell'apertura al pubblico.</p>
 
 <h2>1. Titolare del trattamento</h2>
-<p>Federico Di Luca — contatto: <em>[indirizzo email del titolare, da inserire]</em>.</p>
+<p>Federico Di Luca (persona fisica, progetto personale senza scopo di lucro) — contatto: <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.
+Non è nominato un responsabile della protezione dei dati (DPO): non ricorrono i presupposti dell'art. 37 GDPR.</p>
 
 <h2>2. Quali dati trattiamo</h2>
 <ul>
-  <li><strong>Dati dell'account</strong>: indirizzo email, password (conservata solo come hash non reversibile), data di registrazione.</li>
+  <li><strong>Dati dell'account</strong>: indirizzo email, password (conservata solo come hash non reversibile), data di registrazione;
+      se accedi con Google, l'identificativo tecnico del tuo account Google e l'email che Google ci comunica (nessun altro dato del profilo).</li>
   <li><strong>Telegram</strong> (solo se colleghi il bot): identificativo numerico della chat e, se presente, lo username.</li>
   <li><strong>Preferenze</strong>: fonti seguite, parole chiave, canali e frequenza delle notifiche.</li>
   <li><strong>Log delle notifiche</strong>: quali notizie ti sono state inviate, su quale canale e quando (per non inviartele due volte).</li>
   <li><strong>Consenso</strong>: versione dell'informativa accettata e data, e conferma dell'indirizzo email (double opt-in).</li>
-  <li><strong>Dati tecnici</strong>: indirizzo IP nei log del server e per limitare i tentativi di accesso, conservati per un periodo breve.</li>
+  <li><strong>Dati tecnici</strong>: indirizzo IP nei log del server e, in memoria, per limitare i tentativi di accesso; i log di funzionamento
+      del servizio possono contenere l'identificativo Telegram e le parole chiave che hanno generato una notifica. Tutti conservati per un periodo breve (vedi §6).</li>
 </ul>
 <p>Non trattiamo categorie particolari di dati. Le parole chiave che scegli restano tue: non le usiamo per profilarti.</p>
 
@@ -35,9 +38,12 @@
 <ul>
   <li><strong>Invio email</strong>: il fornitore del servizio di posta (attualmente <em>Brevo</em>, Francia, UE) riceve il tuo indirizzo e il contenuto delle notifiche per recapitarle.</li>
   <li><strong>Telegram</strong>: se scegli questo canale, i messaggi transitano sulla piattaforma Telegram secondo la sua informativa.</li>
+  <li><strong>Google</strong>: solo se scegli "Accedi con Google", Google ci comunica email e identificativo del tuo account; l'autenticazione avviene sui server di Google secondo la sua informativa.</li>
   <li><strong>Hosting</strong>: i dati sono conservati su server <em>[fornitore e paese, da inserire]</em>.</li>
 </ul>
-<p>Non trasferiamo dati fuori dall'Unione Europea, salvo quanto necessario per Telegram se lo attivi.</p>
+<p>I fornitori che trattano dati per nostro conto (posta elettronica, hosting) operano come responsabili del trattamento sulla base
+delle loro condizioni contrattuali e dei loro accordi sul trattamento dei dati (DPA). Non trasferiamo dati fuori dall'Unione Europea,
+salvo quanto necessario per Telegram o Google se li attivi tu.</p>
 
 <h2>6. Conservazione</h2>
 <ul>
@@ -49,7 +55,15 @@
 <h2>7. I tuoi diritti</h2>
 <p>Hai diritto di accesso, rettifica, cancellazione, limitazione, portabilità e opposizione (artt. 15–22 GDPR), e di revocare il consenso senza pregiudicare la liceità del trattamento precedente. Dalla pagina <strong>Account</strong> puoi scaricare i tuoi dati, revocare il consenso e cancellare l'account senza doverci scrivere. Per tutto il resto contatta il titolare. Puoi inoltre proporre reclamo al <a href="https://www.garanteprivacy.it" rel="noopener">Garante per la protezione dei dati personali</a>.</p>
 
-<h2>8. Modifiche</h2>
+<h2>8. Sicurezza e violazioni dei dati</h2>
+<p>Le password sono conservate solo come hash; le comunicazioni con il sito sono cifrate (HTTPS); l'accesso al server è limitato al titolare.
+In caso di violazione dei dati personali che comporti un rischio per i tuoi diritti, ti informeremo via email senza ingiustificato ritardo
+e, ove previsto, notificheremo l'Autorità entro 72 ore (artt. 33–34 GDPR).</p>
+
+<h2>9. Minori</h2>
+<p>Il servizio è rivolto al personale scolastico e a maggiorenni. Non raccogliamo consapevolmente dati di minori di 14 anni.</p>
+
+<h2>10. Modifiche</h2>
 <p>Se l'informativa cambia in modo sostanziale, alla prima visita ti chiederemo di accettare la nuova versione prima di riprendere l'invio delle notifiche.</p>
 </article>
 {% endblock %}

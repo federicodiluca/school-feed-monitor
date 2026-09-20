@@ -61,6 +61,7 @@ def create_app(test_config=None):
         GOOGLE_CLIENT_ID=env("GOOGLE_CLIENT_ID") or "",
         GOOGLE_CLIENT_SECRET=env("GOOGLE_CLIENT_SECRET") or "",
         TELEGRAM_BOT_USERNAME=(env("TELEGRAM_BOT_USERNAME") or "").lstrip("@"),
+        CONTACT_EMAIL=env("CONTACT_EMAIL") or "schoolfeedmonitor@gmail.com",  # contatto pubblico e titolare
     )
     if test_config:
         app.config.update(test_config)
@@ -94,6 +95,10 @@ def create_app(test_config=None):
     def terms():
         return render_template("termini.html")
 
+    @app.get("/chi-siamo")
+    def about():
+        return render_template("chi_siamo.html")
+
     @app.errorhandler(404)
     def not_found(_e):
         return render_template("errore.html", code=404, message="Pagina non trovata."), 404
@@ -110,6 +115,7 @@ def create_app(test_config=None):
     def inject_globals():
         return {"app_name": APP_NAME, "current_user": security.current_user(), "canonical": seo.canonical_url(request),
                 "google_enabled": app.config.get("GOOGLE_ENABLED", False),
+                "contact_email": app.config.get("CONTACT_EMAIL", ""),
                 "bot_username": app.config.get("TELEGRAM_BOT_USERNAME", "")}
 
     return app

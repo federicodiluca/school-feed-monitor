@@ -66,11 +66,14 @@
     <div class="inner">
       <nav aria-label="Footer">
         <a href="{{ url_for('news.index') }}">Notizie</a>
+        <a href="{{ url_for('about') }}">Chi siamo e contatti</a>
         <a href="{{ url_for('privacy') }}">Privacy</a>
         <a href="{{ url_for('terms') }}">Termini</a>
         <a href="https://github.com/federicodiluca/school-feed-monitor" rel="noopener">Codice sorgente (AGPL-3.0)</a>
       </nav>
-      <p>{{ app_name }} non è affiliato al Ministero dell'Istruzione e del Merito né agli Uffici Scolastici.</p>
+      <p>{{ app_name }} è un progetto indipendente, non affiliato al Ministero dell'Istruzione e del Merito né agli Uffici Scolastici.
+        Aggrega notizie pubbliche senza garanzia di completezza o tempestività: fa fede sempre la fonte originale
+        (<a href="{{ url_for('terms') }}#responsabilita">esclusione di responsabilità</a>).</p>
       <p>
         Creato da <a href="https://federicodiluca.github.io" rel="noopener" target="_blank">Federico Di Luca</a> ·
         guarda anche <a href="https://federicodiluca.github.io/vocabe" rel="noopener" target="_blank">Vocabe</a>

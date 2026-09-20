@@ -22,7 +22,9 @@ di default, alert immediato opzionale).
 
 - [ ] **SEO** — priorità altissima: SSR, `<title>`/meta description/OpenGraph, canonical, `sitemap.xml`, `robots.txt`, URL parlanti, HTML semantico, pagine pubbliche indicizzabili
 - [x] Licenza AGPL-3.0: consenso al rilicenziamento ricevuto da tutti i contributor (Fabio, 14/09/2026)
-- [ ] **GDPR — nessun rischio**: privacy policy e termini, consenso esplicito con timestamp e versione, **revoca dei consensi** dall'area utente, export ed eliminazione dell'account (diritto all'oblio), minimizzazione dati, registro trattamenti, provider email/hosting in UE dove possibile, niente tracker di terze parti senza consenso
+- [ ] **GDPR — nessun rischio** — stato al 20/09/2026: ✅ informativa (titolare, dati, basi giuridiche, destinatari incl. Brevo/Google/Telegram, conservazione, diritti, breach, minori), termini con esclusione di responsabilità, consenso con versione+data e ri-consenso, revoca, export JSON, cancellazione definitiva, double opt-in, solo cookie tecnico (niente banner), nessuna risorsa di terze parti (test automatico). ⏳ Prima dell'apertura: (a) inserire hosting/paese nell'informativa; (b) far rileggere privacy e termini a una persona competente; (c) attivare HTTPS e rotazione dei log del server (≤30 giorni) al deploy; (d) registro dei trattamenti minimale (un documento con: finalità, categorie di dati, destinatari, conservazione) — non obbligatorio per un titolare persona fisica con trattamento occasionale, ma ~30 minuti di lavoro e mette al riparo
+- [x] Pagina "Chi siamo e contatti" (`/chi-siamo`), email pubblica configurabile (`CONTACT_EMAIL`)
+- [x] Disclaimer/esclusione di responsabilità nei Termini (§3) + riga nel footer di ogni pagina
 - [x] **Login Google** (OAuth 2.0 / OpenID Connect) oltre a email+password — serve creare il client nella Google Cloud Console
 - [x] **Server SMTP** come alternativa all'API Resend per l'invio email (in uso con Brevo)
 - [x] **Tema chiaro/scuro** (rispetta `prefers-color-scheme`, toggle manuale)
