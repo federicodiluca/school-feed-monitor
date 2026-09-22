@@ -1,0 +1,25 @@
+# Bot Telegram + scraping come servizio di sistema.
+#
+#   sudo cp scripts/sfm-bot.service /etc/systemd/system/
+#   sudo sed -i "s/%USER%/$USER/" /etc/systemd/system/sfm-bot.service
+#   sudo systemctl daemon-reload && sudo systemctl enable --now sfm-bot
+#   journalctl -u sfm-bot -f
+[Unit]
+Description=School Feed Monitor - bot Telegram e raccolta notizie
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=%USER%
+WorkingDirectory=/opt/sfm
+Environment=PYTHONUNBUFFERED=1
+Environment=TZ=Europe/Rome
+ExecStart=/opt/sfm/.venv/bin/python /opt/sfm/main.py
+Restart=always
+RestartSec=10
+# la macchina ha 1 GB: se il processo esplode, meglio farlo riavviare che far morire la VM
+MemoryMax=600M
+
+[Install]
+WantedBy=multi-user.target

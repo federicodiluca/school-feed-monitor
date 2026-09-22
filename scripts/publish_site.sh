@@ -11,6 +11,7 @@
 # Variabili (in .env o nell'ambiente):
 #   SITE_BASE_URL          URL pubblico del sito (default: quello di build_site.py)
 #   SITE_REMOTE            remote git da usare (default: origin)
+#   PYTHON                 interprete da usare (default: python3; con venv: /opt/sfm/.venv/bin/python)
 #   TELEGRAM_BOT_USERNAME  username del bot, per i link "apri il bot"
 set -euo pipefail
 
@@ -25,7 +26,7 @@ WORKTREE="${SITE_WORKTREE:-/tmp/sfm-gh-pages}"
 if [ -n "${SITE_BUILD_CMD:-}" ]; then
   eval "$SITE_BUILD_CMD"           # es. dentro il container Docker
 else
-  python -m scripts.build_site --out "$OUT"
+  "${PYTHON:-python3}" -m scripts.build_site --out "$OUT"
 fi
 
 # worktree usa-e-getta: ogni pubblicazione è un commit orfano, così il branch resta

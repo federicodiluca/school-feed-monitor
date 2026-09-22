@@ -25,32 +25,60 @@ Console Google Cloud → *Compute Engine → VM instances → Create instance*:
 | Region / Zone | `us-central1`, `us-west1` o `us-east1` — **solo queste tre** sono nel free tier |
 | Machine type | `e2-micro` (serie E2) |
 | Boot disk | Debian 12, **Standard persistent disk**, 30 GB |
-| Firewall | non serve niente: nessun traffico in entrata |
-| Network interfaces | External IPv4: **None** |
+| Firewall | non spuntare niente: nessun traffico in entrata |
+| Network interfaces | External IPv4: **Ephemeral** (vedi sotto) |
 
-Senza IP pubblico servono due cose:
+La VM non riceve connessioni: l'IP pubblico serve solo a lei per **uscire** (leggere le fonti,
+parlare con Telegram, spingere su GitHub) e a te per entrare in SSH.
 
-- **uscire verso internet** (scraping, Telegram, push su GitHub): *VPC network → Cloud NAT →
-  crea un gateway* nella stessa regione, con "Source: primary IP ranges of all subnets".
-- **entrare in SSH**: passa da IAP. Una sola volta, *VPC network → Firewall → Create*:
-  direzione *Ingress*, sorgente `35.235.240.0/20`, porta TCP `22`, target: tutte le istanze.
-  Poi dal tuo PC `gcloud compute ssh sfm-vm --tunnel-through-iap` (oppure il pulsante **SSH**
-  della console, che usa IAP da solo quando non c'è IP pubblico).
+Volendo si può togliere del tutto l'IP pubblico, ma allora servono due pezzi in più:
+un **Cloud NAT** nella regione della VM (*VPC network → Cloud NAT*, source: primary IP ranges
+of all subnets) per farla uscire, e una regola firewall *Ingress* da `35.235.240.0/20` su TCP 22
+per entrare in SSH attraverso IAP. Costa più o meno quanto l'IP: si fa per ridurre la superficie
+esposta, non per risparmiare.
 
-> **Costi.** Il free tier copre la VM e il disco, non la rete: Cloud NAT è circa 1 $/mese di
-> gateway più ~0,045 $/GB di traffico processato (lo scraping orario di 112 fonti sta sotto i
-> 25 GB/mese). È più o meno quanto costerebbe tenere un IPv4 pubblico. Metti comunque un budget
-> di 1 € con avviso al 100% in *Billing → Budgets & alerts*.
+> **Costi.** Il free tier copre la VM `e2-micro` e i 30 GB di disco standard; l'indirizzo IPv4
+> pubblico è fatturato a parte (~3 $/mese) ma finché sei nella prova gratuita viene pagato dal
+> credito. Per vedere se lo stai pagando: *Billing → Report*, raggruppa per **SKU** e cerca
+> "External IP Charge on a Standard VM". Metti comunque un budget di 1 € con avviso al 100% in
+> *Billing → Budgets & alerts*.
 
 ## 2. Preparare la macchina
 
-```bash
-sudo apt-get update && sudo apt-get install -y docker.io docker-compose-plugin git
-sudo usermod -aG docker $USER && exit      # poi rientra
+Su una e2-micro (1 GB di RAM) conviene **niente Docker**: il demone si mangia un quinto della
+memoria disponibile. Bot e generatore girano in un virtualenv, gestiti da systemd e cron.
 
-git clone https://github.com/federicodiluca/school-feed-monitor.git /opt/sfm
+```bash
+sudo apt-get update
+sudo apt-get install -y git python3-venv python3-pip
+
+# la cartella è tua, non di root: niente sudo con git, mai
+sudo mkdir -p /opt/sfm && sudo chown "$USER:$USER" /opt/sfm
+```
+
+### La chiave per GitHub
+
+La chiave va generata **sulla VM** e con il tuo utente (non con `sudo`: root ha un'altra
+`~/.ssh`). Se l'hai già fatto, salta il `ssh-keygen`.
+
+```bash
+ls ~/.ssh/id_ed25519.pub 2>/dev/null || ssh-keygen -t ed25519 -C "sfm-vm" -f ~/.ssh/id_ed25519 -N ""
+cat ~/.ssh/id_ed25519.pub        # questa riga va nei Deploy keys del repo, con "Allow write access"
+ssh -T git@github.com            # deve rispondere "Hi federicodiluca/school-feed-monitor!"
+```
+
+Se `ssh -T` dice `Permission denied (publickey)`, la chiave incollata su GitHub non è quella
+della VM: ricontrolla che sia il contenuto esatto del `.pub` qui sopra.
+
+### Il codice
+
+```bash
+git clone git@github.com:federicodiluca/school-feed-monitor.git /opt/sfm
 cd /opt/sfm
-cp config.example.json config.json          # token del bot, fonti, orari
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+
+cp config.example.json config.json && nano config.json     # token del bot e fonti
 cp .env.example .env
 python3 -c "import secrets; print('SECRET_KEY=' + secrets.token_hex(32))" >> .env
 nano .env
@@ -65,37 +93,35 @@ SITE_BASE_URL=https://federicodiluca.github.io/school-feed-monitor
 TELEGRAM_BOT_USERNAME=IlTuoBot
 ADMIN_TELEGRAM_ID=123456789
 CONTACT_EMAIL=schoolfeedmonitor@gmail.com
-SITE_BUILD_CMD=docker compose run --rm -T bot python -m scripts.build_site --out /usr/src/app/data/site
+PYTHON=/opt/sfm/.venv/bin/python
 SITE_OUT=data/site
 ```
 
-Avvio del bot:
+### Il bot come servizio
 
 ```bash
-docker compose up -d --build
-docker compose logs -f bot        # Ctrl-C per uscire
+sudo cp scripts/sfm-bot.service /etc/systemd/system/
+sudo sed -i "s/%USER%/$USER/" /etc/systemd/system/sfm-bot.service
+sudo systemctl daemon-reload && sudo systemctl enable --now sfm-bot
+journalctl -u sfm-bot -f          # Ctrl-C per uscire
 ```
 
-Il primo avvio importa le fonti del catalogo e le legge **senza inviare notifiche**.
+Il primo avvio importa le fonti del catalogo e le legge **senza inviare notifiche**: ci mette
+qualche minuto. Manda `/start` al bot per controllare che risponda.
 
-## 3. Il push su GitHub senza password
+> Se preferisci Docker (`docker compose up -d --build`) funziona comunque: metti in `.env`
+> `SITE_BUILD_CMD=docker compose run --rm -T bot python -m scripts.build_site --out /usr/src/app/data/site`
+> e salta il servizio systemd.
 
-Sulla VM:
-
-```bash
-ssh-keygen -t ed25519 -C "sfm-vm" -f ~/.ssh/id_ed25519 -N ""
-cat ~/.ssh/id_ed25519.pub
-```
-
-Su GitHub: *repo → Settings → Deploy keys → Add deploy key*, incolla la chiave e **spunta
-"Allow write access"**. Poi, sulla VM:
+## 3. La prima pubblicazione
 
 ```bash
 cd /opt/sfm
-git remote set-url origin git@github.com:federicodiluca/school-feed-monitor.git
-ssh -T git@github.com          # accetta l'host la prima volta
-./scripts/publish_site.sh      # prima pubblicazione
+./scripts/publish_site.sh
 ```
+
+Genera il sito in `data/site` e lo spinge su `gh-pages`. Se il repo era stato clonato in
+HTTPS, prima: `git remote set-url origin git@github.com:federicodiluca/school-feed-monitor.git`.
 
 ## 4. Accendere GitHub Pages
 
@@ -126,13 +152,16 @@ repository non cresce all'infinito.
 ## 6. Aggiornare il codice
 
 ```bash
-cd /opt/sfm && git pull && docker compose up -d --build
+cd /opt/sfm && git pull && .venv/bin/pip install -r requirements.txt
+sudo systemctl restart sfm-bot
 ```
 
 ## Note
 
 - **1 GB di RAM**: il bot da solo ci sta comodo. Se la VM va in affanno, alza
   `polling_minutes` in `config.json`.
+- **Prova gratuita**: i 300 $ di credito durano 90 giorni; alla scadenza, se non passi a un
+  account a pagamento, Google **ferma le risorse**. Segnati la data e decidi prima.
 - **Scraping dagli USA**: su 112 fonti, una (USP Macerata) rifiuta le connessioni da IP esteri.
   Il watchdog la segnalerà come "in errore": è atteso, non è un guasto.
 - **Il sito Flask serve ancora**: in locale (`python web.py`) è il modo più comodo per
