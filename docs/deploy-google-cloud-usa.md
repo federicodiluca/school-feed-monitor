@@ -1,4 +1,12 @@
-# Deploy: VM su Google Cloud + sito su GitHub Pages
+# Appendice: VM su Google Cloud (Stati Uniti)
+
+> La guida buona è [deploy.md](deploy.md), che vale per qualunque macchina. Questa resta
+> perché il free tier di Google Cloud è **solo americano**, e da lì alcune fonti italiane
+> sono irraggiungibili: se scegli questa strada devi anche montare il ponte di
+> [deploy/eu-proxy/](../deploy/eu-proxy/README.md). Sono i passi specifici di Google Cloud;
+> per il resto (codice, database, systemd, pubblicazione) segui deploy.md.
+
+# VM su Google Cloud + sito su GitHub Pages
 
 Come è fatto il servizio in produzione:
 
