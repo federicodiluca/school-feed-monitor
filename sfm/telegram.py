@@ -2,7 +2,7 @@
 import requests
 import time
 from sfm.config_loader import get_config
-from sfm.db_user import get_users
+from sfm.db_user import deactivate_user, get_user, get_users
 from sfm.logger import log
 
 CONFIG = get_config()
@@ -55,6 +55,26 @@ def send_message(text, parse_mode=None, chat_id=None, disable_web_page_preview=N
                                 disable_web_page_preview=disable_web_page_preview, reply_markup=reply_markup)
 
 
+# Telegram risponde 403 quando dall'altra parte non c'è più nessuno da avvisare
+BLOCKED_DESCRIPTIONS = ("bot was blocked", "bot was kicked", "user is deactivated", "chat not found")
+
+
+def _suspend_if_unreachable(chat_id, result):
+    """Se l'utente ha bloccato il bot (o ha chiuso l'account) smette di provarci a ogni
+    notizia: sospende le notifiche. Con /start si riattiva da solo."""
+    if result.get("ok") or result.get("status_code") != 403 or not chat_id:
+        return False
+    description = str((result.get("data") or {}).get("description", "")).lower()
+    if not any(hint in description for hint in BLOCKED_DESCRIPTIONS):
+        return False
+    user = get_user(chat_id)
+    if not user or not user.get("active"):
+        return False
+    deactivate_user(chat_id)
+    log(f"🚫 {chat_id} non è più raggiungibile ({description}): notifiche sospese, /start per riattivarle")
+    return True
+
+
 def _send_single_message(text, parse_mode=None, chat_id=None, disable_web_page_preview=None, reply_markup=None):
     """Funzione privata: invia un singolo messaggio a Telegram."""
     payload = {
@@ -66,7 +86,9 @@ def _send_single_message(text, parse_mode=None, chat_id=None, disable_web_page_p
         payload["parse_mode"] = parse_mode
     if reply_markup:
         payload["reply_markup"] = reply_markup
-    return api_call("sendMessage", payload)
+    result = api_call("sendMessage", payload)
+    _suspend_if_unreachable(chat_id, result)
+    return result
 
 
 def edit_message_text(chat_id, message_id, text, parse_mode=None, reply_markup=None):
