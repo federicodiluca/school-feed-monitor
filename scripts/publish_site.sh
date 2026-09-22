@@ -37,15 +37,19 @@ if [ -f .env ]; then
 fi
 
 OUT="${SITE_OUT:-data/site}"
+case "$OUT" in /*) ;; *) OUT="$PWD/$OUT" ;; esac   # serve assoluto: più avanti si lavora nel worktree
 REMOTE="${SITE_REMOTE:-origin}"
 BRANCH="gh-pages"
 WORKTREE="${SITE_WORKTREE:-/tmp/sfm-gh-pages}"
+TMPBRANCH="sfm-publish-$$"    # ramo usa-e-getta: quello vero vive solo su GitHub
 
 if [ -n "${SITE_BUILD_CMD:-}" ]; then
   eval "$SITE_BUILD_CMD"           # es. dentro il container Docker
 else
   "${PYTHON:-python3}" -m scripts.build_site --out "$OUT"
 fi
+
+[ -f "$OUT/index.html" ] || { echo "[publish_site] $OUT/index.html non c'è: la generazione non è andata a buon fine" >&2; exit 1; }
 
 # worktree usa-e-getta: ogni pubblicazione è un commit orfano, così il branch resta
 # lungo un commit solo anche pubblicando ogni ora
@@ -54,7 +58,7 @@ git worktree prune
 git worktree add --force --detach "$WORKTREE" HEAD
 
 cd "$WORKTREE"
-git checkout -q --orphan "$BRANCH"
+git checkout -q --orphan "$TMPBRANCH"
 git rm -rq --cached . >/dev/null 2>&1 || true
 find . -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
 cp -r "$OUT/." .
@@ -66,3 +70,4 @@ echo "[publish_site] pubblicato su $BRANCH"
 
 cd - >/dev/null
 git worktree remove --force "$WORKTREE"
+git branch -D "$TMPBRANCH" >/dev/null 2>&1 || true
