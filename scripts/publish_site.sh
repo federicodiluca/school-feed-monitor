@@ -16,7 +16,25 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-[ -f .env ] && set -a && . ./.env && set +a || true
+
+# Legge .env come lo legge Python (sfm/env.py): il valore è tutto quello che segue il primo
+# "=", anche con spazi dentro. Non usiamo ". ./.env" perché una riga tipo
+#   SITE_BUILD_CMD=docker compose run ...
+# la shell la eseguirebbe invece di assegnarla.
+if [ -f .env ]; then
+  while IFS= read -r line || [ -n "$line" ]; do
+    case "$line" in ""|"#"*) continue ;; *"="*) ;; *) continue ;; esac
+    key="${line%%=*}"
+    value="${line#*=}"
+    key="$(printf '%s' "$key" | tr -d '[:space:]')"
+    case "$value" in
+      \"*\") value="${value#\"}"; value="${value%\"}" ;;
+      "'"*"'") value="${value#'}"; value="${value%'}" ;;
+    esac
+    [ -n "$key" ] || continue
+    export "$key=$value"
+  done < .env
+fi
 
 OUT="${SITE_OUT:-data/site}"
 REMOTE="${SITE_REMOTE:-origin}"
@@ -39,7 +57,7 @@ cd "$WORKTREE"
 git checkout -q --orphan "$BRANCH"
 git rm -rq --cached . >/dev/null 2>&1 || true
 find . -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
-cp -a "$OUT/." .
+cp -r "$OUT/." .
 
 git add -A
 git -c user.name="School Feed Monitor" -c user.email="bot@school-feed-monitor" commit -qm "Sito aggiornato $(date -u '+%Y-%m-%d %H:%M UTC')"

@@ -91,6 +91,11 @@ SITE_OUT=data/site
 SITE_BUILD_CMD=docker compose run --rm -T bot python -m scripts.build_site --out /usr/src/app/data/site
 ```
 
+Il valore può restare senza virgolette: `.env` lo leggono sia Python sia gli script, e
+prendono tutto quello che segue il primo `=`. Ricorda però che `docker compose run` usa
+**l'immagine già costruita**: dopo ogni `git pull` rifai `docker compose up -d --build`,
+altrimenti generi il sito con il codice vecchio.
+
 ## 4. Il database
 
 Se stai spostando un'installazione esistente, **ferma prima il vecchio bot**: due processi con
