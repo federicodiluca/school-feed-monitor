@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ app_name }}{% endblock %}</title>
-  <meta name="description" content="{% block description %}Aggiornamenti dal mondo scuola (USR, USP, MIM) filtrati per parole chiave, via email e Telegram: report giornaliero o avvisi immediati.{% endblock %}">
+  <meta name="description" content="{% block description %}Le notizie di Ministero, USR e USP raccolte da oltre cento siti e filtrate per le fonti e le parole chiave che scegli. Senza registrazione, anche su Telegram.{% endblock %}">
   <link rel="canonical" href="{{ canonical }}">
   {% block robots %}{% endblock %}
   <meta property="og:site_name" content="{{ app_name }}">
@@ -22,6 +22,7 @@
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
   <link rel="mask-icon" href="{{ url_for('static', filename='mask-icon.svg') }}" color="#1e3a8a">
   <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+  {% block jsonld %}{% endblock %}
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <script src="{{ url_for('static', filename='theme.js') }}"></script>
   <script src="{{ url_for('static', filename='app.js') }}" defer></script>
@@ -55,6 +56,7 @@
     <div class="inner">
       <nav aria-label="Footer">
         <a href="{{ url_for('news.index') }}">Notizie</a>
+        <a href="{{ url_for('news.sources') }}">Fonti</a>
         <a href="{{ url_for('about') }}">Chi siamo e contatti</a>
         <a href="{{ url_for('privacy') }}">Privacy</a>
         <a href="{{ url_for('terms') }}">Termini</a>

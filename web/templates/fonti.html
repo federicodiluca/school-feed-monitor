@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Le fonti monitorate — {{ app_name }}{% endblock %}
+{% block description %}Tutte le fonti lette da {{ app_name }}: Ministero, Uffici Scolastici Regionali e Provinciali, {{ total }} siti istituzionali, con l'ultima notizia raccolta da ognuno.{% endblock %}
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Le fonti monitorate",
+  "url": {{ canonical | tojson }},
+  "inLanguage": "it-IT",
+  "mainEntity": {
+    "@type": "ItemList",
+    "numberOfItems": {{ total }},
+    "itemListElement": [
+      {%- for group, items in groups %}{% for s in items %}
+      {"@type": "ListItem", "name": {{ s.name | tojson }}, "url": {{ (config.BASE_URL ~ source_url(s)) | tojson }}}{% if not loop.last %},{% endif %}
+      {%- endfor %}{% if not loop.last %},{% endif %}{% endfor %}
+    ]
+  }
+}
+</script>
+{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Le fonti monitorate</h1>
+  <p>{{ total }} siti istituzionali letti a intervalli regolari: Ministero, Uffici Scolastici Regionali e Uffici
+    Scolastici Provinciali (Ambiti Territoriali). Ogni fonte ha la sua pagina con le ultime notizie raccolte, e ogni
+    notizia rimanda alla pagina originale. <a href="{{ url_for('config.show') }}">Scegli quelle che ti interessano</a>
+    per vedere solo le loro notizie, qui o su Telegram.</p>
+</div>
+
+{% for group, items in groups %}
+<section class="card">
+  <h2 id="{{ group | lower | replace(' ', '-') }}">{{ group }}</h2>
+  <ul class="source-index">
+    {% for s in items %}
+    <li>
+      <a href="{{ source_url(s) }}">{{ s.name }}</a>
+      {% if s.kind == 'usp' and s.province %}<small class="muted">{{ s.province.replace('|', ', ') }}</small>{% endif %}
+      <small class="muted">{% if s.n_news %}{{ s.n_news }} notizie{% if s.last_news %}, ultima il {{ s.last_news[:10] }}{% endif %}{% else %}nessuna notizia raccolta finora{% endif %}</small>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endfor %}
+{% endblock %}

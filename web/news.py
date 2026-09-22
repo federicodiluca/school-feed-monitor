@@ -4,7 +4,8 @@ from datetime import date, datetime, timedelta
 
 from flask import Blueprint, abort, redirect, render_template, request, url_for
 
-from sfm.db_news import get_today_news, search_news
+from sfm.catalog import group_sources
+from sfm.db_news import count_per_source, get_today_news, latest_per_source, search_news
 from sfm.db_sources import get_source, get_sources
 from sfm.digest import annotate
 from sfm.utils import slugify
@@ -69,6 +70,16 @@ def index():
     return render_template("notizie.html", news=rows, sources=sources, q=q, days=days, days_choices=DAYS_CHOICES,
                            selected_source=source_id, pages=_pages(total, page), source=None,
                            noindex=bool(q or source_id))
+
+
+@bp.get("/fonti")
+def sources():
+    """Elenco completo delle fonti, per regione. È la pagina che rende raggiungibili — a un
+    lettore come a un motore di ricerca — le oltre cento pagine per fonte."""
+    items = get_sources()
+    last, counts = latest_per_source(), count_per_source()
+    items = [dict(s, last_news=last.get(s["id"]), n_news=counts.get(s["id"], 0)) for s in items]
+    return render_template("fonti.html", groups=group_sources(items), total=len(items))
 
 
 @bp.get("/notizie/fonte/<int:source_id>")

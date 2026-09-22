@@ -3,12 +3,14 @@ from urllib.parse import urlsplit
 
 from flask import Response, current_app, request, url_for
 
+from sfm.db_news import latest_per_source
 from sfm.db_sources import get_sources
 
 # Pagine pubbliche indicizzabili: (endpoint, priorità, changefreq)
 PUBLIC_PAGES = [
     ("index", "1.0", "daily"),
     ("news.index", "0.9", "hourly"),
+    ("news.sources", "0.8", "weekly"),
     ("config.show", "0.8", "monthly"),
     ("about", "0.6", "monthly"),
     ("privacy", "0.2", "yearly"),
@@ -45,11 +47,15 @@ def init_app(app):
     def sitemap():
         base = app.config.get("BASE_URL") or request.url_root.rstrip("/")
         entries = [(url_for(endpoint), prio, freq) for endpoint, prio, freq in PUBLIC_PAGES]
-        entries += [(source_url(s), "0.7", "daily") for s in get_sources()]
+        entries = [(path, prio, freq, None) for path, prio, freq in entries]
+        last = latest_per_source()
+        entries += [(source_url(s), "0.7", "daily", (last.get(s["id"]) or "")[:10]) for s in get_sources()]
         host = origin(base)
         urls = "".join(
-            f"<url><loc>{host}{path}</loc><changefreq>{freq}</changefreq><priority>{prio}</priority></url>"
-            for path, prio, freq in entries
+            f"<url><loc>{host}{path}</loc>"
+            + (f"<lastmod>{lastmod}</lastmod>" if lastmod else "")
+            + f"<changefreq>{freq}</changefreq><priority>{prio}</priority></url>"
+            for path, prio, freq, lastmod in entries
         )
         body = f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>'
         return Response(body, mimetype="application/xml")

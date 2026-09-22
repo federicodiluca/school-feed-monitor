@@ -2,12 +2,32 @@
 {% block title %}{% if source %}Notizie da {{ source.name }}{% else %}Ultime notizie dal mondo scuola{% endif %} — {{ app_name }}{% endblock %}
 {% block description %}{% if source %}Le ultime notizie pubblicate da {{ source.name }}, raccolte automaticamente da {{ app_name }}.{% else %}Le ultime notizie da Uffici Scolastici Regionali, Provinciali e Ministero, tutte in una pagina: graduatorie, trasferimenti, circolari, concorsi.{% endif %}{% endblock %}
 {% block robots %}{% if noindex or pages.current > 1 %}<meta name="robots" content="noindex, follow">{% endif %}{% endblock %}
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": {{ (("Notizie da " ~ source.name) if source else "Ultime notizie dal mondo scuola") | tojson }},
+  "url": {{ canonical | tojson }},
+  "inLanguage": "it-IT"{% if source %},
+  "about": {"@type": "GovernmentOrganization", "name": {{ source.name | tojson }}, "url": {{ source.url | tojson }}},
+  "breadcrumb": {
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": {{ app_name | tojson }}, "item": {{ (config.BASE_URL ~ url_for('index')) | tojson }}},
+      {"@type": "ListItem", "position": 2, "name": "Fonti", "item": {{ (config.BASE_URL ~ url_for('news.sources')) | tojson }}},
+      {"@type": "ListItem", "position": 3, "name": {{ source.name | tojson }}, "item": {{ canonical | tojson }}}
+    ]
+  }{% endif %}
+}
+</script>
+{% endblock %}
 {% block content %}
 <div class="page-head">
 <h1>{% if source %}Notizie da {{ source.name }}{% else %}Ultime notizie dal mondo scuola{% endif %}</h1>
 <p>
-  {% if source %}<a href="{{ source.url }}" rel="noopener nofollow">Sito ufficiale</a> · <a href="{{ url_for('news.index') }}">Tutte le fonti</a>
-  {% else %}Questo è quello che {{ app_name }} raccoglie ogni giorno da {{ sources | length }} fonti.
+  {% if source %}<a href="{{ source.url }}" rel="noopener nofollow">Sito ufficiale</a> · <a href="{{ url_for('news.sources') }}">Tutte le fonti</a> · <a href="{{ url_for('news.index') }}">Tutte le notizie</a>
+  {% else %}Questo è quello che {{ app_name }} raccoglie ogni giorno da <a href="{{ url_for('news.sources') }}">{{ sources | length }} fonti</a>.
   <a href="{{ url_for('config.show') }}">Scegli le tue fonti</a> per vedere solo ciò che ti interessa, qui o su Telegram.{% endif %}
 </p>
 </div>

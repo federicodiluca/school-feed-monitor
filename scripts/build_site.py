@@ -30,6 +30,7 @@ PREVIEW_CHARS = 220
 PAGES = [
     ("/", "index.html"),
     ("/notizie", "notizie/index.html"),
+    ("/fonti", "fonti/index.html"),
     ("/le-mie-notizie", "le-mie-notizie/index.html"),
     ("/configura", "configura/index.html"),
     ("/chi-siamo", "chi-siamo/index.html"),
@@ -113,6 +114,9 @@ def build(out_dir="site", base_url=None, bot_username=None):
                json.dumps(payload, ensure_ascii=False, separators=(",", ":")))
 
     _write(os.path.join(out_dir, ".nojekyll"), "")       # niente Jekyll: i file passano così come sono
+    # spiega a chi capita sul branch gh-pages che è roba generata (non si modifica lì)
+    shutil.copy(os.path.join(os.path.dirname(__file__), "..", "web", "site_meta", "README.md"),
+                os.path.join(out_dir, "README.md"))
     log(f"[build_site] sito generato in {out_dir} ({len(sources)} fonti, prefisso '{prefix or '/'}')")
     return out_dir
 

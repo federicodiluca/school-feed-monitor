@@ -183,3 +183,43 @@ def test_the_configurator_is_one_form(client):
     assert html.count('<form method="post" action="/configura"') == 1
     assert 'formaction="/configura/area"' in html
     assert html.count('name="azione" value="telegram"') == 1
+
+
+# --- SEO ----------------------------------------------------------------------------------
+
+def test_the_sources_index_links_every_source(client, catalog_db):
+    """Senza questa pagina le oltre cento pagine per fonte sarebbero orfane: raggiungibili
+    solo dalla sitemap, cioè da nessun link."""
+    html = client.get("/fonti").get_data(as_text=True)
+    links = set(re.findall(r'href="(/notizie/fonte/[^"]+)"', html))
+    assert len(links) == len(catalog_db)
+    assert "Emilia-Romagna" in html and "Nazionali" in html
+    for path in list(links)[:3]:
+        assert client.get(path).status_code == 200
+    assert '<a href="/fonti"' in client.get("/notizie").get_data(as_text=True)
+
+
+def test_structured_data_is_valid_json(client, catalog_db):
+    import json
+    for path, expected in (("/", "WebSite"), ("/fonti", "CollectionPage"), ("/notizie", "CollectionPage")):
+        html = client.get(path).get_data(as_text=True)
+        block = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.S)
+        assert block, path
+        data = json.loads(block.group(1))
+        assert data["@type"] == expected and data["inLanguage"] == "it-IT"
+
+
+def test_sitemap_has_the_sources_index_and_dates(client, catalog_db):
+    from sfm.db_news import add_news
+    source = catalog_db["USP Bologna"]
+    add_news("Notizia", "https://x/1", source["name"], "2026-09-20 08:00:00", "c", source_id=source["id"])
+    xml = client.get("/sitemap.xml").get_data(as_text=True)
+    assert "<loc>https://sfm.example/fonti</loc>" in xml
+    assert f"<loc>https://sfm.example/notizie/fonte/{source['id']}/usp-bologna</loc><lastmod>2026-09-20</lastmod>" in xml
+
+
+def test_the_default_description_matches_the_current_product(client):
+    """Niente email: il sito non ne ha più."""
+    html = client.get("/notizie").get_data(as_text=True)
+    description = re.search(r'name="description" content="(.*?)"', html, re.S).group(1)
+    assert "email" not in description.lower()

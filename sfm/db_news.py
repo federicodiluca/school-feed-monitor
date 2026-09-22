@@ -135,6 +135,25 @@ def latest_news(limit=1200, days=None):
     return [dict(r) for r in rows]
 
 
+def latest_per_source():
+    """{source_id: data dell'ultima notizia}. Serve al <lastmod> della sitemap e a mostrare
+    nell'elenco delle fonti quando ognuna ha pubblicato l'ultima volta."""
+    conn = get_conn()
+    rows = conn.execute("""
+        SELECT source_id, MAX(published_at) AS last FROM news
+        WHERE source_id IS NOT NULL GROUP BY source_id
+    """).fetchall()
+    conn.close()
+    return {r["source_id"]: r["last"] for r in rows}
+
+
+def count_per_source():
+    conn = get_conn()
+    rows = conn.execute("SELECT source_id, COUNT(*) AS n FROM news WHERE source_id IS NOT NULL GROUP BY source_id").fetchall()
+    conn.close()
+    return {r["source_id"]: r["n"] for r in rows}
+
+
 def cleanup_old_news(days=7):
     """Elimina le news con fetched_at più vecchio di `days` giorni. Ritorna il numero di righe eliminate."""
     conn = get_conn()
