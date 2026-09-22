@@ -61,6 +61,32 @@ def test_start_registers_user_and_sends_help(sent_messages):
     assert "Retention notizie e log: 3 giorni" in help_text
 
 
+def test_start_with_a_link_payload_applies_the_configuration(sent_messages):
+    """Il sito statico non puo' salvare un codice: la configurazione viaggia nel link."""
+    from sfm import config_link
+    from sfm.catalog import load_catalog
+    from sfm.db_sources import get_followed_source_ids, get_sources, sync_config_sources
+    from sfm.db_user import get_user as _get_user, user_id_for_telegram
+
+    catalog = load_catalog()
+    sync_config_sources(catalog)
+    wanted = [s for s in get_sources() if s["name"] in ("MIM — Notizie", "USP Bologna")]
+    assert len(wanted) == 2
+    payload = config_link.encode([s["url"] for s in wanted], ["A041"], catalog=catalog)
+
+    tc.handle_update(update(f"/start {payload}"))
+
+    user_id = user_id_for_telegram(1)
+    assert get_followed_source_ids(user_id) == {s["id"] for s in wanted}
+    assert _get_user(1)["keywords"] == ["A041"]
+    assert "Configurazione applicata" in sent_messages[-2]["text"]
+
+
+def test_start_with_an_unreadable_payload_says_so(sent_messages):
+    tc.handle_update(update("/start C1!!!!"))
+    assert any("non valido o scaduto" in m["text"] for m in sent_messages)
+
+
 def test_stop_then_start_reactivates(sent_messages):
     tc.handle_update(update("/start"))
     tc.handle_update(update("/stop"))
