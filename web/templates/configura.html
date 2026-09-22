@@ -9,8 +9,8 @@
     porti la stessa configurazione sul bot Telegram con un clic.</p>
 </div>
 
-<form method="post" action="{{ url_for('config.area') }}" class="card">
-  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+<form {% if not static_mode %}method="post" action="{{ url_for('config.area') }}"{% endif %} class="card" id="form-area">
+  {% if not static_mode %}<input type="hidden" name="_csrf" value="{{ csrf_token() }}">{% endif %}
   <h2>1. Da dove vuoi le notizie?</h2>
   <p class="muted">Seleziona una o più regioni — dove lavori e, se ti interessa, dove vorresti trasferirti — e le
     province. Preparo io la selezione delle fonti (Ministero + USR + USP); potrai comunque ritoccarla sotto.</p>
@@ -33,8 +33,8 @@
   <button type="submit" class="button">Seleziona le fonti di queste aree</button>
 </form>
 
-<form method="post" action="{{ url_for('config.save') }}" class="card" id="fonti">
-  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+<form {% if not static_mode %}method="post" action="{{ url_for('config.save') }}"{% endif %} class="card" id="fonti">
+  {% if not static_mode %}<input type="hidden" name="_csrf" value="{{ csrf_token() }}">{% endif %}
   <h2>2. Fonti e parole chiave</h2>
   <fieldset>
     <legend>Parole chiave <small class="muted">(facoltative)</small></legend>
@@ -54,7 +54,7 @@
         <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
       <ul class="sources">
         {% for s in items %}
-        <li><label><input type="checkbox" name="sources" value="{{ s.id }}" {% if s.followed %}checked{% endif %}>
+        <li><label><input type="checkbox" name="sources" value="{{ s.id }}" data-catalog="{{ s.catalog_index if s.catalog_index is not none else -1 }}" {% if s.followed %}checked{% endif %}>
           {{ s.name }}{% if s.kind == 'usp' and s.province %} <small class="muted">({{ s.province.replace('|', ', ') }})</small>{% endif %}</label></li>
         {% endfor %}
       </ul>
@@ -68,7 +68,12 @@
 
 <section class="card" id="telegram">
   <h2>3. Ricevere gli avvisi su Telegram <small class="muted">(facoltativo)</small></h2>
-  {% if code %}
+  {% if static_mode %}
+    <div id="telegram-out" hidden></div>
+    <p id="telegram-hint">Sul sito le notizie le leggi quando vuoi. Il bot Telegram invece <strong>ti avvisa</strong>:
+      subito quando esce una notizia con le tue parole chiave, e con un riepilogo una volta al giorno.
+      Scegli le fonti qui sopra e usa «Salva e porta su Telegram».</p>
+  {% elif code %}
     <p>La tua configurazione è pronta. Apri il bot e il codice verrà applicato da solo:</p>
     {% set link = telegram_link(code) %}
     {% if link %}<p><a class="button primary" href="{{ link }}" rel="noopener" target="_blank">{{ icon('send', 18) }} Apri il bot e configura</a></p>{% endif %}
@@ -88,10 +93,10 @@
   <p class="muted">Sono due cookie tecnici in questo browser (<code>sfm_fonti</code>, <code>sfm_parole</code>): sul
     server non resta niente. Se cambi dispositivo o cancelli i dati del browser, dovrai rifare la scelta.</p>
   <p>
-    <a class="button" href="{{ url_for('config.export') }}">{{ icon('download', 18) }} Scarica le tue preferenze</a>
+    <a class="button" id="export-prefs" href="{{ url_for('config.export') }}">{{ icon('download', 18) }} Scarica le tue preferenze</a>
   </p>
-  <form method="post" action="{{ url_for('config.forget') }}">
-    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+  <form {% if not static_mode %}method="post" action="{{ url_for('config.forget') }}"{% endif %} id="form-forget">
+    {% if not static_mode %}<input type="hidden" name="_csrf" value="{{ csrf_token() }}">{% endif %}
     <button type="submit" class="button danger">{{ icon('trash', 18) }} Dimentica tutto da questo browser</button>
   </form>
 </section>

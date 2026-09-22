@@ -97,7 +97,7 @@ def test_choose_sources_stores_cookies_and_filters_news(client, catalog_db):
     html = client.get("/le-mie-notizie").get_data(as_text=True)
     assert "1 fonti che hai scelto" in html and "A041, trasferimenti" in html
     html = client.get("/configura").get_data(as_text=True)
-    assert f'value="{bo}" checked' in html and "A041, trasferimenti" in html
+    assert f'value="{bo}"' in html and "checked" in html and "A041, trasferimenti" in html
     assert "Le mie notizie" in client.get("/").get_data(as_text=True)   # voce di menu quando ci sono preferenze
 
 

@@ -2,6 +2,32 @@
 {% block title %}Le mie notizie — {{ app_name }}{% endblock %}
 {% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 {% block content %}
+{% if static_mode %}
+<div class="page-head">
+<h1>Le mie notizie</h1>
+<p id="mine-intro">Dalle fonti che hai scelto in questo browser. <a href="{{ url_for('config.show') }}">Modifica la selezione</a>.</p>
+</div>
+
+<div class="card" id="mine-empty">
+  <h2>Non hai ancora scelto le fonti</h2>
+  <p>Scegli la tua regione e le tue province: le notizie compariranno qui, e la scelta resta salvata in questo browser
+    (niente account, niente email).</p>
+  <p><a class="button primary" href="{{ url_for('config.show') }}">Scegli le fonti</a></p>
+</div>
+
+<div id="mine-body" hidden>
+  <form class="filters" role="search" id="mine-filters" data-live="1">
+    <div class="field grow"><label for="q">Cerca</label>
+    <input type="search" id="q" name="q" placeholder="es. graduatorie, A041" maxlength="80"></div>
+    <div class="field"><label for="giorni">Periodo</label>
+    <select id="giorni" name="giorni">
+      {% for d in days_choices %}<option value="{{ d }}" {% if d == 7 %}selected{% endif %}>{% if d == 1 %}Oggi e ieri{% else %}Ultimi {{ d }} giorni{% endif %}</option>{% endfor %}
+    </select></div>
+  </form>
+  <p class="count" id="mine-count"></p>
+  <div id="mine-results"></div>
+</div>
+{% else %}
 <div class="page-head">
 <h1>Le mie notizie</h1>
 <p>Dalle {{ n_sources }} fonti che hai scelto in questo browser{% if user.keywords %}, con evidenziate le tue parole chiave: <strong>{{ user.keywords | join(', ') }}</strong>{% else %}. <a href="{{ url_for('config.show') }}">Aggiungi parole chiave</a> per evidenziare ciò che ti interessa{% endif %}.
@@ -50,6 +76,7 @@
     {% if pages.current < pages.last %}{% set _ = base_args.update({'pagina': pages.current + 1}) %}<a rel="next" href="?{{ base_args | urlencode }}">Più vecchie →</a>{% endif %}
   </nav>
   {% endif %}
+{% endif %}
 {% endif %}
 {% endif %}
 {% endblock %}

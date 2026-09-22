@@ -1,7 +1,7 @@
 // Service worker minimo: la "shell" (CSS, icone, JS) sta in cache, le pagine passano dalla
 // rete e, se la rete manca, si ricade sull'ultima versione vista.
 const CACHE = "sfm-v1";
-const SHELL = ["/", "/static/style.css", "/static/theme.js", "/static/favicon.svg", "/static/offline.html"];
+const SHELL = ["./", "./static/style.css", "./static/theme.js", "./static/favicon.svg", "./static/offline.html"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -22,6 +22,6 @@ self.addEventListener("fetch", (e) => {
         caches.open(CACHE).then((c) => c.put(req, copy));
         return resp;
       })
-      .catch(() => caches.match(req).then((hit) => hit || caches.match("/static/offline.html")))
+      .catch(() => caches.match(req).then((hit) => hit || caches.match(new URL("./static/offline.html", self.location).pathname)))
   );
 });

@@ -12,7 +12,8 @@
 </p>
 </div>
 
-<form method="get" class="filters" role="search">
+<form method="get" class="filters" role="search" id="news-filters"{% if static_mode %} data-live="1"{% endif %}>
+  {% if source and static_mode %}<input type="hidden" name="fonte" value="{{ source.id }}">{% endif %}
   <div class="field grow"><label for="q">Cerca</label>
   <input type="search" id="q" name="q" value="{{ q }}" placeholder="es. graduatorie, A041, trasferimenti" maxlength="80"></div>
   {% if not source %}
@@ -29,10 +30,11 @@
   <button type="submit" class="button">Filtra</button>
 </form>
 
-<p class="count">{{ pages.total }} notizie{% if pages.last > 1 %} · pagina {{ pages.current }} di {{ pages.last }}{% endif %}</p>
-{% include "_news_list.html" %}
+<p class="count" id="news-count">{{ pages.total }} notizie{% if pages.last > 1 and not static_mode %} · pagina {{ pages.current }} di {{ pages.last }}{% endif %}</p>
+<div id="news-results">{% include "_news_list.html" %}</div>
+{% if static_mode %}<p class="center"><button type="button" class="button" id="news-more">Carica altre notizie</button></p>{% endif %}
 
-{% if pages.last > 1 %}
+{% if pages.last > 1 and not static_mode %}
 <nav class="pagination" aria-label="Pagine">
   {% set base_args = request.args.to_dict() %}
   {% if pages.current > 1 %}{% set _ = base_args.update({'pagina': pages.current - 1}) %}<a rel="prev" href="?{{ base_args | urlencode }}">← Più recenti</a>{% endif %}

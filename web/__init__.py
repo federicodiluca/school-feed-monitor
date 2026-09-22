@@ -60,6 +60,9 @@ def create_app(test_config=None):
         MAX_CONTENT_LENGTH=64 * 1024,
         TELEGRAM_BOT_USERNAME=(env("TELEGRAM_BOT_USERNAME") or "").lstrip("@"),
         CONTACT_EMAIL=env("CONTACT_EMAIL") or "schoolfeedmonitor@gmail.com",
+        # True quando le pagine vengono congelate per GitHub Pages: niente POST né
+        # query string, l'interazione passa tutta da static/app.js (vedi scripts/build_site.py)
+        STATIC=False,
     )
     if test_config:
         app.config.update(test_config)
@@ -112,6 +115,8 @@ def create_app(test_config=None):
     @app.context_processor
     def inject_globals():
         return {"app_name": APP_NAME, "canonical": seo.canonical_url(request),
+                "static_mode": app.config.get("STATIC", False),
+                "base_path": request.script_root or "",
                 "bot_username": app.config.get("TELEGRAM_BOT_USERNAME", ""),
                 "contact_email": app.config.get("CONTACT_EMAIL", ""),
                 "telegram_link": telegram_link,

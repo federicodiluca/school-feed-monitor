@@ -4,7 +4,7 @@ import json
 
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 
-from sfm.catalog import REGIONS, group_sources, provinces_by_region, sources_for_areas
+from sfm.catalog import REGIONS, group_sources, load_catalog, provinces_by_region, sources_for_areas
 from sfm.db_configs import TTL_HOURS, save_config
 from sfm.db_sources import get_sources
 from sfm.utils import parse_keywords
@@ -13,9 +13,17 @@ from web import prefs
 bp = Blueprint("config", __name__)
 
 
+def catalog_positions():
+    """{url della fonte: posizione nel catalogo}. La posizione è quella che finisce nel link
+    di Telegram quando il sito è statico (vedi sfm/config_link.py)."""
+    return {entry["url"]: i for i, entry in enumerate(load_catalog())}
+
+
 def _sources_with_selection():
     chosen = prefs.selected_source_ids()
-    return [dict(s, followed=s["id"] in chosen) for s in get_sources()]
+    positions = catalog_positions()
+    return [dict(s, followed=s["id"] in chosen, catalog_index=positions.get(s["url"]))
+            for s in get_sources()]
 
 
 @bp.get("/configura")

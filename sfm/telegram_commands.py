@@ -11,6 +11,7 @@ from sfm.db_user import (
     update_keywords,
     user_id_for_telegram,
 )
+from sfm import config_link
 from sfm.db_configs import load_config
 from sfm.db_health import get_failing_source_ids
 from sfm.db_news import get_recent_news
@@ -142,7 +143,7 @@ def cmd_start(telegram_id, args, username=None):
         activate_user(telegram_id)
         send_message("👋 Bentornato! Le notifiche sono attive.", chat_id=telegram_id)
 
-    code = (args or "").strip().upper()
+    code = (args or "").strip()
     if code:
         apply_config_code(telegram_id, code)
     elif added:
@@ -151,10 +152,22 @@ def cmd_start(telegram_id, args, username=None):
     send_message(build_help_message(telegram_id), parse_mode="HTML", chat_id=telegram_id)
 
 
+def resolve_config(code):
+    """Configurazione dietro l'argomento di /start: o un payload che se la porta dietro
+    (sito statico), o un codice usa-e-getta salvato dal sito. None se non è leggibile."""
+    if config_link.looks_like_payload(code):
+        link = config_link.decode(code)
+        if link is None:
+            return None
+        ids = [s["id"] for url in link["urls"] if (s := get_source_by_url(url))]
+        return {"sources": ids, "keywords": link["keywords"]} if ids else None
+    return load_config(code.strip().upper())
+
+
 def apply_config_code(telegram_id, code):
     """Applica una configurazione creata sul sito: fonti seguite + parole chiave.
     Ritorna True se il codice era valido."""
-    config = load_config(code)
+    config = resolve_config(code)
     if config is None:
         send_message("❌ Codice non valido o scaduto (vale 24 ore e si usa una volta sola). "
                      "Generane uno nuovo dal sito.", chat_id=telegram_id)

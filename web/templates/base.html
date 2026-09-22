@@ -26,15 +26,15 @@
   <script src="{{ url_for('static', filename='theme.js') }}"></script>
   <script src="{{ url_for('static', filename='app.js') }}" defer></script>
 </head>
-<body>
+<body data-base="{{ base_path }}"{% if static_mode %} data-static="1" data-bot="{{ bot_username }}"{% endif %}>
   <a class="skip" href="#main">Vai al contenuto</a>
   <header class="site-header">
     <nav aria-label="Principale">
       <a class="brand" href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='favicon.svg') }}" alt="" width="28" height="28" class="brand-logo">{{ app_name }}</a>
       <ul>
         <li><a href="{{ url_for('news.index') }}">Notizie</a></li>
-        {% if has_prefs %}<li><a href="{{ url_for('news.mine') }}">Le mie notizie</a></li>{% endif %}
-        <li><a class="button primary" href="{{ url_for('config.show') }}">{% if has_prefs %}Le mie fonti{% else %}Scegli le fonti{% endif %}</a></li>
+        {% if has_prefs or static_mode %}<li id="nav-mine"{% if static_mode %} hidden{% endif %}><a href="{{ url_for('news.mine') }}">Le mie notizie</a></li>{% endif %}
+        <li><a class="button primary" href="{{ url_for('config.show') }}"><span id="nav-config-label">{% if has_prefs %}Le mie fonti{% else %}Scegli le fonti{% endif %}</span></a></li>
         <li><button type="button" id="theme-toggle" class="icon" aria-label="Cambia tema chiaro/scuro" title="Tema chiaro/scuro"><span class="only-light">{% from "_icons.html" import icon %}{{ icon('moon', 18) }}</span><span class="only-dark">{{ icon('sun', 18) }}</span></button></li>
       </ul>
     </nav>
