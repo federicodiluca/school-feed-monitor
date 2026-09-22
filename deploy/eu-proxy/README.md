@@ -22,7 +22,21 @@ gcloud run deploy sfm-eu-proxy \
   --min-instances 0 \
   --max-instances 1 \
   --memory 256Mi \
-  --set-env-vars "ALLOWED_HOSTS=istruzione.calabria.it,uspmc.sinp.net,PROXY_KEY=LA-CHIAVE-GENERATA"
+  --set-env-vars "^@^ALLOWED_HOSTS=istruzione.calabria.it,uspmc.sinp.net@PROXY_KEY=LA-CHIAVE-GENERATA"
+```
+
+Quel `^@^` iniziale non è un refuso: dice a `gcloud` di separare le variabili con `@` invece
+che con la virgola, che qui serve dentro `ALLOWED_HOSTS`. Senza, `gcloud` risponde
+*"Bad syntax for dict arg"*. In alternativa, un file (ricordati che contiene la chiave:
+non committarlo):
+
+```bash
+cat > /tmp/proxy-env.yaml <<'YAML'
+ALLOWED_HOSTS: "istruzione.calabria.it,uspmc.sinp.net"
+PROXY_KEY: "LA-CHIAVE-GENERATA"
+YAML
+gcloud run deploy sfm-eu-proxy --source . --region europe-west8   --allow-unauthenticated --min-instances 0 --max-instances 1 --memory 256Mi   --env-vars-file /tmp/proxy-env.yaml
+rm /tmp/proxy-env.yaml
 ```
 
 `europe-west8` è Milano; va bene anche `europe-west1` (Belgio). Al termine `gcloud` stampa
