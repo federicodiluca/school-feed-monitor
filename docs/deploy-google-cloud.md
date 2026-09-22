@@ -175,9 +175,10 @@ sudo systemctl restart sfm-bot
 " https://www.istruzione.calabria.it/feed/
   ```
 
-  Se cambia qualcosa con lo user-agent da browser è un blocco sul client, e si aggiusta; se
-  resta appeso in entrambi i casi è l'indirizzo IP, e l'unica soluzione è leggere quelle fonti
-  da una macchina europea.
+  Verificato il 22 settembre 2026: resta appeso in entrambi i casi, quindi è l'indirizzo IP.
+  La soluzione è in [deploy/eu-proxy/](../deploy/eu-proxy/README.md): un micro-servizio su
+  Cloud Run in Europa che legge quei due domini per conto della VM (free tier, niente acceso
+  quando non serve).
 - **Il sito Flask serve ancora**: in locale (`python web.py`) è il modo più comodo per
   provare le modifiche prima di generarle; in produzione non viene esposto.
 - **Se un giorno servisse un dominio**, il sito statico si sposta senza toccare la VM: cambia

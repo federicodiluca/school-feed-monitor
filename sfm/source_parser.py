@@ -13,6 +13,7 @@ import feedparser
 import requests
 from bs4 import BeautifulSoup
 
+from sfm.env import env
 from sfm.utils import strip_html
 
 USER_AGENT = "Mozilla/5.0 (compatible; SchoolFeedMonitor/1.0; +https://github.com/federicodiluca/school-feed-monitor)"
@@ -38,13 +39,44 @@ class SourceError(Exception):
 
 # --- rete -----------------------------------------------------------------
 
+def _proxy_hosts():
+    """Domini da leggere sempre attraverso il proxy europeo (SFM_FETCH_PROXY_HOSTS)."""
+    return {h.strip().lower() for h in (env("SFM_FETCH_PROXY_HOSTS") or "").split(",") if h.strip()}
+
+
+def _get(url, via_proxy=False):
+    """Una singola richiesta HTTP, diretta o attraverso il proxy europeo."""
+    proxy = (env("SFM_FETCH_PROXY") or "").rstrip("/")
+    if via_proxy and proxy:
+        headers = {"User-Agent": USER_AGENT}
+        key = env("SFM_FETCH_PROXY_KEY")
+        if key:
+            headers["X-Sfm-Key"] = key
+        return requests.get(proxy + "/fetch", params={"url": url}, headers=headers, timeout=FETCH_TIMEOUT + 15)
+    return requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=FETCH_TIMEOUT)
+
+
 def fetch_url(url):
-    """Scarica una URL. Ritorna (bytes, content_type). Solleva SourceError."""
+    """Scarica una URL. Ritorna (bytes, content_type). Solleva SourceError.
+
+    Alcuni siti istituzionali non rispondono agli indirizzi IP esteri: se è configurato un
+    proxy europeo (SFM_FETCH_PROXY) i domini elencati in SFM_FETCH_PROXY_HOSTS passano
+    direttamente da lì, e per gli altri il proxy resta una seconda possibilità dopo un errore
+    di rete (vedi deploy/eu-proxy/)."""
+    proxy = (env("SFM_FETCH_PROXY") or "").rstrip("/")
+    host = (urlparse(url).hostname or "").lower()
+    known = bool(proxy) and any(host == h or host.endswith("." + h) for h in _proxy_hosts())
     try:
-        resp = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=FETCH_TIMEOUT)
+        resp = _get(url, via_proxy=known)
         resp.raise_for_status()
     except requests.RequestException as e:
-        raise SourceError(f"impossibile scaricare {url}: {e}") from e
+        if known or not proxy:
+            raise SourceError(f"impossibile scaricare {url}: {e}") from e
+        try:                                    # seconda possibilità: dall'Europa
+            resp = _get(url, via_proxy=True)
+            resp.raise_for_status()
+        except requests.RequestException:
+            raise SourceError(f"impossibile scaricare {url}: {e}") from e
     return resp.content, resp.headers.get("content-type", "")
 
 
