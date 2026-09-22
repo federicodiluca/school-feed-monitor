@@ -64,7 +64,7 @@ Ai sensi dell'art. 30 GDPR. Documento interno del titolare; da aggiornare quando
 |---|---|
 | **Finalità** | Prevenzione abusi, diagnosi di errori, funzionamento del servizio |
 | **Base giuridica** | Legittimo interesse (art. 6.1.f): protezione del servizio e degli utenti |
-| **Dati** | Indirizzo IP nei log del server web (se il sito è servito dalla VM; assente se il frontend è statico su GitHub Pages, dove i log restano di GitHub); nei log applicativi del bot: identificativo Telegram e parole chiave che hanno generato una notifica; messaggi di errore |
+| **Dati** | Le pagine sono servite da GitHub Pages (GitHub Inc., USA): i log di accesso (IP, pagina, data) sono di GitHub, titolare autonomo, e il titolare del servizio non vi accede. Sulla VM: log applicativi del bot (identificativo Telegram e parole chiave che hanno generato una notifica) e messaggi di errore |
 | **Dove** | File `data/logs/AAAA-MM-GG.log`, log del server web **[da configurare al deploy]**, memoria del processo |
 | **Conservazione** | Log applicativi: `data_retention_days` (default 7, massimo consigliato 30); log del server: ≤ 30 giorni con rotazione **[da configurare al deploy]** |
 
@@ -95,4 +95,4 @@ Ai sensi dell'art. 30 GDPR. Documento interno del titolare; da aggiornare quando
 ## Storico
 
 - 2026-09-20 — prima stesura (versione con account web ed email).
-- 2026-09-22 — rimossi account web, email e accesso Google: restano il bot Telegram, i cookie tecnici del sito e i codici di configurazione usa-e-getta. Hosting: VM Google Cloud (Stati Uniti).
+- 2026-09-22 — rimossi account web, email e accesso Google: restano il bot Telegram, i cookie tecnici del sito e la configurazione passata al bot dentro il link di /start. Hosting: VM Google Cloud (Stati Uniti) per bot e raccolta notizie, GitHub Pages (Stati Uniti) per il sito.
