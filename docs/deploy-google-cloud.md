@@ -162,8 +162,22 @@ sudo systemctl restart sfm-bot
   `polling_minutes` in `config.json`.
 - **Prova gratuita**: i 300 $ di credito durano 90 giorni; alla scadenza, se non passi a un
   account a pagamento, Google **ferma le risorse**. Segnati la data e decidi prima.
-- **Scraping dagli USA**: su 112 fonti, una (USP Macerata) rifiuta le connessioni da IP esteri.
-  Il watchdog la segnalerà come "in errore": è atteso, non è un guasto.
+- **Scraping dagli USA**: alcune fonti non rispondono a un server americano pur funzionando
+  benissimo dall'Italia — al 22 settembre 2026 sono USP Macerata e i siti calabresi
+  (`istruzione.calabria.it`: USR Calabria e gli USP della regione). Le connessioni restano
+  appese fino al timeout: è filtraggio geografico o per rete di datacenter, non un guasto.
+  Il watchdog le segnalerà come "in errore". Per verificarlo dalla VM:
+
+  ```bash
+  curl -sS -m 30 -o /dev/null -w "%{http_code} %{time_total}s
+" https://www.istruzione.calabria.it/feed/
+  curl -sS -m 30 -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" -o /dev/null        -w "%{http_code} %{time_total}s
+" https://www.istruzione.calabria.it/feed/
+  ```
+
+  Se cambia qualcosa con lo user-agent da browser è un blocco sul client, e si aggiusta; se
+  resta appeso in entrambi i casi è l'indirizzo IP, e l'unica soluzione è leggere quelle fonti
+  da una macchina europea.
 - **Il sito Flask serve ancora**: in locale (`python web.py`) è il modo più comodo per
   provare le modifiche prima di generarle; in produzione non viene esposto.
 - **Se un giorno servisse un dominio**, il sito statico si sposta senza toccare la VM: cambia
