@@ -46,6 +46,10 @@ tiene solo quello che riguarda la versione in produzione; il resto è lì.
   Oltre non si va: se serve, generare pagine per mese o per fonte+anno
 - [ ] **Icona vera**: il set PNG/apple-touch/manifest c'è, ma l'icona è provvisoria
 - [ ] **Accessibilità**: giro di verifica con tastiera e screen reader sulle pagine principali
+- [ ] **Pulizia degli iscritti sospesi**: chi blocca il bot resta nel database con `active=0` —
+  non riceve più niente, ma i suoi dati restano per sempre, mentre la privacy dice "finché usi
+  il bot". Servirebbe la data di disattivazione (migrazione) e una cancellazione automatica
+  dopo, indicativamente, 12 mesi di inattività
 - [ ] Ricontrollare ogni tanto il catalogo: `python scripts/check_sources.py --catalog`
   (il controllo settimanale in CI lo fa già, ma le fonti "recuperabili" sopra vanno riprovate a mano)
 
