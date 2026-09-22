@@ -10,7 +10,10 @@ from web import create_app
 
 
 def _at(days_ago, hours=10):
-    return (datetime.now(timezone.utc) - timedelta(days=days_ago)).replace(hour=hours, minute=0, second=0).isoformat()
+    """Data di pubblicazione nel fuso *locale*: "oggi" nel riepilogo è il giorno locale, e
+    con l'ora UTC il test falliva ogni notte fra mezzanotte e le due."""
+    local = datetime.now().astimezone() - timedelta(days=days_ago)
+    return local.replace(hour=hours, minute=0, second=0, microsecond=0).isoformat()
 
 
 @pytest.fixture

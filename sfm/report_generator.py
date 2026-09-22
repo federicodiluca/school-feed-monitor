@@ -1,6 +1,6 @@
 """Report giornaliero: wrapper di compatibilità sul modulo digest.
 `/report` su Telegram e la vecchia API generate_report() passano da qui."""
-from sfm.channels.telegram_channel import NO_NEWS_MESSAGE, build_report  # noqa: F401 (compatibilità)
+from sfm.channels.telegram_channel import build_report, no_news_message  # noqa: F401 (compatibilità)
 from sfm.db_user import get_user
 from sfm.digest import run_digests, send_user_digest
 from sfm.logger import log

@@ -34,6 +34,14 @@ def load_env(path=None, override=False):
     return count
 
 
+DEFAULT_SITE_URL = "https://federicodiluca.github.io/school-feed-monitor"
+
+
+def site_url():
+    """Indirizzo pubblico del sito, da APP_BASE_URL (senza barra finale)."""
+    return (env("APP_BASE_URL") or DEFAULT_SITE_URL).rstrip("/")
+
+
 def env(key, default=None):
     """Variabile d'ambiente, caricando .env la prima volta."""
     global _loaded

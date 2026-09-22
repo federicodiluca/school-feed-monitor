@@ -1,11 +1,16 @@
 """Canale Telegram: formatta e invia alert e report tramite sfm.telegram."""
 from datetime import datetime
 
+from sfm.env import site_url
 from sfm.telegram import send_long_message, send_message
 from sfm.utils import cleanHTMLPreview, escape_html, format_local_datetime
 
 NAME = "telegram"
-NO_NEWS_MESSAGE = "🗓️ Nessuna notizia per oggi dalle fonti che segui."
+
+
+def no_news_message():
+    return ("🗓️ Nessuna notizia per oggi dalle fonti che segui.\n"
+            f"Tutte le notizie, anche delle altre fonti: {site_url()}/notizie")
 
 
 def format_alert(news):
@@ -38,10 +43,9 @@ def build_report(news_list):
         hint = f" · <b>{escape_html(', '.join(kws))}</b>" if kws else ""
         if n.get("already_alerted"):
             hint += " · <i>già segnalata</i>"
-        if n.get("already_alerted"):
-            hint += " · <i>già segnalata</i>"
         lines.append(f"{icon} <a href=\"{link}\">{source}</a> — {published}{hint}\n<b>{title}</b>\n<i>{preview}</i>\n")
 
+    lines.append(f"🌐 Cerca fra tutte le notizie, anche delle fonti che non segui: {site_url()}/notizie")
     return "\n".join(lines).strip()
 
 
@@ -50,5 +54,5 @@ def send_alert(user, news, matched_keywords):
 
 
 def send_digest(user, news_list):
-    text = build_report(news_list) or NO_NEWS_MESSAGE
+    text = build_report(news_list) or no_news_message()
     return send_long_message(text, chat_id=user["telegram_id"], parse_mode="HTML")

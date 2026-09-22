@@ -30,6 +30,7 @@ from sfm.source_parser import SourceError, detect_source
 from sfm.report_generator import generate_report
 from sfm.logger import log
 from sfm.config_loader import get_config
+from sfm.env import site_url
 from sfm.utils import cleanHTMLPreview, escape_html, format_local_datetime, parse_keywords
 import requests
 import time
@@ -60,6 +61,7 @@ def build_help_message(telegram_id=None):
     else:
         feed_list = "\n".join(f"• {escape_html(s['name'])}" for s in get_sources())
     feed_list = feed_list or "⚠️ Nessuna fonte configurata."
+    site = site_url()
     return f"""
 🤖 <b>School Feed Monitor</b> — servizio attivo.
 
@@ -80,6 +82,8 @@ def build_help_message(telegram_id=None):
 /start CODICE — applica la configurazione creata sul sito
 /dati — cosa conservo su di te · /cancellami — cancella tutto
 /commands — elenco rapido comandi
+
+🌐 <b>Sito</b>: {site} — tutte le notizie, ricerca e configuratore delle fonti
 
 <b>Scheduler:</b>
 • Fetch ogni {polling} minuti
@@ -147,8 +151,9 @@ def cmd_start(telegram_id, args, username=None):
     if code:
         apply_config_code(telegram_id, code)
     elif added:
-        send_message("Scegli le fonti sul sito (è più comodo) oppure qui con /sources, "
-                     "poi imposta le parole chiave con /setkeywords parola1, parola2.", chat_id=telegram_id)
+        send_message(f"Scegli le fonti sul sito — è più comodo: {site_url()}/configura\n"
+                     "In fondo alla pagina premi «Salva e porta su Telegram» e torni qui con tutto pronto.\n"
+                     "Oppure fai da qui con /sources e /setkeywords parola1, parola2.", chat_id=telegram_id)
     send_message(build_help_message(telegram_id), parse_mode="HTML", chat_id=telegram_id)
 
 
