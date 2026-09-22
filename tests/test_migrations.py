@@ -189,3 +189,17 @@ def test_v7_removes_web_accounts_but_keeps_telegram_users():
     conn.close()
     assert [u["telegram_id"] for u in get_users(active_only=False)] == [1001, 2002]   # l'utente web sparisce
     assert get_user(1001)["keywords"] == ["docenti", "ata"]
+
+
+def test_a_forgotten_database_next_to_the_one_in_use_is_reported(tmp_path, monkeypatch, capsys):
+    """Il caso vero: il servizio riparte su un database nuovo e quello con gli utenti resta
+    lì accanto, in silenzio."""
+    import sfm.settings as settings
+    monkeypatch.setattr(settings, "DB_PATH", str(tmp_path / "sfm.db"))
+    (tmp_path / "sfm.db").write_text("")
+    assert settings.warn_about_other_db_files() == []
+
+    (tmp_path / "checkfeed.db").write_text("")
+    (tmp_path / "vecchio-backup.db").write_text("")
+    assert settings.warn_about_other_db_files() == ["checkfeed.db", "vecchio-backup.db"]
+    assert "il database buono è uno di quelli" in capsys.readouterr().err

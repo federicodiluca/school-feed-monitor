@@ -32,6 +32,27 @@ LEGACY_DB_PATH = "data/checkfeed.db"
 DB_PATH = env_setting("DB_PATH", DEFAULT_DB_PATH)
 
 
+def other_db_files():
+    """Altri file .db nella cartella del database in uso. Se ce ne sono, quasi sempre
+    significa che il servizio sta scrivendo su un database nuovo mentre quello vero è lì
+    accanto: meglio dirlo forte all'avvio che scoprirlo dagli utenti spariti."""
+    folder = os.path.dirname(DB_PATH) or "."
+    if not os.path.isdir(folder):
+        return []
+    in_use = os.path.basename(DB_PATH)
+    return sorted(name for name in os.listdir(folder)
+                  if name.endswith(".db") and name != in_use)
+
+
+def warn_about_other_db_files():
+    others = other_db_files()
+    if others:
+        print(f"⚠️ Sto usando {DB_PATH}, ma nella stessa cartella ci sono anche: "
+              f"{', '.join(others)}. Se gli utenti sembrano spariti, il database buono è uno di quelli.",
+              file=sys.stderr)
+    return others
+
+
 def migrate_legacy_db_file():
     """Se il DB è ancora al vecchio percorso predefinito e quello nuovo non esiste,
     lo sposta (con i file -wal/-shm). Ritorna True se ha spostato qualcosa."""

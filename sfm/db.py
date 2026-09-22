@@ -2,7 +2,7 @@ import os
 import sqlite3
 
 from sfm.migrations import run_migrations
-from sfm.settings import DB_PATH, migrate_legacy_db_file  # SFM_DB_PATH (o CHECKFEED_DB_PATH, deprecata)
+from sfm.settings import DB_PATH, migrate_legacy_db_file, warn_about_other_db_files  # SFM_DB_PATH (o CHECKFEED_DB_PATH, deprecata)
 
 
 def get_conn():
@@ -120,6 +120,7 @@ def init_db():
     if parent:
         os.makedirs(parent, exist_ok=True)
     migrate_legacy_db_file()  # data/checkfeed.db -> data/sfm.db, una volta sola
+    warn_about_other_db_files()
 
     conn = get_conn()
     conn.execute("PRAGMA journal_mode=WAL")  # letture/scritture concorrenti (bot + web)
