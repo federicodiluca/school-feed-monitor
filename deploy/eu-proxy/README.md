@@ -7,7 +7,17 @@ mese; noi ne facciamo ~170 al giorno).
 
 Non è un proxy aperto: risponde solo per i domini elencati e solo con la chiave condivisa.
 
-## Deploy (dal tuo PC o dalla VM, una volta sola)
+## Deploy (una volta sola)
+
+**Non farlo dalla VM.** Il suo account di servizio ha scope ridotti e `gcloud run deploy`
+risponde `ACCESS_TOKEN_SCOPE_INSUFFICIENT`. Il posto giusto è la **Cloud Shell** della console
+Google Cloud (l'icona `>_` in alto a destra): è già autenticata come te, ha `gcloud` pronta ed
+è gratuita.
+
+```bash
+git clone https://github.com/federicodiluca/school-feed-monitor.git
+cd school-feed-monitor/deploy/eu-proxy
+```
 
 ```bash
 cd deploy/eu-proxy
