@@ -3,14 +3,15 @@ from sfm.telegram import TELEGRAM_TOKEN, answer_callback_query, edit_message_tex
 from sfm.db_user import (
     activate_user,
     add_user,
-    consume_link_code,
     deactivate_user,
+    delete_user,
+    export_user_data,
     get_user,
-    get_user_by_id,
-    merge_telegram_user,
+    set_keywords,
     update_keywords,
     user_id_for_telegram,
 )
+from sfm.db_configs import load_config
 from sfm.db_health import get_failing_source_ids
 from sfm.db_news import get_recent_news
 from sfm.db_sources import (
@@ -45,7 +46,6 @@ USAGE_FOLLOW = "❗ Usa: /follow 1, 3 (numeri da /sources) oppure /follow all"
 USAGE_UNFOLLOW = "❗ Usa: /unfollow 2 (numeri da /sources) oppure /unfollow all"
 USAGE_ADDSOURCE = "❗ Usa: /addsource https://sito.it/notizie/ [Nome fonte]"
 USAGE_REMOVESOURCE = "❗ Usa: /removesource N (numero da /sources; solo fonti aggiunte da te)"
-USAGE_LINK = "❗ Usa: /link CODICE (lo trovi nella pagina Account del sito, vale 15 minuti)"
 
 
 def build_help_message(telegram_id=None):
@@ -76,7 +76,8 @@ def build_help_message(telegram_id=None):
 /unfollow n, m — smetti di seguire le fonti indicate (o "all")
 /addsource URL [nome] — aggiungi una fonte (RSS o pagina notizie)
 /removesource n — rimuovi una fonte aggiunta da te
-/link CODICE — collega questa chat al tuo account sul sito
+/start CODICE — applica la configurazione creata sul sito
+/dati — cosa conservo su di te · /cancellami — cancella tutto
 /commands — elenco rapido comandi
 
 <b>Scheduler:</b>
@@ -105,7 +106,9 @@ COMMANDS_MESSAGE = f"""
 /unfollow n, m — non seguire fonti (o "all")
 /addsource URL [nome] — aggiungi una fonte
 /removesource n — rimuovi una fonte aggiunta da te
-/link CODICE — collega questa chat al tuo account sul sito
+/start CODICE — applica la configurazione creata sul sito
+/dati — cosa conservo su di te
+/cancellami — cancella tutto quello che ho su di te
 /commands — mostra questo elenco
 
 💡 <i>Usa /start per informazioni complete su feed e scheduler.</i>
@@ -130,13 +133,47 @@ def parse_command(text):
 # === Handler dei singoli comandi ===
 
 def cmd_start(telegram_id, args, username=None):
+    """/start, eventualmente seguito dal codice di configurazione creato sul sito
+    (il link "Apri il bot e configura" apre proprio /start CODICE)."""
     added = add_user(telegram_id, username)
     if added:
-        send_message("👋 Benvenuto! Imposta le tue parole chiave con /setkeywords parola1, parola2, PAROLA COMPOSTA", chat_id=telegram_id)
+        send_message("👋 Benvenuto!", chat_id=telegram_id)
     else:
         activate_user(telegram_id)
-        send_message("👋 Bentornato! Le notifiche sono attive. Usa /setkeywords per aggiornare.", chat_id=telegram_id)
+        send_message("👋 Bentornato! Le notifiche sono attive.", chat_id=telegram_id)
+
+    code = (args or "").strip().upper()
+    if code:
+        apply_config_code(telegram_id, code)
+    elif added:
+        send_message("Scegli le fonti sul sito (è più comodo) oppure qui con /sources, "
+                     "poi imposta le parole chiave con /setkeywords parola1, parola2.", chat_id=telegram_id)
     send_message(build_help_message(telegram_id), parse_mode="HTML", chat_id=telegram_id)
+
+
+def apply_config_code(telegram_id, code):
+    """Applica una configurazione creata sul sito: fonti seguite + parole chiave.
+    Ritorna True se il codice era valido."""
+    config = load_config(code)
+    if config is None:
+        send_message("❌ Codice non valido o scaduto (vale 24 ore e si usa una volta sola). "
+                     "Generane uno nuovo dal sito.", chat_id=telegram_id)
+        return False
+    user_id = user_id_for_telegram(telegram_id)
+    chosen = {int(s) for s in config.get("sources", [])}
+    sources = get_sources()
+    for source in sources:
+        set_user_source(user_id, source["id"], source["id"] in chosen)
+    keywords = config.get("keywords") or []
+    if keywords:
+        set_keywords(user_id, keywords)
+    n = sum(1 for s in sources if s["id"] in chosen)
+    message = f"✅ Configurazione applicata: <b>{n} fonti</b>"
+    if keywords:
+        message += f" e parole chiave <b>{escape_html(', '.join(keywords))}</b>"
+    message += ".\nTi avviso quando esce una notizia con le tue parole, più un riepilogo giornaliero."
+    send_message(message, parse_mode="HTML", chat_id=telegram_id)
+    return True
 
 
 def cmd_stop(telegram_id, args):
@@ -493,25 +530,42 @@ def cmd_removesource(telegram_id, args):
     send_message(f"🗑️ Fonte rimossa: {escape_html(source['name'])}", parse_mode="HTML", chat_id=telegram_id)
 
 
-def cmd_link(telegram_id, args, username=None):
-    """Collega la chat a un account web tramite il codice generato nella pagina Account."""
-    code = (args or "").strip().upper()
-    if not code:
-        send_message(USAGE_LINK, chat_id=telegram_id)
+def cmd_dati(telegram_id, args):
+    """Mostra cosa il bot conserva su questa chat (GDPR: diritto di accesso)."""
+    user = get_user(telegram_id)
+    if not user:
+        send_message("Non ho nulla su questa chat. Usa /start per iniziare.", chat_id=telegram_id)
         return
-    user_id = consume_link_code(code)
-    if user_id is None:
-        send_message("❌ Codice non valido o scaduto. Generane uno nuovo dalla pagina Account del sito.", chat_id=telegram_id)
+    data = export_user_data(user["id"])
+    followed = [f["name"] for f in data["source_preferences"] if f["follow"]]
+    lines = [
+        "🔎 <b>Quello che conservo su questa chat</b>",
+        f"• Identificativo Telegram: <code>{user['telegram_id']}</code>" + (f" (@{escape_html(user['username'])})" if user["username"] else ""),
+        f"• Parole chiave: {escape_html(', '.join(user['keywords'])) if user['keywords'] else '—'}",
+        f"• Notifiche: {'attive' if user['active'] else 'sospese'}",
+        f"• Riepilogo: {user['digest_time'] or 'orario predefinito'}",
+        f"• Fonti seguite ({len(followed)}): {escape_html(', '.join(followed[:20])) if followed else '—'}" + (" …" if len(followed) > 20 else ""),
+        f"• Iscritto dal: {str(user['created_at'])[:10]}",
+        "",
+        "Inoltre tengo l'elenco delle notizie già inviate, per non ripetertele (massimo 30 giorni).",
+        "Con /cancellami elimino tutto subito.",
+    ]
+    send_long_message("\n".join(lines), chat_id=telegram_id, parse_mode="HTML")
+
+
+def cmd_cancellami(telegram_id, args):
+    """Cancella definitivamente i dati di questa chat (GDPR: diritto all'oblio)."""
+    user = get_user(telegram_id)
+    if not user:
+        send_message("Non ho nulla da cancellare per questa chat.", chat_id=telegram_id)
         return
-    if not merge_telegram_user(user_id, telegram_id):
-        send_message("❌ Questa chat è già collegata a un altro account del sito. Scollegala da lì prima di riprovare.", chat_id=telegram_id)
+    if (args or "").strip().upper() != "CONFERMO":
+        send_message("⚠️ Questo cancella <b>tutto</b> (parole chiave, fonti, storico invii) e non è reversibile.\n"
+                     "Se sei sicuro scrivi: <code>/cancellami CONFERMO</code>", parse_mode="HTML", chat_id=telegram_id)
         return
-    if username:
-        add_user(telegram_id, username)  # aggiorna lo username
-    user = get_user_by_id(user_id)
-    send_message(f"✅ Chat collegata all'account <b>{escape_html(user['email'])}</b>.\n"
-                 "Da ora keyword, fonti e frequenza si gestiscono dal sito; i comandi qui restano disponibili.",
-                 parse_mode="HTML", chat_id=telegram_id)
+    delete_user(user["id"])
+    send_message("🗑️ Fatto: non conservo più niente su questa chat. Con /start puoi ricominciare quando vuoi.",
+                 chat_id=telegram_id)
 
 
 def cmd_unknown(telegram_id, args, command=None):
@@ -534,7 +588,8 @@ HANDLERS = {
     "unfollow": cmd_unfollow,
     "addsource": cmd_addsource,
     "removesource": cmd_removesource,
-    "link": cmd_link,
+    "dati": cmd_dati,
+    "cancellami": cmd_cancellami,
 }
 
 
@@ -557,8 +612,6 @@ def handle_update(update):
     username = chat.get("username") or message.get("from", {}).get("username")
     if command == "start":
         cmd_start(telegram_id, args, username=username)
-    elif command == "link":
-        cmd_link(telegram_id, args, username=username)
     elif command in HANDLERS:
         HANDLERS[command](telegram_id, args)
     else:

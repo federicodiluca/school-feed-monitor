@@ -4,9 +4,18 @@
 {% block content %}
 <div class="page-head">
 <h1>Le mie notizie</h1>
-<p>Dalle {{ n_sources }} fonti che segui{% if user.keywords %}, con evidenziate le tue parole chiave: <strong>{{ user.keywords | join(', ') }}</strong>{% else %}. <a href="{{ url_for('prefs.show') }}">Aggiungi parole chiave</a> per evidenziare ciò che ti interessa{% endif %}.</p>
+<p>Dalle {{ n_sources }} fonti che hai scelto in questo browser{% if user.keywords %}, con evidenziate le tue parole chiave: <strong>{{ user.keywords | join(', ') }}</strong>{% else %}. <a href="{{ url_for('config.show') }}">Aggiungi parole chiave</a> per evidenziare ciò che ti interessa{% endif %}.
+  <a href="{{ url_for('config.show') }}">Modifica la selezione</a>.</p>
 </div>
 
+{% if n_sources == 0 %}
+<div class="card">
+  <h2>Non hai ancora scelto le fonti</h2>
+  <p>Scegli la tua regione e le tue province: le notizie compariranno qui, e la scelta resta salvata in questo browser
+    (niente account, niente email).</p>
+  <p><a class="button primary" href="{{ url_for('config.show') }}">Scegli le fonti</a></p>
+</div>
+{% else %}
 <nav class="tabs" aria-label="Vista">
   <a href="{{ url_for('news.mine') }}" {% if view == 'oggi' %}class="active" aria-current="page"{% endif %}>Riepilogo del giorno</a>
   <a href="{{ url_for('news.mine', vista='tutte') }}" {% if view == 'tutte' %}class="active" aria-current="page"{% endif %}>Tutte le notizie</a>
@@ -41,5 +50,6 @@
     {% if pages.current < pages.last %}{% set _ = base_args.update({'pagina': pages.current + 1}) %}<a rel="next" href="?{{ base_args | urlencode }}">Più vecchie →</a>{% endif %}
   </nav>
   {% endif %}
+{% endif %}
 {% endif %}
 {% endblock %}

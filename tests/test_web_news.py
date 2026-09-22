@@ -3,11 +3,10 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from sfm.db_news import add_news, search_news
-from sfm.db_sources import set_user_source, sync_config_sources
-from sfm.db_user import get_user_by_email, set_keywords
+from sfm.db_sources import sync_config_sources
 from sfm.utils import slugify
-from tests.test_web import EMAIL, csrf, register
-from web import create_app, security
+from tests.test_web import choose
+from web import create_app
 
 
 def _at(days_ago, hours=10):
@@ -16,9 +15,7 @@ def _at(days_ago, hours=10):
 
 @pytest.fixture
 def app():
-    app = create_app({"TESTING": True, "BASE_URL": "https://sfm.example"})
-    security.reset_rate_limits()
-    return app
+    return create_app({"TESTING": True, "BASE_URL": "https://sfm.example"})
 
 
 @pytest.fixture
@@ -61,7 +58,7 @@ def test_public_news_page_lists_and_filters(client, some_news):
     assert "Vecchia" not in html                      # fuori dagli ultimi 7 giorni
     assert "3 notizie" in html and "pubblicate le GPS" in html
     assert 'name="robots"' not in html               # pagina base indicizzabile
-    assert "Registrati" in html                      # invito per chi non è loggato
+    assert "Scegli le tue fonti" in html             # invito per chi non ha ancora scelto
 
     html = client.get("/notizie?giorni=30").get_data(as_text=True)
     assert "Vecchia" in html and "4 notizie" in html
@@ -110,14 +107,13 @@ def test_sitemap_and_home_include_news(client, some_news):
 
 # --- /le-mie-notizie ---------------------------------------------------------------
 
-def test_my_news_requires_login(client):
-    assert client.get("/le-mie-notizie").status_code == 302
+def test_my_news_without_choice_shows_invite(client):
+    html = client.get("/le-mie-notizie").get_data(as_text=True)
+    assert "Non hai ancora scelto le fonti" in html
 
 
 def test_my_news_daily_recap_highlights_keywords(client, some_news):
-    register(client)
-    user = get_user_by_email(EMAIL)
-    set_keywords(user["id"], ["GPS", "A041"])
+    choose(client, [1, 2], "GPS, A041")
     html = client.get("/le-mie-notizie").get_data(as_text=True)
     assert "Riepilogo del giorno" in html and 'content="noindex, nofollow"' in html
     assert "Graduatorie provinciali docenti" in html and "</svg> GPS" in html
@@ -134,9 +130,7 @@ def test_my_news_daily_recap_highlights_keywords(client, some_news):
 
 
 def test_my_news_all_view_respects_followed_sources(client, some_news):
-    register(client)
-    user = get_user_by_email(EMAIL)
-    set_user_source(user["id"], 2, False)
+    choose(client, [1], "")
     html = client.get("/le-mie-notizie?vista=tutte&giorni=30").get_data(as_text=True)
     assert "Graduatorie" in html and "Trasferimenti" in html
     assert "Concorso ATA" not in html and "Vecchia" not in html

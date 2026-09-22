@@ -4,11 +4,11 @@ from datetime import date, datetime, timedelta
 
 from flask import Blueprint, abort, redirect, render_template, request, url_for
 
-from sfm.db_news import search_news
-from sfm.db_sources import get_followed_source_ids, get_source, get_sources
-from sfm.digest import annotate, build_user_digest
+from sfm.db_news import get_today_news, search_news
+from sfm.db_sources import get_source, get_sources
+from sfm.digest import annotate
 from sfm.utils import slugify
-from web import security
+from web import prefs
 
 bp = Blueprint("news", __name__)
 
@@ -88,7 +88,7 @@ def by_source(source_id, slug=None):
                            selected_source=source_id, pages=_pages(total, page), source=source, noindex=bool(q))
 
 
-# --- area personale ---------------------------------------------------------
+# --- le mie notizie (preferenze nel browser, nessun account) ------------------
 
 def _parse_day(value):
     try:
@@ -98,19 +98,23 @@ def _parse_day(value):
 
 
 @bp.get("/le-mie-notizie")
-@security.login_required
 def mine():
-    user = security.current_user()
-    followed = get_followed_source_ids(user["id"])
+    """Notizie dalle fonti scelte in questo browser, con le parole chiave evidenziate."""
+    followed = prefs.selected_source_ids()
+    user = {"id": None, "keywords": prefs.selected_keywords()}
     q, days, page = _filters()
     view = request.args.get("vista") or "oggi"
+    if not followed:
+        return render_template("le_mie_notizie.html", view=view, news=[], user=user, day=date.today(),
+                               prev_day=None, next_day=None, q="", days=None, days_choices=DAYS_CHOICES,
+                               pages=None, n_sources=0)
 
     if view == "tutte":
         rows, total = search_news(source_ids=followed, query=q, days=days, page=page, per_page=PER_PAGE)
         if (r := _clamp_page(total, page)):
             return r
         rows = annotate(rows, user)
-        rows.sort(key=lambda n: (n.get("published_at") or ""), reverse=True)  # cronologico, evidenza sul singolo
+        rows.sort(key=lambda n: (n.get("published_at") or ""), reverse=True)
         return render_template("le_mie_notizie.html", user=user, view="tutte", news=rows, q=q, days=days,
                                days_choices=DAYS_CHOICES, pages=_pages(total, page), day=None, n_sources=len(followed))
 
@@ -118,7 +122,7 @@ def mine():
     if day > date.today():
         day = date.today()
     at = datetime.combine(day, datetime.min.time()).astimezone() + timedelta(hours=12)
-    rows = build_user_digest(user, now=at)
+    rows = annotate(get_today_news(now=at, source_ids=followed), user)
     return render_template("le_mie_notizie.html", user=user, view="oggi", news=rows, day=day,
                            prev_day=day - timedelta(days=1), next_day=(day + timedelta(days=1)) if day < date.today() else None,
                            q="", days=None, days_choices=DAYS_CHOICES, pages=None, n_sources=len(followed))

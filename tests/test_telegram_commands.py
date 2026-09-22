@@ -50,10 +50,10 @@ def test_start_registers_user_and_sends_help(sent_messages):
     tc.handle_update(update("/start"))
     user = get_user(1)
     assert user and user["active"] and user["username"] == "alice"
-    assert len(sent_messages) == 2
-    assert "Benvenuto" in sent_messages[0]["text"]
-    help_text = sent_messages[1]["text"]
-    assert sent_messages[1]["parse_mode"] == "HTML"
+    assert len(sent_messages) == 3
+    assert "Benvenuto" in sent_messages[0]["text"] and "Scegli le fonti sul sito" in sent_messages[1]["text"]
+    help_text = sent_messages[-1]["text"]
+    assert sent_messages[-1]["parse_mode"] == "HTML"
     assert "• ✅ Feed Uno" in help_text and "• ✅ Feed Due" in help_text
     assert "/sources" in help_text and "/addsource" in help_text
     assert "Fetch ogni 15 minuti" in help_text

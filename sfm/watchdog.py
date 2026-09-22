@@ -4,7 +4,6 @@ Avvisa UNA volta all'apertura di un problema e una volta quando rientra
 (gli incidenti aperti stanno in watchdog_incidents). Configurazione via ambiente:
 
     ADMIN_TELEGRAM_ID               chat Telegram dell'admin (opzionale)
-    ADMIN_EMAIL                     email dell'admin (opzionale; richiede EMAIL_BACKEND)
     WATCHDOG_SOURCE_FAILURES        fallimenti consecutivi prima dell'avviso (default 3)
     WATCHDOG_SOURCE_SILENCE_HOURS   ore senza notizie nuove prima dell'avviso (default 72)
     WATCHDOG_JOB_STALE_MINUTES      minuti senza esecuzione di fetch_news prima dell'avviso
@@ -21,7 +20,6 @@ from urllib.parse import urlparse
 
 import requests
 
-from sfm import mailer
 from sfm.config_loader import get_config
 from sfm.db_health import (
     close_incident,
@@ -185,12 +183,11 @@ def find_problems(now=None):
 
 def admin_targets():
     tg = env("ADMIN_TELEGRAM_ID")
-    return {"telegram_id": int(tg) if tg and tg.strip().lstrip("-").isdigit() else None,
-            "email": (env("ADMIN_EMAIL") or "").strip() or None}
+    return {"telegram_id": int(tg) if tg and tg.strip().lstrip("-").isdigit() else None}
 
 
 def notify_admin(subject, lines):
-    """Invia un avviso all'admin su Telegram e/o email. Ritorna i canali usati."""
+    """Invia un avviso all'admin su Telegram. Ritorna i canali usati."""
     targets = admin_targets()
     used = []
     text = "\n".join(lines)
@@ -199,13 +196,6 @@ def notify_admin(subject, lines):
         res = telegram.send_message(body, parse_mode="HTML", chat_id=targets["telegram_id"])
         if res and res.get("ok"):
             used.append("telegram")
-    if targets["email"] and mailer.is_enabled():
-        try:
-            html = f"<p><b>{escape_html(subject)}</b></p><ul>" + "".join(f"<li>{escape_html(l)}</li>" for l in lines) + "</ul>"
-            if mailer.send_email(targets["email"], f"[School Feed Monitor] {subject}", html, f"{subject}\n\n{text}"):
-                used.append("email")
-        except mailer.EmailError as e:
-            log(f"❌ Avviso admin via email fallito: {e}")
     if not used:
         log(f"🐶 Watchdog (nessun admin configurato): {subject}\n{text}")
     return used
@@ -228,7 +218,7 @@ def weekly_summary(now=None):
     lines = [
         f"Fonti attive: {len(sources)} — in errore: {len(failing)}, silenziose da {th['silence_hours']}h: {len(silent)}, mai lette: {len(never)}",
         f"Notizie raccolte negli ultimi 7 giorni: {n_news}",
-        f"Utenti: {len(users)} ({active} attivi; {sum(1 for u in users if u.get('email'))} con email, {sum(1 for u in users if u.get('telegram_id'))} con Telegram)",
+        f"Utenti iscritti al bot: {len(users)} ({active} attivi)",
     ]
     if failing:
         lines.append("In errore: " + ", ".join(failing[:15]) + (" …" if len(failing) > 15 else ""))

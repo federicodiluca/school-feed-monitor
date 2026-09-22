@@ -24,6 +24,7 @@
   <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <script src="{{ url_for('static', filename='theme.js') }}"></script>
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Vai al contenuto</a>
@@ -32,20 +33,8 @@
       <a class="brand" href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='favicon.svg') }}" alt="" width="28" height="28" class="brand-logo">{{ app_name }}</a>
       <ul>
         <li><a href="{{ url_for('news.index') }}">Notizie</a></li>
-        {% if current_user %}
-          <li><a href="{{ url_for('news.mine') }}">Le mie notizie</a></li>
-          <li><a href="{{ url_for('prefs.show') }}">Preferenze</a></li>
-          <li><a href="{{ url_for('auth.account') }}">Account</a></li>
-          <li>
-            <form method="post" action="{{ url_for('auth.logout') }}" class="inline">
-              <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
-              <button type="submit" class="link">Esci</button>
-            </form>
-          </li>
-        {% else %}
-          <li><a href="{{ url_for('auth.login') }}">Accedi</a></li>
-          <li><a class="button primary" href="{{ url_for('auth.register') }}">Registrati</a></li>
-        {% endif %}
+        {% if has_prefs %}<li><a href="{{ url_for('news.mine') }}">Le mie notizie</a></li>{% endif %}
+        <li><a class="button primary" href="{{ url_for('config.show') }}">{% if has_prefs %}Le mie fonti{% else %}Scegli le fonti{% endif %}</a></li>
         <li><button type="button" id="theme-toggle" class="icon" aria-label="Cambia tema chiaro/scuro" title="Tema chiaro/scuro"><span class="only-light">{% from "_icons.html" import icon %}{{ icon('moon', 18) }}</span><span class="only-dark">{{ icon('sun', 18) }}</span></button></li>
       </ul>
     </nav>

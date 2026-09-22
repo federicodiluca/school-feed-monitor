@@ -105,6 +105,38 @@ def _v6_fix_future_dates(conn):
                  "WHERE datetime(published_at) > datetime('now', '+1 day')")
 
 
+def _v7_drop_web_accounts(conn):
+    """Torniamo alla versione "utility": nessun account web, nessuna email.
+    Restano gli utenti Telegram; le colonne e le tabelle dell'era account spariscono."""
+    conn.executescript("""
+        DROP TABLE IF EXISTS email_tokens;
+        DROP TABLE IF EXISTS link_codes;
+    """)
+    if column_exists(conn, "users", "email"):
+        conn.executescript("""
+            DELETE FROM user_sources WHERE user_id IN (SELECT id FROM users WHERE telegram_id IS NULL);
+            DELETE FROM deliveries   WHERE user_id IN (SELECT id FROM users WHERE telegram_id IS NULL);
+            UPDATE sources SET added_by = NULL
+             WHERE added_by IN (SELECT id FROM users WHERE telegram_id IS NULL);
+            DELETE FROM users WHERE telegram_id IS NULL;   -- account creati solo sul sito
+
+            CREATE TABLE users_v7 (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                telegram_id INTEGER UNIQUE,
+                username TEXT,
+                keywords TEXT,
+                active INTEGER NOT NULL DEFAULT 1,
+                digest_time TEXT,
+                last_digest_date TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+            INSERT INTO users_v7 (id, telegram_id, username, keywords, active, digest_time, last_digest_date, created_at)
+                SELECT id, telegram_id, username, keywords, active, digest_time, last_digest_date, created_at FROM users;
+            DROP TABLE users;
+            ALTER TABLE users_v7 RENAME TO users;
+        """)
+
+
 MIGRATIONS = [
     (1, _v1_multi_channel),
     (2, _v2_digest_guard),
@@ -112,6 +144,7 @@ MIGRATIONS = [
     (4, _v4_google),
     (5, _v5_source_geo),
     (6, _v6_fix_future_dates),
+    (7, _v7_drop_web_accounts),
 ]
 
 

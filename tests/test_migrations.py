@@ -4,17 +4,7 @@ import sqlite3
 import sfm.db as db
 from sfm.db_deliveries import cleanup_old_deliveries, delivered_news_ids, record_delivery
 from sfm.db_sources import get_followed_source_ids, get_followers_map, get_source
-from sfm.db_user import (
-    create_web_user,
-    get_user,
-    get_user_by_email,
-    get_user_by_id,
-    get_users,
-    link_telegram,
-    set_keywords,
-    set_preferences,
-    user_id_for_telegram,
-)
+from sfm.db_user import get_user, get_user_by_id, get_users, set_digest_time, set_keywords
 from sfm.migrations import MIGRATIONS, column_exists, get_version
 
 LATEST = MIGRATIONS[-1][0]
@@ -86,7 +76,8 @@ def test_legacy_db_is_migrated_preserving_users_and_follows():
 
     conn = db.get_conn()
     assert get_version(conn) == LATEST
-    assert column_exists(conn, "users", "email") and column_exists(conn, "users", "last_digest_date")
+    assert not column_exists(conn, "users", "email")      # v7: via gli account web
+    assert column_exists(conn, "users", "last_digest_date")
     assert column_exists(conn, "user_sources", "user_id") and not column_exists(conn, "user_sources", "telegram_id")
     assert column_exists(conn, "news", "source_id")
     assert conn.execute("SELECT COUNT(*) FROM user_sources").fetchone()[0] == 2  # orfano 9999 scartato
@@ -95,7 +86,6 @@ def test_legacy_db_is_migrated_preserving_users_and_follows():
     alice, bob = get_user(1001), get_user(2002)
     assert alice["id"] == 1 and alice["username"] == "alice" and alice["keywords"] == ["docenti", "ata"]
     assert alice["active"] is True and bob["active"] is False
-    assert alice["alert_mode"] == "instant" and alice["notify_telegram"] and not alice["notify_email"]
     assert get_followed_source_ids(1) == set()       # alice ha escluso Feed Uno
     assert get_followed_source_ids(2) == {1, 2}      # bob: default + la sua custom
     assert get_source(2)["added_by"] == 2            # added_by rimappato da telegram_id a users.id
@@ -144,39 +134,6 @@ def test_cleanup_old_deliveries():
 
 # --- utenti web -------------------------------------------------------------
 
-def test_create_web_user_defaults_and_uniqueness():
-    user = create_web_user("  Prof@Example.IT ", "hash")
-    assert user["id"] == 1 and user["email"] == "prof@example.it" and user["telegram_id"] is None
-    assert user["alert_mode"] == "digest" and user["notify_email"] and not user["notify_telegram"]
-    assert user["email_verified"] is False
-    assert create_web_user("prof@example.it", "hash2") is None
-    assert get_user_by_email("PROF@example.it")["id"] == 1
-    assert get_user_by_id(1)["email"] == "prof@example.it"
-    assert get_user_by_id(99) is None
-
-
-def test_link_telegram_and_preferences():
-    user = create_web_user("a@b.it", "h")
-    assert link_telegram(user["id"], 555, "alice") is True
-    linked = get_user(555)
-    assert linked["id"] == user["id"] and linked["notify_telegram"] and linked["username"] == "alice"
-    assert user_id_for_telegram(555) == user["id"]
-
-    other = create_web_user("c@d.it", "h")
-    assert link_telegram(other["id"], 555) is False   # già collegato ad altri
-
-    set_preferences(user["id"], alert_mode="instant", notify_email=False, digest_time="07:30")
-    u = get_user_by_id(user["id"])
-    assert u["alert_mode"] == "instant" and not u["notify_email"] and u["digest_time"] == "07:30"
-    set_preferences(user["id"], digest_time="")
-    assert get_user_by_id(user["id"])["digest_time"] is None
-    set_keywords(user["id"], [" A23 ", "", "trasferimenti"])
-    assert get_user_by_id(user["id"])["keywords"] == ["A23", "trasferimenti"]
-    assert [u["id"] for u in get_users()] == [1, 2]
-
-
-# --- impostazioni: nomi nuovi SFM_*, vecchi CHECKFEED_* ancora accettati -----------
-
 def test_env_setting_prefers_new_name_and_falls_back_to_legacy(monkeypatch, capsys):
     from sfm.settings import env_setting
     monkeypatch.delenv("SFM_FOO", raising=False); monkeypatch.delenv("CHECKFEED_FOO", raising=False)
@@ -198,3 +155,37 @@ def test_legacy_db_file_is_moved_to_new_default(tmp_path, monkeypatch):
     assert (tmp_path / "data" / "sfm.db").read_bytes() == b"x" and (tmp_path / "data" / "sfm.db-wal").exists()
     assert not (tmp_path / "data" / "checkfeed.db").exists()
     assert settings.migrate_legacy_db_file() is False   # niente da fare la seconda volta
+
+
+def test_v7_removes_web_accounts_but_keeps_telegram_users():
+    """Un DB della versione "piattaforma" (account web + email) va ripulito senza perdere il bot."""
+    import sqlite3
+    _legacy_db()
+    conn = sqlite3.connect(db.DB_PATH)
+    # nella versione "piattaforma" telegram_id era nullable: rifacciamo la tabella com'era allora
+    conn.executescript("""
+        CREATE TABLE users_web (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, telegram_id INTEGER UNIQUE, username TEXT,
+            email TEXT, keywords TEXT, active INTEGER DEFAULT 1,
+            digest_time TEXT, last_digest_date TEXT, created_at DATETIME
+        );
+        INSERT INTO users_web (id, telegram_id, username, keywords, active)
+            SELECT id, telegram_id, username, keywords, active FROM users;
+        DROP TABLE users;
+        ALTER TABLE users_web RENAME TO users;
+        INSERT INTO users (id, telegram_id, username, keywords, active, email) VALUES (3, NULL, NULL, 'x', 1, 'web@x.it');
+        INSERT INTO user_sources (telegram_id, source_id, follow) VALUES (3, 1, 1);
+        CREATE TABLE email_tokens (token TEXT PRIMARY KEY, user_id INTEGER, purpose TEXT, expires_at DATETIME);
+        CREATE TABLE link_codes (code TEXT PRIMARY KEY, user_id INTEGER, expires_at DATETIME);
+    """)
+    conn.commit(); conn.close()
+
+    db.init_db()
+
+    conn = db.get_conn()
+    tables = {r["name"] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+    assert "email_tokens" not in tables and "link_codes" not in tables and "configs" in tables
+    assert not column_exists(conn, "users", "email")
+    conn.close()
+    assert [u["telegram_id"] for u in get_users(active_only=False)] == [1001, 2002]   # l'utente web sparisce
+    assert get_user(1001)["keywords"] == ["docenti", "ata"]

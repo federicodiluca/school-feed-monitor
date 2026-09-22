@@ -5,11 +5,12 @@
 <article class="prose">
 <h1>Termini del servizio</h1>
 <p class="muted">Versione {{ config.PRIVACY_VERSION }}. Usando {{ app_name }} accetti questi termini.</p>
-<p class="notice"><strong>Bozza</strong>: testo in prima stesura, sarà rivisto prima dell'apertura al pubblico.</p>
+<p class="notice"><strong>Versione di prova</strong>: il servizio è in fase sperimentale, può cambiare o fermarsi
+in qualsiasi momento.</p>
 
 <h2>1. Cos'è il servizio</h2>
 <p>{{ app_name }} ("il Servizio") raccoglie automaticamente notizie <strong>pubbliche</strong> dai siti degli Uffici
-Scolastici, del Ministero e da altre fonti scelte dagli utenti, e le segnala via email o Telegram in base alle
+Scolastici, del Ministero e da altre fonti scelte dagli utenti, e le mostra sul sito o le segnala via Telegram in base alle
 preferenze di ciascuno. È un progetto personale, indipendente e <strong>gratuito</strong>, gestito da una singola
 persona nel tempo libero, fornito <strong>"così com'è" e "come disponibile"</strong>, senza alcun obbligo di
 continuità, manutenzione o assistenza.</p>
@@ -21,7 +22,7 @@ correggere o rimuovere contenuti. Il Servizio <strong>non garantisce</strong>:</
   <li>che ogni notizia rilevante venga rilevata, né che venga segnalata in tempo utile;</li>
   <li>che le notizie segnalate siano corrette, complete, aggiornate o attribuite alla fonte giusta;</li>
   <li>che le parole chiave corrispondano davvero a ciò che ti interessa (la ricerca è testuale e automatica);</li>
-  <li>che email e messaggi Telegram vengano recapitati (dipendono da fornitori terzi, filtri antispam, impostazioni del tuo dispositivo);</li>
+  <li>che i messaggi Telegram vengano recapitati (dipendono da Telegram e dalle impostazioni del tuo dispositivo);</li>
   <li>che il Servizio sia sempre disponibile, privo di errori o interruzioni.</li>
 </ul>
 <p><strong>Per scadenze, convocazioni, graduatorie e adempimenti fai sempre riferimento alle fonti ufficiali.</strong>
@@ -34,22 +35,19 @@ danno o pregiudizio</strong>, diretto o indiretto, derivante da o comunque conne
 <ul>
   <li>notizie non rilevate, segnalate in ritardo, errate, incomplete o non più attuali;</li>
   <li>interruzioni, malfunzionamenti, perdita di dati, errori del software, attacchi informatici o sospensione del Servizio;</li>
-  <li>malfunzionamenti, ritardi o modifiche dei siti delle fonti, dei fornitori di posta elettronica, di Telegram, di
-    Google o dell'hosting;</li>
+  <li>malfunzionamenti, ritardi o modifiche dei siti delle fonti, di Telegram o dell'hosting;</li>
   <li>decisioni prese o non prese, scadenze mancate, domande non presentate o presentate in modo errato sulla base
     delle segnalazioni ricevute o non ricevute;</li>
-  <li>uso improprio del Servizio da parte tua o di terzi, o accesso non autorizzato al tuo account per cause a te
-    imputabili (es. password debole o condivisa).</li>
+  <li>uso improprio del Servizio da parte tua o di terzi.</li>
 </ul>
 <p>In ogni caso, trattandosi di un servizio gratuito, l'eventuale responsabilità del titolare — ove non esclusa — è
 limitata a quanto inderogabilmente previsto dalla legge. Resta ferma la responsabilità per dolo o colpa grave e ogni
 tutela inderogabile riconosciuta ai consumatori.</p>
 
 <h2>4. Uso corretto</h2>
-<p>Ti impegni a fornire un indirizzo email tuo, a non usare il Servizio per attività illecite, a non tentare di
-comprometterne la sicurezza o di sovraccaricarlo, e a non aggiungere come fonti siti che non hai il diritto di far
-leggere. Il titolare può sospendere o cancellare account che violano queste regole, o che risultano inattivi da lungo
-tempo, senza preavviso.</p>
+<p>Ti impegni a non usare il Servizio per attività illecite, a non tentare di comprometterne la sicurezza o di
+sovraccaricarlo, e a non aggiungere come fonti siti che non hai il diritto di far leggere. Il titolare può sospendere
+l'accesso al bot a chi viola queste regole, senza preavviso.</p>
 
 <h2>5. Contenuti delle fonti</h2>
 <p>Titoli, estratti e link appartengono ai rispettivi autori ed editori; vengono riprodotti nella misura minima
@@ -57,8 +55,9 @@ necessaria a segnalarli, sempre con il link alla pagina originale. Se sei il ges
 venga letta, <a href="{{ url_for('about') }}#contatti">scrivici</a>: la rimuoveremo.</p>
 
 <h2>6. Modifiche e cessazione</h2>
-<p>Il Servizio può cambiare, essere sospeso o cessare in qualsiasi momento, anche senza preavviso. Puoi cancellare il
-tuo account quando vuoi dalla pagina Account: i tuoi dati vengono eliminati subito e definitivamente.</p>
+<p>Il Servizio può cambiare, essere sospeso o cessare in qualsiasi momento, anche senza preavviso. Sul sito non
+c'è niente da cancellare (le tue scelte sono nel tuo browser); sul bot, il comando <code>/cancellami</code> elimina
+subito e definitivamente tutto quello che ti riguarda.</p>
 
 <h2>7. Software libero</h2>
 <p>Il codice del Servizio è pubblicato con licenza

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Scegli le tue fonti — {{ app_name }}{% endblock %}
+{% block description %}Scegli gli Uffici Scolastici che ti interessano e le tue parole chiave: le notizie filtrate compaiono sul sito e, se vuoi, sul bot Telegram. Senza registrazione.{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Le tue fonti e le tue parole</h1>
+  <p>Nessun account: quello che scegli resta <strong>nel tuo browser</strong>. Se poi vuoi ricevere gli avvisi,
+    porti la stessa configurazione sul bot Telegram con un clic.</p>
+</div>
+
+<form method="post" action="{{ url_for('config.area') }}" class="card">
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+  <h2>1. Da dove vuoi le notizie?</h2>
+  <p class="muted">Seleziona una o più regioni — dove lavori e, se ti interessa, dove vorresti trasferirti — e le
+    province. Preparo io la selezione delle fonti (Ministero + USR + USP); potrai comunque ritoccarla sotto.</p>
+  <fieldset>
+    <legend>Regioni</legend>
+    <ul class="sources regions">
+      {% for r in regions %}
+      <li><label><input type="checkbox" name="regions" value="{{ r }}" data-region="{{ r }}"> {{ r }}</label></li>
+      {% endfor %}
+    </ul>
+  </fieldset>
+  {% for r, plist in provinces_by_region.items() %}
+  <fieldset class="provinces" data-region="{{ r }}" hidden>
+    <legend>Province di {{ r }} <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+    <ul class="sources">
+      {% for p in plist %}<li><label><input type="checkbox" name="provinces" value="{{ r }}|{{ p }}"> {{ p }}</label></li>{% endfor %}
+    </ul>
+  </fieldset>
+  {% endfor %}
+  <button type="submit" class="button">Seleziona le fonti di queste aree</button>
+</form>
+
+<form method="post" action="{{ url_for('config.save') }}" class="card" id="fonti">
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+  <h2>2. Fonti e parole chiave</h2>
+  <fieldset>
+    <legend>Parole chiave <small class="muted">(facoltative)</small></legend>
+    <p class="muted">Separate da virgola. Cerchiamo la parola intera, senza distinguere maiuscole:
+      <em>A041, trasferimenti, graduatorie provinciali</em>. Servono a evidenziare (e, sul bot, ad avvisarti subito).</p>
+    <textarea name="keywords" id="keywords">{{ keywords | join(', ') }}</textarea>
+  </fieldset>
+
+  <fieldset>
+    <legend>Fonti seguite <span class="muted">({{ sources | selectattr('followed') | list | length }} selezionate)</span></legend>
+    <label for="sources-search" class="visually-hidden">Cerca una fonte</label>
+    <input type="search" id="sources-search" placeholder="Cerca una fonte (es. Bologna, USR, Ministero)…" autocomplete="off">
+    {% for group, items in groups %}
+    {% set n_followed = items | selectattr('followed') | list | length %}
+    <details class="source-group" {% if n_followed %}open{% endif %}>
+      <summary><span>{{ group }}</span> <span class="group-count muted">{{ n_followed }} selezionate</span>
+        <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+      <ul class="sources">
+        {% for s in items %}
+        <li><label><input type="checkbox" name="sources" value="{{ s.id }}" {% if s.followed %}checked{% endif %}>
+          {{ s.name }}{% if s.kind == 'usp' and s.province %} <small class="muted">({{ s.province.replace('|', ', ') }})</small>{% endif %}</label></li>
+        {% endfor %}
+      </ul>
+    </details>
+    {% endfor %}
+  </fieldset>
+
+  <button type="submit" class="button primary">Salva in questo browser</button>
+  <button type="submit" name="azione" value="telegram" class="button">{{ icon('send', 18) }} Salva e porta su Telegram</button>
+</form>
+
+<section class="card" id="telegram">
+  <h2>3. Ricevere gli avvisi su Telegram <small class="muted">(facoltativo)</small></h2>
+  {% if code %}
+    <p>La tua configurazione è pronta. Apri il bot e il codice verrà applicato da solo:</p>
+    {% set link = telegram_link(code) %}
+    {% if link %}<p><a class="button primary" href="{{ link }}" rel="noopener" target="_blank">{{ icon('send', 18) }} Apri il bot e configura</a></p>{% endif %}
+    <p class="muted">Oppure scrivi al bot{% if bot_username %} <a href="https://t.me/{{ bot_username }}" rel="noopener" target="_blank">@{{ bot_username }}</a>{% endif %} questo comando:</p>
+    <p><span class="code">/start {{ code }}</span></p>
+    <p class="muted">Il codice vale {{ ttl_hours }} ore e si può usare una volta sola. Contiene solo le fonti e le parole
+      che hai scelto: nessun dato tuo.</p>
+  {% else %}
+    <p>Sul sito le notizie le leggi quando vuoi. Il bot Telegram invece <strong>ti avvisa</strong>: subito quando esce
+      una notizia con le tue parole chiave, e con un riepilogo una volta al giorno.</p>
+    <p class="muted">Scegli le fonti qui sopra e usa «Salva e porta su Telegram»: ti diamo un codice da aprire nel bot.</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Le tue preferenze</h2>
+  <p class="muted">Sono due cookie tecnici in questo browser (<code>sfm_fonti</code>, <code>sfm_parole</code>): sul
+    server non resta niente. Se cambi dispositivo o cancelli i dati del browser, dovrai rifare la scelta.</p>
+  <p>
+    <a class="button" href="{{ url_for('config.export') }}">{{ icon('download', 18) }} Scarica le tue preferenze</a>
+  </p>
+  <form method="post" action="{{ url_for('config.forget') }}">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <button type="submit" class="button danger">{{ icon('trash', 18) }} Dimentica tutto da questo browser</button>
+  </form>
+</section>
+<script src="{{ url_for('static', filename='area.js') }}"></script>
+<script src="{{ url_for('static', filename='sources.js') }}"></script>
+{% endblock %}

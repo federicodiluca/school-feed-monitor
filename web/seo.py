@@ -7,13 +7,12 @@ from sfm.db_sources import get_sources
 PUBLIC_PAGES = [
     ("index", "1.0", "daily"),
     ("news.index", "0.9", "hourly"),
-    ("auth.register", "0.8", "monthly"),
+    ("config.show", "0.8", "monthly"),
     ("about", "0.6", "monthly"),
-    ("auth.login", "0.3", "monthly"),
     ("privacy", "0.2", "yearly"),
     ("terms", "0.2", "yearly"),
 ]
-PRIVATE_PREFIXES = ("/account", "/preferenze", "/le-mie-notizie")  # /preferenze copre anche /preferenze/area
+PRIVATE_PREFIXES = ("/le-mie-notizie", "/configura/esporta.json")  # dipendono dai cookie del visitatore
 
 
 def canonical_url(req=None):

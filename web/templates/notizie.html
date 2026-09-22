@@ -8,7 +8,7 @@
 <p>
   {% if source %}<a href="{{ source.url }}" rel="noopener nofollow">Sito ufficiale</a> · <a href="{{ url_for('news.index') }}">Tutte le fonti</a>
   {% else %}Questo è quello che {{ app_name }} raccoglie ogni giorno da {{ sources | length }} fonti.
-  {% if not current_user %}<a href="{{ url_for('auth.register') }}">Registrati</a> per ricevere solo ciò che ti interessa, via email o Telegram.{% endif %}{% endif %}
+  <a href="{{ url_for('config.show') }}">Scegli le tue fonti</a> per vedere solo ciò che ti interessa, qui o su Telegram.{% endif %}
 </p>
 </div>
 

@@ -31,9 +31,10 @@ def test_new_user_has_empty_keyword_list_not_blank_string():
     assert get_user(1)["keywords"] == []
     users = get_users()
     assert len(users) == 1 and users[0]["telegram_id"] == 1 and users[0]["keywords"] == []
-    assert users[0]["id"] == 1 and users[0]["email"] is None
-    # default di un utente Telegram: alert immediati, solo Telegram
-    assert users[0]["alert_mode"] == "instant" and users[0]["notify_telegram"] and not users[0]["notify_email"]
+    assert users[0]["id"] == 1 and users[0]["active"] is True
+    # l'utente del bot nasce senza campi extra: niente account, niente email
+    assert set(users[0]) == {"id", "telegram_id", "username", "keywords", "active",
+                             "digest_time", "last_digest_date", "created_at"}
 
 
 def test_update_keywords_roundtrip_strips_blanks():

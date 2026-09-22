@@ -9,18 +9,12 @@ from sfm.matching import match_users
 from sfm.source_parser import SourceError, read_source
 
 
-def wants_instant_alerts(user):
-    """Gli utenti in modalità 'digest' ricevono le notizie solo nel report."""
-    return (user.get("alert_mode") or "instant") == "instant"
-
-
 def notify_users(users, news):
-    """Alert immediato agli utenti (in modalità instant) le cui keyword compaiono nel
-    titolo o nel contenuto; ogni invio riuscito è registrato in deliveries.
-    Ritorna il numero di utenti notificati."""
+    """Alert immediato agli utenti le cui parole chiave compaiono nel titolo o nel
+    contenuto; ogni invio riuscito è registrato in deliveries (per il badge "già
+    segnalata" nel riepilogo). Ritorna il numero di utenti notificati."""
     notified = 0
-    candidates = [u for u in users if wants_instant_alerts(u)]
-    for user, matched_keywords in match_users(news, candidates):
+    for user, matched_keywords in match_users(news, users):
         log(f"📨 Notifica a {notifier.user_label(user)} per keyword: {', '.join(matched_keywords)} | Titolo: {news['title']}")
         channels = notifier.send_alert(user, news, matched_keywords)
         if channels:

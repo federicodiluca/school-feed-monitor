@@ -18,19 +18,10 @@ CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     telegram_id INTEGER UNIQUE,
     username TEXT,
-    email TEXT UNIQUE,
-    password_hash TEXT,
-    email_verified INTEGER NOT NULL DEFAULT 0,
     keywords TEXT,
     active INTEGER NOT NULL DEFAULT 1,
-    notify_telegram INTEGER NOT NULL DEFAULT 1,
-    notify_email INTEGER NOT NULL DEFAULT 0,
-    alert_mode TEXT NOT NULL DEFAULT 'instant',
     digest_time TEXT,
     last_digest_date TEXT,
-    consent_version TEXT,
-    consent_at DATETIME,
-    google_sub TEXT UNIQUE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -106,18 +97,11 @@ CREATE TABLE IF NOT EXISTS job_runs (
     error TEXT
 );
 
--- Codici usa-e-getta per collegare un account web a una chat Telegram (/link CODICE).
-CREATE TABLE IF NOT EXISTS link_codes (
+-- Configurazioni create sul sito (fonti + parole chiave) e passate al bot con /start CODICE.
+-- Non contengono dati personali: nessun riferimento a chi le ha create.
+CREATE TABLE IF NOT EXISTS configs (
     code TEXT PRIMARY KEY,
-    user_id INTEGER NOT NULL,
-    expires_at DATETIME NOT NULL
-);
-
--- Token usa-e-getta inviati via email (verifica indirizzo, in futuro reset password).
-CREATE TABLE IF NOT EXISTS email_tokens (
-    token TEXT PRIMARY KEY,
-    user_id INTEGER NOT NULL,
-    purpose TEXT NOT NULL,
+    payload TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     expires_at DATETIME NOT NULL
 );

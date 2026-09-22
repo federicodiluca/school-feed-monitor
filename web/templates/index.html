@@ -12,10 +12,10 @@
       trasferirti — e gli argomenti che segui: graduatorie, mobilità, bandi, circolari, concorsi.
     </p>
     <div class="cta">
-      <a class="button primary lg" href="{{ url_for('auth.register') }}">Registrati gratis</a>
+      <a class="button primary lg" href="{{ url_for('config.show') }}">Scegli le tue fonti</a>
       <a class="button lg" href="{{ url_for('news.index') }}">Guarda le notizie</a>
     </div>
-    <p class="muted cta-note">Via email o Telegram · riepilogo giornaliero o avvisi immediati · nessun tracciamento</p>
+    <p class="muted cta-note">Nessuna registrazione · le tue scelte restano nel tuo browser · avvisi su Telegram se li vuoi</p>
   </div>
   <aside class="hero-demo" aria-label="Esempio di riepilogo">
     <div class="demo-head"><span class="with-ico">{{ icon('megaphone', 16) }} Riepilogo del giorno</span><span>3 notizie · 1 per te</span></div>
@@ -30,7 +30,7 @@
   <div class="grid cols-3">
     <div class="feature"><div class="ico">{{ icon('sources') }}</div><h3>Scegli le fonti</h3><p>Gli USR e gli USP che ti riguardano, il Ministero, o aggiungi tu un sito o un feed.</p></div>
     <div class="feature"><div class="ico">{{ icon('search') }}</div><h3>Scegli le parole chiave</h3><p>La tua classe di concorso (es. <em>A041</em>), «trasferimenti», «graduatorie», «immissioni in ruolo»…</p></div>
-    <div class="feature"><div class="ico">{{ icon('bell') }}</div><h3>Scegli come e quando</h3><p>Un riepilogo al giorno via email e/o Telegram, oppure un avviso immediato appena esce una notizia con le tue parole.</p></div>
+    <div class="feature"><div class="ico">{{ icon('bell') }}</div><h3>Leggile qui o su Telegram</h3><p>Sul sito hai subito "Le mie notizie". Se vuoi essere avvisato appena esce qualcosa, porti la stessa configurazione sul bot con un clic.</p></div>
   </div>
 </section>
 
@@ -45,9 +45,9 @@
 <section class="section">
   <h2>Perché usarlo</h2>
   <div class="grid cols-2">
-    <div class="feature"><div class="ico">{{ icon('mail') }}{{ icon('send') }}</div><h3>Doppio canale</h3><p>Email per chi non usa Telegram, Telegram per chi vuole tutto sul telefono. O entrambi.</p></div>
-    <div class="feature"><div class="ico">{{ icon('clock') }}</div><h3>Tu decidi la frequenza</h3><p>Niente raffiche di notifiche: un riepilogo all'ora che preferisci, e gli avvisi immediati solo se li vuoi.</p></div>
-    <div class="feature"><div class="ico">{{ icon('shield') }}</div><h3>Nessun tracciamento</h3><p>Solo un cookie tecnico per l'accesso, nessun servizio di terze parti nel browser. Cancelli l'account quando vuoi.</p></div>
+    <div class="feature"><div class="ico">{{ icon('user') }}</div><h3>Senza registrazione</h3><p>Niente account, niente password, niente email da lasciare. Scegli le fonti e sei operativo.</p></div>
+    <div class="feature"><div class="ico">{{ icon('clock') }}</div><h3>Tu decidi la frequenza</h3><p>Sul bot: un riepilogo al giorno all'ora che preferisci, più gli avvisi immediati sulle tue parole chiave.</p></div>
+    <div class="feature"><div class="ico">{{ icon('shield') }}</div><h3>Nessun tracciamento</h3><p>Le tue scelte restano nel tuo browser: sul server non c'è niente di tuo. Nessun servizio di terze parti nelle pagine.</p></div>
     <div class="feature"><div class="ico">{{ icon('code') }}</div><h3>Software libero</h3><p>Il codice è pubblico con licenza AGPL: puoi verificarlo e proporre miglioramenti.</p></div>
   </div>
 </section>

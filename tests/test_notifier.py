@@ -45,6 +45,7 @@ def test_channels_for_telegram_only_when_id_present():
     assert notifier.channels_for({"telegram_id": 5}) == ["telegram"]
     assert notifier.channels_for({"telegram_id": None}) == []
     assert notifier.channels_for({}) == []
+    assert notifier.channels_for({"email": "a@b.it"}) == []   # niente canale email in questa versione
 
 
 def test_send_alert_dispatches_to_user_channels(monkeypatch):

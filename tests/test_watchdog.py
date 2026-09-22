@@ -5,7 +5,6 @@ import pytest
 import sfm.news_fetcher as news_fetcher
 import sfm.telegram_commands as tc
 import sfm.watchdog as watchdog
-from sfm import mailer
 from sfm.db_health import (
     get_job_runs,
     get_open_incidents,
@@ -142,25 +141,10 @@ def test_run_watchdog_notifies_once_and_on_recovery(admin_env, sent_messages):
     assert "✅" in sent_messages[-1]["text"] and "Feed Due" in sent_messages[-1]["text"]
 
 
-def test_notify_admin_email_and_no_admin(admin_env, sent_messages, monkeypatch):
+def test_notify_admin_without_admin_only_logs(admin_env, sent_messages):
     admin_env.delenv("ADMIN_TELEGRAM_ID")
-    assert watchdog.notify_admin("test", ["a"]) == []          # nessun admin: solo log
+    assert watchdog.notify_admin("test", ["a"]) == []
     assert sent_messages == []
-
-    admin_env.setenv("ADMIN_EMAIL", "admin@x.it")
-    admin_env.setenv("EMAIL_BACKEND", "smtp")
-    admin_env.setenv("EMAIL_FROM", "bot@x.it")
-    sent = []
-    monkeypatch.setattr(mailer, "send_email", lambda to, subject, html, text=None: sent.append((to, subject)) or True)
-    assert watchdog.notify_admin("Watchdog", ["fonte rotta"]) == ["email"]
-    assert sent == [("admin@x.it", "[School Feed Monitor] Watchdog")]
-
-    monkeypatch.setattr(mailer, "send_email", lambda *a, **k: (_ for _ in ()).throw(mailer.EmailError("down")))
-    assert watchdog.notify_admin("Watchdog", ["x"]) == []
-
-
-# --- deriva del dominio e riepilogo settimanale ---------------------------------------
-
 def test_site_of_registrable_domain():
     assert watchdog.site_of("https://bo.istruzioneer.gov.it/feed/") == "istruzioneer.gov.it"
     assert watchdog.site_of("https://www.usr.sicilia.it/x") == "sicilia.it"
@@ -197,6 +181,6 @@ def test_weekly_summary_reports_counts(admin_env, sent_messages):
         record_source_failure(2, "HTTP 500", now=NOW)
     lines = watchdog.weekly_summary(NOW)
     assert lines[0].startswith("Fonti attive: 2") and "in errore: 1" in lines[0]
-    assert "Utenti: 1 (1 attivi" in lines[2]
+    assert "Utenti iscritti al bot: 1 (1 attivi)" in lines[2]
     assert any("In errore: Feed Due" in l for l in lines)
     assert sent_messages and "Riepilogo settimanale" in sent_messages[-1]["text"]

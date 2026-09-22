@@ -112,5 +112,5 @@ def test_telegram_commands_survive_odd_input(sent_messages):
     tc.handle_update({"update_id": 3, "message": {"text": "/latest abc", "chat": {"id": 1}}})
     tc.handle_update({"update_id": 4, "message": {"text": "/follow 999999", "chat": {"id": 1}}})
     assert "Nessuna fonte valida" in sent_messages[-1]["text"]
-    tc.handle_update({"update_id": 5, "message": {"text": "/link", "chat": {"id": 1}}})
-    assert "Usa: /link" in sent_messages[-1]["text"]
+    tc.handle_update({"update_id": 5, "message": {"text": "/start ZZZZZZZZ", "chat": {"id": 1}}})
+    assert any("non valido o scaduto" in m["text"] for m in sent_messages[-3:])
