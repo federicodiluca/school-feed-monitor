@@ -637,8 +637,27 @@ def handle_update(update):
     return command
 
 
+POLL_BACKOFF_START = 5
+POLL_BACKOFF_MAX = 60
+POLL_LOG_EVERY = 10       # dopo il primo errore, una riga ogni N tentativi falliti
+
+
+def _poll_failure(problem, failures):
+    """Tempo di attesa dopo un getUpdates fallito, con log parsimonioso: un errore che dura
+    (tipico il 409 di due bot accesi insieme) non deve riempire il file di log."""
+    if failures == 1 or failures % POLL_LOG_EVERY == 0:
+        hint = ""
+        if "409" in str(problem) or "Conflict" in str(problem):
+            hint = (" — un'altra istanza del bot sta leggendo gli update: controlla di non "
+                    "averlo acceso su due macchine (o in due container)")
+        suffix = f" [{failures}° tentativo di fila]" if failures > 1 else ""
+        log(f"❌ getUpdates fallito{suffix}: {problem}{hint}")
+    return min(POLL_BACKOFF_START * 2 ** (failures - 1), POLL_BACKOFF_MAX)
+
+
 def handle_commands():
     offset = None
+    failures = 0
     while True:
         try:
             resp = requests.get(
@@ -648,10 +667,12 @@ def handle_commands():
             )
             data = resp.json()
             if not data.get("ok"):
-                # es. 409 se un'altra istanza del bot sta già facendo polling
-                log(f"❌ getUpdates fallito: {data}")
-                time.sleep(5)
+                failures += 1
+                time.sleep(_poll_failure(data, failures))
                 continue
+            if failures:
+                log(f"✅ getUpdates di nuovo funzionante dopo {failures} tentativi falliti")
+                failures = 0
 
             for update in data.get("result", []):
                 offset = update["update_id"] + 1
@@ -661,8 +682,8 @@ def handle_commands():
                     log(f"❌ Errore gestione update {update.get('update_id')}: {e}")
 
         except Exception as e:
-            log(f"❌ Errore comandi Telegram: {e}")
-            time.sleep(5)
+            failures += 1
+            time.sleep(_poll_failure(e, failures))
 
 
 def start_telegram_listener():
