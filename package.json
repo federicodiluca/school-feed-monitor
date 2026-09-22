@@ -1,0 +1,11 @@
+{
+  "name": "school-feed-monitor-tests",
+  "private": true,
+  "description": "Solo per le prove del sito statico in un browser finto (tests/site_check.js).",
+  "scripts": {
+    "check-site": "node tests/site_check.js"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.0"
+  }
+}

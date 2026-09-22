@@ -116,6 +116,25 @@ def search_news(source_ids=None, query=None, days=None, page=1, per_page=20):
     return [dict(r) for r in rows], total
 
 
+def latest_news(limit=1200, days=None):
+    """Le notizie più recenti, senza il tetto di 100 di search_news (che serve alle pagine
+    web). La usa il generatore del sito statico per il dataset che filtra il browser."""
+    where, params = "", []
+    if days:
+        where = " AND datetime(published_at) >= datetime('now', ?)"
+        params.append(f"-{int(days)} days")
+    conn = get_conn()
+    rows = conn.execute(f"""
+        SELECT id, title, link, source, source_id, published_at, content
+        FROM news
+        WHERE 1=1{where}
+        ORDER BY datetime(published_at) DESC, id DESC
+        LIMIT ?
+    """, params + [max(1, int(limit))]).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
 def cleanup_old_news(days=7):
     """Elimina le news con fetched_at più vecchio di `days` giorni. Ritorna il numero di righe eliminate."""
     conn = get_conn()

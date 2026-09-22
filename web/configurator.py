@@ -4,7 +4,8 @@ import json
 
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 
-from sfm.catalog import REGIONS, group_sources, load_catalog, provinces_by_region, sources_for_areas
+from sfm.catalog import (REGIONS, group_sources, load_catalog, provinces_by_region,
+                         provinces_with_own_office, sources_for_areas)
 from sfm.db_configs import TTL_HOURS, save_config
 from sfm.db_sources import get_sources
 from sfm.utils import parse_keywords
@@ -31,7 +32,8 @@ def show():
     sources = _sources_with_selection()
     return render_template("configura.html", sources=sources, groups=group_sources(sources),
                            keywords=prefs.selected_keywords(), regions=REGIONS,
-                           provinces_by_region=provinces_by_region(sources),
+                           provinces_by_region=provinces_by_region(),
+                           provinces_with_office={r: sorted(p) for r, p in provinces_with_own_office(sources).items()},
                            code=request.args.get("codice"), ttl_hours=TTL_HOURS)
 
 
@@ -68,8 +70,9 @@ def area():
             areas[region].append(province)
     chosen = [s["id"] for s in sources_for_areas(get_sources(), areas)]
     where = "; ".join(r + (f" ({', '.join(ps)})" if ps else "") for r, ps in areas.items())
-    flash(f"Selezionate {len(chosen)} fonti per: {where}. Aggiungi le parole chiave e salva.", "success")
-    return prefs.store(redirect(url_for("config.show") + "#fonti"), chosen, prefs.selected_keywords())
+    flash(f"Selezionate {len(chosen)} fonti per: {where}. Controllale e salva in fondo.", "success")
+    keywords = prefs.clean_keywords(parse_keywords(request.form.get("keywords", ""))) or prefs.selected_keywords()
+    return prefs.store(redirect(url_for("config.show") + "#fonti-elenco"), chosen, keywords)
 
 
 @bp.post("/configura/dimentica")

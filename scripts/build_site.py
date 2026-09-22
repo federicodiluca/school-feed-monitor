@@ -13,7 +13,7 @@ import os
 import shutil
 from urllib.parse import urlsplit
 
-from sfm.db_news import search_news
+from sfm.db_news import latest_news
 from sfm.db_sources import get_sources
 from sfm.env import env
 from sfm.logger import log
@@ -22,8 +22,8 @@ from web import create_app
 from web.configurator import catalog_positions
 
 DEFAULT_BASE_URL = "https://federicodiluca.github.io/school-feed-monitor"
-NEWS_IN_DATASET = 800          # quante notizie finiscono nel JSON usato dal browser
-NEWS_DAYS = 60
+NEWS_IN_DATASET = 1200         # quante notizie finiscono nel JSON usato dal browser
+NEWS_DAYS = 90
 PREVIEW_CHARS = 220
 
 # (percorso sull'app, file nella cartella di uscita)
@@ -64,7 +64,7 @@ def _fetch(client, base_url, path):
 def news_dataset(sources):
     """Le notizie che il browser filtra: poche chiavi, nomi corti (il file viene scaricato)."""
     names = {s["id"]: s["name"] for s in sources}
-    rows, _ = search_news(days=NEWS_DAYS, page=1, per_page=NEWS_IN_DATASET)
+    rows = latest_news(limit=NEWS_IN_DATASET, days=NEWS_DAYS)
     items = [{"i": r["id"], "t": r["title"], "l": r["link"], "s": r["source_id"],
               "n": names.get(r["source_id"], r["source"] or ""), "d": r["published_at"],
               "p": _preview(r["content"])}

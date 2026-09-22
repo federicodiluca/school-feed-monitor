@@ -70,8 +70,12 @@
     });
     bytes = bytes.concat(bitmap);
     var text = keywords.join(",");
-    if (text) {
-      new TextEncoder().encode(text).forEach(function (b) { bytes.push(b); });
+    if (text) {                         // UTF-8 a mano: niente TextEncoder, funziona ovunque
+      var encoded = encodeURIComponent(text);
+      for (var i = 0; i < encoded.length; i++) {
+        if (encoded.charAt(i) === "%") { bytes.push(parseInt(encoded.substr(i + 1, 2), 16)); i += 2; }
+        else bytes.push(encoded.charCodeAt(i));
+      }
     }
     var binary = bytes.map(function (b) { return String.fromCharCode(b); }).join("");
     var payload = "C1" + btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -256,8 +260,13 @@
     boxes.forEach(function (b) { b.checked = chosen.indexOf(Number(b.value)) !== -1; });
     if (keywordsField) keywordsField.value = prefs.keywords().join(", ");
     refreshGroups();
+    formSources.addEventListener("change", function (e) {
+      if (e.target && e.target.name === "sources") refreshGroups();
+    });
 
     function refreshGroups() {
+      var total = document.getElementById("sources-selected");
+      if (total) total.textContent = boxes.filter(function (b) { return b.checked; }).length;
       document.querySelectorAll("details.source-group").forEach(function (g) {
         var n = g.querySelectorAll("input[type=checkbox]:checked").length;
         var label = g.querySelector(".group-count");
@@ -275,40 +284,40 @@
         .map(function (k) { return k.trim().slice(0, 60); }).filter(Boolean).slice(0, 30);
     }
 
-    // 2. scorciatoia per area (regioni/province) — stessa regola del server
-    var formArea = document.getElementById("form-area");
-    if (formArea) {
-      formArea.addEventListener("submit", function (e) {
-        e.preventDefault();
-        var regions = Array.prototype.slice.call(formArea.querySelectorAll("input[name=regions]:checked")).map(function (b) { return b.value; });
-        if (!regions.length) { flash("Scegli almeno una regione.", "error"); return; }
-        var wanted = {};
-        regions.forEach(function (r) { wanted[r] = []; });
-        formArea.querySelectorAll("input[name=provinces]:checked").forEach(function (b) {
-          var parts = b.value.split("|");
-          if (wanted[parts[0]]) wanted[parts[0]].push(parts[1]);
-        });
-        data("sources").then(function (src) {
-          var ids = src.items.filter(function (s) {
-            if (s.kind === "mim") return true;
-            if (!s.region || !wanted[s.region]) return false;
-            if (s.kind === "usr") return true;
-            if (s.kind !== "usp") return false;
-            var asked = wanted[s.region];
-            return !asked.length || (s.province || "").split("|").some(function (p) { return asked.indexOf(p) !== -1; });
-          }).map(function (s) { return s.id; });
-          boxes.forEach(function (b) { b.checked = ids.indexOf(Number(b.value)) !== -1; });
-          refreshGroups();
-          flash("Selezionate " + ids.length + " fonti per: " + regions.join(", ") + ". Aggiungi le parole chiave e salva.");
-          location.hash = "#fonti";
-        });
+    // 2. scorciatoia per area: spunta le fonti, senza ricaricare né salvare
+    function applyArea() {
+      var regions = Array.prototype.slice.call(formSources.querySelectorAll("input[name=regions]:checked"))
+        .map(function (b) { return b.value; });
+      if (!regions.length) { flash("Scegli almeno una regione.", "error"); return; }
+      var wanted = {};
+      regions.forEach(function (r) { wanted[r] = []; });
+      formSources.querySelectorAll("input[name=provinces]:checked").forEach(function (b) {
+        var parts = b.value.split("|");
+        if (wanted[parts[0]]) wanted[parts[0]].push(parts[1]);
+      });
+      data("sources").then(function (src) {
+        var ids = src.items.filter(function (s) {
+          if (s.kind === "mim") return true;
+          if (!s.region || !wanted[s.region]) return false;
+          if (s.kind === "usr") return true;
+          if (s.kind !== "usp") return false;
+          var asked = wanted[s.region];
+          return !asked.length || (s.province || "").split("|").some(function (p) { return asked.indexOf(p) !== -1; });
+        }).map(function (s) { return s.id; });
+        boxes.forEach(function (b) { b.checked = ids.indexOf(Number(b.value)) !== -1; });
+        refreshGroups();
+        flash("Spuntate " + ids.length + " fonti per: " + regions.join(", ") + ". Controllale e salva in fondo.");
+        var list = document.getElementById("fonti-elenco");
+        if (list && list.scrollIntoView) list.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
 
     // 3. salvataggio nel browser e passaggio a Telegram
     formSources.addEventListener("submit", function (e) {
       e.preventDefault();
-      var wantTelegram = e.submitter && e.submitter.value === "telegram";
+      var azione = (e.submitter && e.submitter.value) || "";
+      if (azione === "area") { applyArea(); return; }
+      var wantTelegram = azione === "telegram";
       var picked = selected();
       var keywords = currentKeywords();
       prefs.save(picked.map(function (b) { return Number(b.value); }), keywords);
@@ -354,7 +363,7 @@
         out.innerHTML = html;
         out.hidden = false;
         if (hint) hint.hidden = true;
-        out.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (out.scrollIntoView) out.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
 

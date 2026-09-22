@@ -98,3 +98,44 @@ def test_parse_mim_liferay_notizie():
     assert all(i["link"].startswith("https://www.mim.gov.it/") for i in items)
     assert all(i["published"].startswith("2026") for i in items)
     assert all(len(i["title"]) >= 10 for i in items)
+
+
+# --- config.json e catalogo sono la stessa cosa -------------------------------------------
+
+def test_config_entries_inherit_the_catalog_metadata():
+    """Una fonte di config.json che è già nel catalogo (stesso URL o stesso nome) non deve
+    diventare una fonte 'altra' seguita da tutti: eredita regione, provincia e opt-in."""
+    from sfm.catalog import load_catalog, merge_sites
+    catalog = load_catalog()
+    config = [
+        {"name": "USP Bologna", "url": "https://bo.istruzioneer.gov.it/feed/"},        # stesso URL
+        {"name": "USR Emilia Romagna", "url": "https://www.istruzioneer.gov.it/tutte-le-notizie/feed/"},  # stesso nome
+        {"name": "Il mio blog", "url": "https://esempio.it/feed/"},                    # davvero altra
+    ]
+    merged = merge_sites(config, catalog)
+    by_name = {s["name"]: s for s in merged}
+
+    bologna = by_name["USP Bologna"]
+    assert bologna["kind"] == "usp" and bologna["region"] == "Emilia-Romagna"
+    assert bologna["province"] == "Bologna" and bologna["default_follow"] is False
+
+    usr = by_name["USR Emilia Romagna"]
+    assert usr["kind"] == "usr" and usr["region"] == "Emilia-Romagna" and usr["default_follow"] is False
+    assert usr["url"] == "https://www.istruzioneer.gov.it/tutte-le-notizie/feed/"   # l'URL di config resta
+
+    mio = by_name["Il mio blog"]
+    assert mio.get("kind") in (None, "other") and mio.get("region") is None
+
+    # niente doppioni: il catalogo contribuisce una sola volta per fonte
+    assert len(merged) == len(catalog) + 1
+    assert sum(1 for s in merged if s["name"].startswith("USP Bologna")) == 1
+
+
+def test_provinces_offered_cover_all_of_italy():
+    from sfm.catalog import PROVINCES, load_catalog, provinces_by_region, provinces_with_own_office
+    offered = provinces_by_region()
+    assert offered == {r: list(p) for r, p in sorted(PROVINCES.items())}
+    assert sum(len(p) for p in offered.values()) == 107
+    with_office = provinces_with_own_office(load_catalog())
+    assert with_office["Emilia-Romagna"] >= {"Bologna", "Modena"}
+    assert "Udine" not in with_office.get("Friuli-Venezia Giulia", set())   # solo l'USR pubblica

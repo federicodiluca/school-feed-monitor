@@ -1,892 +1,900 @@
 [
- {
-  "name": "MIM — Notizie",
-  "url": "https://www.mim.gov.it/web/guest/news",
-  "type": "html",
-  "kind": "mim",
-  "default_follow": true
- },
- {
-  "name": "MIM — Comunicati stampa",
-  "url": "https://www.mim.gov.it/web/guest/comunicati",
-  "type": "html",
-  "kind": "mim",
-  "default_follow": false
- },
- {
-  "name": "USR Abruzzo",
-  "url": "https://www.mim.gov.it/web/abruzzo/notizie",
-  "type": "html",
-  "kind": "usr",
-  "region": "Abruzzo"
- },
- {
-  "name": "USR Basilicata",
-  "url": "https://www.mim.gov.it/web/basilicata/notizie",
-  "type": "html",
-  "kind": "usr",
-  "region": "Basilicata"
- },
- {
-  "name": "USR Calabria",
-  "url": "https://www.istruzione.calabria.it/feed/",
-  "type": "rss",
-  "kind": "usr",
-  "region": "Calabria"
- },
- {
-  "name": "USR Campania — Notizie",
-  "url": "https://www.mim.gov.it/web/miur-usr-campania/notizie",
-  "type": "html",
-  "kind": "usr",
-  "region": "Campania"
- },
- {
-  "name": "USR Campania — Avvisi",
-  "url": "https://www.mim.gov.it/web/miur-usr-campania/avvisi",
-  "type": "html",
-  "kind": "usr",
-  "region": "Campania"
- },
- {
-  "name": "USR Emilia-Romagna",
-  "url": "https://www.istruzioneer.gov.it/tutte-le-notizie/feed/",
-  "type": "rss",
-  "kind": "usr",
-  "region": "Emilia-Romagna"
- },
- {
-  "name": "USR Friuli-Venezia Giulia",
-  "url": "https://usrfvg.gov.it/it/home/menu/notizie/",
-  "type": "html",
-  "kind": "usr",
-  "region": "Friuli-Venezia Giulia"
- },
- {
-  "name": "USR Lazio",
-  "url": "https://www.ufficioscolasticoregionalelazio.it/feed/",
-  "type": "rss",
-  "kind": "usr",
-  "region": "Lazio"
- },
- {
-  "name": "USR Liguria",
-  "url": "https://www.istruzioneliguria.gov.it/archivio-news",
-  "type": "html",
-  "kind": "usr",
-  "region": "Liguria"
- },
- {
-  "name": "USR Lombardia",
-  "url": "https://www.mim.gov.it/web/usr-lombardia/comunicazioni",
-  "type": "html",
-  "kind": "usr",
-  "region": "Lombardia"
- },
- {
-  "name": "USR Marche",
-  "url": "https://www.mim.gov.it/web/miur-usr-marche/novit%C3%A0-dall-usr-marche",
-  "type": "html",
-  "kind": "usr",
-  "region": "Marche"
- },
- {
-  "name": "USR Molise",
-  "url": "https://www.mim.gov.it/web/molise/notizie",
-  "type": "html",
-  "kind": "usr",
-  "region": "Molise"
- },
- {
-  "name": "USR Piemonte",
-  "url": "https://www.istruzionepiemonte.it/feed/",
-  "type": "rss",
-  "kind": "usr",
-  "region": "Piemonte"
- },
- {
-  "name": "USR Puglia",
-  "url": "https://www.pugliausr.gov.it/index.php?format=feed&type=rss",
-  "type": "rss",
-  "kind": "usr",
-  "region": "Puglia"
- },
- {
-  "name": "USR Sardegna",
-  "url": "https://www.mim.gov.it/web/usr-sardegna/notizie",
-  "type": "html",
-  "kind": "usr",
-  "region": "Sardegna"
- },
- {
-  "name": "USR Sicilia",
-  "url": "https://www.usr.sicilia.it/feed/",
-  "type": "rss",
-  "kind": "usr",
-  "region": "Sicilia"
- },
- {
-  "name": "USR Toscana",
-  "url": "https://www.mim.gov.it/web/miur-usr-toscana/notizie",
-  "type": "html",
-  "kind": "usr",
-  "region": "Toscana"
- },
- {
-  "name": "USR Umbria",
-  "url": "https://www.istruzione.umbria.it/feed/",
-  "type": "rss",
-  "kind": "usr",
-  "region": "Umbria"
- },
- {
-  "name": "USR Veneto",
-  "url": "https://istruzioneveneto.gov.it/feed/",
-  "type": "rss",
-  "kind": "usr",
-  "region": "Veneto"
- },
- {
-  "name": "USP Bologna",
-  "url": "https://bo.istruzioneer.gov.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Emilia-Romagna",
-  "province": "Bologna"
- },
- {
-  "name": "USP Ferrara",
-  "url": "https://fe.istruzioneer.gov.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Emilia-Romagna",
-  "province": "Ferrara"
- },
- {
-  "name": "USP Forlì-Cesena",
-  "url": "https://fc.istruzioneer.gov.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Emilia-Romagna",
-  "province": "Forlì-Cesena"
- },
- {
-  "name": "USP Modena",
-  "url": "https://mo.istruzioneer.gov.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Emilia-Romagna",
-  "province": "Modena"
- },
- {
-  "name": "USP Parma",
-  "url": "https://pr.istruzioneer.gov.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Emilia-Romagna",
-  "province": "Parma"
- },
- {
-  "name": "USP Piacenza",
-  "url": "https://pc.istruzioneer.gov.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Emilia-Romagna",
-  "province": "Piacenza"
- },
- {
-  "name": "USP Ravenna",
-  "url": "https://ra.istruzioneer.gov.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Emilia-Romagna",
-  "province": "Ravenna"
- },
- {
-  "name": "USP Reggio Emilia",
-  "url": "https://re.istruzioneer.gov.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Emilia-Romagna",
-  "province": "Reggio Emilia"
- },
- {
-  "name": "USP Rimini",
-  "url": "https://rn.istruzioneer.gov.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Emilia-Romagna",
-  "province": "Rimini"
- },
- {
-  "name": "USP Belluno",
-  "url": "https://belluno.istruzioneveneto.gov.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Veneto",
-  "province": "Belluno"
- },
- {
-  "name": "USP Padova",
-  "url": "https://padova.istruzioneveneto.gov.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Veneto",
-  "province": "Padova"
- },
- {
-  "name": "USP Rovigo",
-  "url": "https://rovigo.istruzioneveneto.gov.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Veneto",
-  "province": "Rovigo"
- },
- {
-  "name": "USP Treviso",
-  "url": "https://treviso.istruzioneveneto.gov.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Veneto",
-  "province": "Treviso"
- },
- {
-  "name": "USP Venezia",
-  "url": "https://venezia.istruzioneveneto.gov.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Veneto",
-  "province": "Venezia"
- },
- {
-  "name": "USP Verona",
-  "url": "https://verona.istruzioneveneto.gov.it/index.php/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Veneto",
-  "province": "Verona"
- },
- {
-  "name": "USP Vicenza",
-  "url": "https://vicenza.istruzioneveneto.gov.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Veneto",
-  "province": "Vicenza"
- },
- {
-  "name": "USP Torino",
-  "url": "https://www.istruzionepiemonte.it/torino/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Piemonte",
-  "province": "Torino"
- },
- {
-  "name": "USP Alessandria e Asti",
-  "url": "https://www.istruzionepiemonte.it/alessandria-asti/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Piemonte",
-  "province": [
-   "Alessandria",
-   "Asti"
-  ]
- },
- {
-  "name": "USP Biella",
-  "url": "https://www.istruzionepiemonte.it/biella/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Piemonte",
-  "province": "Biella"
- },
- {
-  "name": "USP Cuneo",
-  "url": "https://www.istruzionepiemonte.it/cuneo/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Piemonte",
-  "province": "Cuneo"
- },
- {
-  "name": "USP Novara",
-  "url": "https://www.istruzionepiemonte.it/novara/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Piemonte",
-  "province": "Novara"
- },
- {
-  "name": "USP Vercelli",
-  "url": "https://www.istruzionepiemonte.it/vercelli/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Piemonte",
-  "province": "Vercelli"
- },
- {
-  "name": "USP Verbano-Cusio-Ossola",
-  "url": "https://www.istruzionepiemonte.it/verbania/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Piemonte",
-  "province": "Verbano-Cusio-Ossola"
- },
- {
-  "name": "UST Milano",
-  "url": "https://www.mim.gov.it/web/milano/comunicazioni",
-  "type": "html",
-  "kind": "usp",
-  "region": "Lombardia",
-  "province": "Milano"
- },
- {
-  "name": "UST Bergamo",
-  "url": "https://www.mim.gov.it/web/bergamo/comunicazioni",
-  "type": "html",
-  "kind": "usp",
-  "region": "Lombardia",
-  "province": "Bergamo"
- },
- {
-  "name": "UST Brescia",
-  "url": "https://www.mim.gov.it/web/brescia/comunicazioni",
-  "type": "html",
-  "kind": "usp",
-  "region": "Lombardia",
-  "province": "Brescia"
- },
- {
-  "name": "UST Como",
-  "url": "https://www.mim.gov.it/web/como/comunicazioni",
-  "type": "html",
-  "kind": "usp",
-  "region": "Lombardia",
-  "province": "Como"
- },
- {
-  "name": "UST Cremona",
-  "url": "https://www.mim.gov.it/web/cremona/comunicazioni",
-  "type": "html",
-  "kind": "usp",
-  "region": "Lombardia",
-  "province": "Cremona"
- },
- {
-  "name": "UST Lecco",
-  "url": "https://www.mim.gov.it/web/lecco/comunicazioni",
-  "type": "html",
-  "kind": "usp",
-  "region": "Lombardia",
-  "province": "Lecco"
- },
- {
-  "name": "UST Lodi",
-  "url": "https://www.mim.gov.it/web/lodi/comunicazioni",
-  "type": "html",
-  "kind": "usp",
-  "region": "Lombardia",
-  "province": "Lodi"
- },
- {
-  "name": "UST Mantova",
-  "url": "https://www.mim.gov.it/web/mantova/comunicazioni",
-  "type": "html",
-  "kind": "usp",
-  "region": "Lombardia",
-  "province": "Mantova"
- },
- {
-  "name": "UST Monza e Brianza",
-  "url": "https://www.mim.gov.it/web/monza-brianza/comunicazioni",
-  "type": "html",
-  "kind": "usp",
-  "region": "Lombardia",
-  "province": "Monza e Brianza"
- },
- {
-  "name": "UST Pavia",
-  "url": "https://www.mim.gov.it/web/pavia/comunicazioni",
-  "type": "html",
-  "kind": "usp",
-  "region": "Lombardia",
-  "province": "Pavia"
- },
- {
-  "name": "UST Sondrio",
-  "url": "https://www.mim.gov.it/web/sondrio/comunicazioni",
-  "type": "html",
-  "kind": "usp",
-  "region": "Lombardia",
-  "province": "Sondrio"
- },
- {
-  "name": "UST Varese",
-  "url": "https://www.mim.gov.it/web/varese/comunicazioni",
-  "type": "html",
-  "kind": "usp",
-  "region": "Lombardia",
-  "province": "Varese"
- },
- {
-  "name": "USP Cosenza",
-  "url": "https://www.istruzione.calabria.it/cosenza/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Calabria",
-  "province": "Cosenza"
- },
- {
-  "name": "USP Catanzaro",
-  "url": "https://www.istruzione.calabria.it/catanzaro/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Calabria",
-  "province": "Catanzaro"
- },
- {
-  "name": "USP Crotone",
-  "url": "https://www.istruzione.calabria.it/crotone/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Calabria",
-  "province": "Crotone"
- },
- {
-  "name": "USP Reggio Calabria",
-  "url": "https://www.istruzioneatprc.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Calabria",
-  "province": "Reggio Calabria"
- },
- {
-  "name": "USP Vibo Valentia",
-  "url": "https://www.istruzione.calabria.it/vibovalentia/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Calabria",
-  "province": "Vibo Valentia"
- },
- {
-  "name": "USP Agrigento",
-  "url": "https://ag.usr.sicilia.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Sicilia",
-  "province": "Agrigento"
- },
- {
-  "name": "USP Caltanissetta ed Enna",
-  "url": "https://cl-en.usr.sicilia.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Sicilia",
-  "province": [
-   "Caltanissetta",
-   "Enna"
-  ]
- },
- {
-  "name": "USP Catania",
-  "url": "https://ct.usr.sicilia.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Sicilia",
-  "province": "Catania"
- },
- {
-  "name": "USP Messina",
-  "url": "https://me.usr.sicilia.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Sicilia",
-  "province": "Messina"
- },
- {
-  "name": "USP Palermo",
-  "url": "https://pa.usr.sicilia.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Sicilia",
-  "province": "Palermo"
- },
- {
-  "name": "USP Ragusa",
-  "url": "https://rg.usr.sicilia.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Sicilia",
-  "province": "Ragusa"
- },
- {
-  "name": "USP Siracusa",
-  "url": "https://sr.usr.sicilia.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Sicilia",
-  "province": "Siracusa"
- },
- {
-  "name": "USP Trapani",
-  "url": "https://tp.usr.sicilia.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Sicilia",
-  "province": "Trapani"
- },
- {
-  "name": "USP Cagliari",
-  "url": "https://www.mim.gov.it/web/cagliari/notizie",
-  "type": "html",
-  "kind": "usp",
-  "region": "Sardegna",
-  "province": [
-   "Cagliari",
-   "Sud Sardegna"
-  ]
- },
- {
-  "name": "USP Sassari",
-  "url": "https://www.mim.gov.it/web/sassari/notizie",
-  "type": "html",
-  "kind": "usp",
-  "region": "Sardegna",
-  "province": "Sassari"
- },
- {
-  "name": "USP Nuoro",
-  "url": "https://www.mim.gov.it/web/nuoro/notizie",
-  "type": "html",
-  "kind": "usp",
-  "region": "Sardegna",
-  "province": "Nuoro"
- },
- {
-  "name": "USP Oristano",
-  "url": "https://www.mim.gov.it/web/oristano/notizie",
-  "type": "html",
-  "kind": "usp",
-  "region": "Sardegna",
-  "province": "Oristano"
- },
- {
-  "name": "USP Campobasso",
-  "url": "https://www.mim.gov.it/web/campobasso/notizie",
-  "type": "html",
-  "kind": "usp",
-  "region": "Molise",
-  "province": "Campobasso"
- },
- {
-  "name": "USP Isernia",
-  "url": "https://www.mim.gov.it/web/isernia/notizie",
-  "type": "html",
-  "kind": "usp",
-  "region": "Molise",
-  "province": "Isernia"
- },
- {
-  "name": "USP Arezzo",
-  "url": "https://www.arezzoistruzione.it/usparezzo/index.php?format=feed&type=rss",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Toscana",
-  "province": "Arezzo"
- },
- {
-  "name": "USP Firenze",
-  "url": "https://www.ust.fi.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Toscana",
-  "province": "Firenze"
- },
- {
-  "name": "USP Livorno",
-  "url": "https://www.ustli.it/usp_livorno/index.php?format=feed&type=rss",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Toscana",
-  "province": "Livorno"
- },
- {
-  "name": "USP Lucca",
-  "url": "https://ustlucca.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Toscana",
-  "province": "Lucca"
- },
- {
-  "name": "USP Massa-Carrara",
-  "url": "https://www.ustms.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Toscana",
-  "province": "Massa-Carrara"
- },
- {
-  "name": "USP Prato",
-  "url": "https://www.ufficioscolasticoprovinciale.prato.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Toscana",
-  "province": "Prato"
- },
- {
-  "name": "USP Siena",
-  "url": "https://www.uspsi.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Toscana",
-  "province": "Siena"
- },
- {
-  "name": "USP Napoli",
-  "url": "https://www.uat-napoli.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Campania",
-  "province": "Napoli"
- },
- {
-  "name": "USP Avellino",
-  "url": "https://atavellino.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Campania",
-  "province": "Avellino"
- },
- {
-  "name": "USP Bari",
-  "url": "https://www.uspbari.it/usp/feed",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Puglia",
-  "province": "Bari"
- },
- {
-  "name": "USP Barletta-Andria-Trani",
-  "url": "https://www.istruzionebat.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Puglia",
-  "province": "Barletta-Andria-Trani"
- },
- {
-  "name": "USP Brindisi",
-  "url": "https://www.istruzionebrindisi.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Puglia",
-  "province": "Brindisi"
- },
- {
-  "name": "USP Foggia",
-  "url": "https://www.ustfoggia.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Puglia",
-  "province": "Foggia"
- },
- {
-  "name": "USP Taranto",
-  "url": "https://www.usptaranto.it/",
-  "type": "html",
-  "kind": "usp",
-  "region": "Puglia",
-  "province": "Taranto"
- },
- {
-  "name": "USP Roma",
-  "url": "https://www.atpromaistruzione.it/atp/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Lazio",
-  "province": "Roma"
- },
- {
-  "name": "USP Frosinone",
-  "url": "https://www.uspistruzione.fr.it/wp2/feed",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Lazio",
-  "province": "Frosinone"
- },
- {
-  "name": "USP Latina",
-  "url": "https://www.usplatina.it/wp/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Lazio",
-  "province": "Latina"
- },
- {
-  "name": "USP Rieti",
-  "url": "https://www.usp-rieti.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Lazio",
-  "province": "Rieti"
- },
- {
-  "name": "USP Chieti e Pescara",
-  "url": "https://www.istruzionechietipescara.it/",
-  "type": "html",
-  "kind": "usp",
-  "region": "Abruzzo",
-  "province": [
-   "Chieti",
-   "Pescara"
-  ]
- },
- {
-  "name": "USP Teramo",
-  "url": "https://www.csateramo.it/wpusp/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Abruzzo",
-  "province": "Teramo"
- },
- {
-  "name": "USP Ancona",
-  "url": "https://www.istruzione-ancona.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Marche",
-  "province": "Ancona"
- },
- {
-  "name": "USP Pesaro e Urbino",
-  "url": "https://www.usppesarourbino.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Marche",
-  "province": "Pesaro e Urbino"
- },
- {
-  "name": "USP Perugia",
-  "url": "https://istruzione.umbria.it/category/ambito-territoriale-perugia/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Umbria",
-  "province": "Perugia"
- },
- {
-  "name": "USP Terni",
-  "url": "https://istruzione.umbria.it/category/ambito-territoriale-terni/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Umbria",
-  "province": "Terni"
- },
- {
-  "name": "USP Potenza",
-  "url": "https://www.istruzionepotenza.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Basilicata",
-  "province": "Potenza"
- },
- {
-  "name": "USP Matera",
-  "url": "https://www.istruzionematera.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Basilicata",
-  "province": "Matera"
- },
- {
-  "name": "USP Trieste",
-  "url": "https://usrfvg.gov.it/it/home/menu/uffici/ufficio-territoriale-di-trieste/notizie/",
-  "type": "html",
-  "kind": "usp",
-  "region": "Friuli-Venezia Giulia",
-  "province": "Trieste"
- },
- {
-  "name": "USP L'Aquila",
-  "url": "https://lnx.csalaquila.it/wp/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Abruzzo",
-  "province": "L'Aquila"
- },
- {
-  "name": "USP Ascoli Piceno e Fermo",
-  "url": "https://www.uspascolipiceno.it/wordpress/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Marche",
-  "province": [
-   "Ascoli Piceno",
-   "Fermo"
-  ]
- },
- {
-  "name": "USP Macerata",
-  "url": "https://www.uspmc.sinp.net/tutte-le-notizie/",
-  "type": "html",
-  "kind": "usp",
-  "region": "Marche",
-  "province": "Macerata"
- },
- {
-  "name": "USP Pisa",
-  "url": "https://www.usp-pi.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Toscana",
-  "province": "Pisa"
- },
- {
-  "name": "USP Grosseto",
-  "url": "https://www.ufficioscolasticogrosseto.it/uff7/index.php/novita?format=feed&type=rss",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Toscana",
-  "province": "Grosseto"
- },
- {
-  "name": "USP Pistoia",
-  "url": "https://www.ufficioscolasticoprovinciale.pistoia.it/feed/",
-  "type": "rss",
-  "kind": "usp",
-  "region": "Toscana",
-  "province": "Pistoia"
- },
- {
-  "name": "USP Genova",
-  "url": "https://www.istruzionegenova.gov.it/archivio-news",
-  "type": "html",
-  "kind": "usp",
-  "region": "Liguria",
-  "province": "Genova"
- },
- {
-  "name": "USP Imperia",
-  "url": "https://www.istruzioneimperia.gov.it/archivio-news",
-  "type": "html",
-  "kind": "usp",
-  "region": "Liguria",
-  "province": "Imperia"
- },
- {
-  "name": "USP La Spezia",
-  "url": "https://www.istruzionelaspezia.gov.it/archivio-news",
-  "type": "html",
-  "kind": "usp",
-  "region": "Liguria",
-  "province": "La Spezia"
- },
- {
-  "name": "USP Savona",
-  "url": "https://www.istruzionesavona.gov.it/archivio-news",
-  "type": "html",
-  "kind": "usp",
-  "region": "Liguria",
-  "province": "Savona"
- }
+  {
+    "name": "MIM — Notizie",
+    "url": "https://www.mim.gov.it/web/guest/news",
+    "type": "html",
+    "kind": "mim",
+    "default_follow": true
+  },
+  {
+    "name": "MIM — Comunicati stampa",
+    "url": "https://www.mim.gov.it/web/guest/comunicati",
+    "type": "html",
+    "kind": "mim",
+    "default_follow": false
+  },
+  {
+    "name": "USR Abruzzo",
+    "url": "https://www.mim.gov.it/web/abruzzo/notizie",
+    "type": "html",
+    "kind": "usr",
+    "region": "Abruzzo"
+  },
+  {
+    "name": "USR Basilicata",
+    "url": "https://www.mim.gov.it/web/basilicata/notizie",
+    "type": "html",
+    "kind": "usr",
+    "region": "Basilicata"
+  },
+  {
+    "name": "USR Calabria",
+    "url": "https://www.istruzione.calabria.it/feed/",
+    "type": "rss",
+    "kind": "usr",
+    "region": "Calabria"
+  },
+  {
+    "name": "USR Campania — Notizie",
+    "url": "https://www.mim.gov.it/web/miur-usr-campania/notizie",
+    "type": "html",
+    "kind": "usr",
+    "region": "Campania"
+  },
+  {
+    "name": "USR Campania — Avvisi",
+    "url": "https://www.mim.gov.it/web/miur-usr-campania/avvisi",
+    "type": "html",
+    "kind": "usr",
+    "region": "Campania"
+  },
+  {
+    "name": "USR Emilia-Romagna",
+    "url": "https://www.istruzioneer.gov.it/tutte-le-notizie/feed/",
+    "type": "rss",
+    "kind": "usr",
+    "region": "Emilia-Romagna"
+  },
+  {
+    "name": "USR Friuli-Venezia Giulia",
+    "url": "https://usrfvg.gov.it/it/home/menu/notizie/",
+    "type": "html",
+    "kind": "usr",
+    "region": "Friuli-Venezia Giulia"
+  },
+  {
+    "name": "USR Lazio",
+    "url": "https://www.ufficioscolasticoregionalelazio.it/feed/",
+    "type": "rss",
+    "kind": "usr",
+    "region": "Lazio"
+  },
+  {
+    "name": "USR Liguria",
+    "url": "https://www.istruzioneliguria.gov.it/archivio-news",
+    "type": "html",
+    "kind": "usr",
+    "region": "Liguria"
+  },
+  {
+    "name": "USR Lombardia",
+    "url": "https://www.mim.gov.it/web/usr-lombardia/comunicazioni",
+    "type": "html",
+    "kind": "usr",
+    "region": "Lombardia"
+  },
+  {
+    "name": "USR Marche",
+    "url": "https://www.mim.gov.it/web/miur-usr-marche/novit%C3%A0-dall-usr-marche",
+    "type": "html",
+    "kind": "usr",
+    "region": "Marche"
+  },
+  {
+    "name": "USR Molise",
+    "url": "https://www.mim.gov.it/web/molise/notizie",
+    "type": "html",
+    "kind": "usr",
+    "region": "Molise"
+  },
+  {
+    "name": "USR Piemonte",
+    "url": "https://www.istruzionepiemonte.it/feed/",
+    "type": "rss",
+    "kind": "usr",
+    "region": "Piemonte"
+  },
+  {
+    "name": "USR Puglia",
+    "url": "https://www.pugliausr.gov.it/index.php?format=feed&type=rss",
+    "type": "rss",
+    "kind": "usr",
+    "region": "Puglia"
+  },
+  {
+    "name": "USR Sardegna",
+    "url": "https://www.mim.gov.it/web/usr-sardegna/notizie",
+    "type": "html",
+    "kind": "usr",
+    "region": "Sardegna"
+  },
+  {
+    "name": "USR Sicilia",
+    "url": "https://www.usr.sicilia.it/feed/",
+    "type": "rss",
+    "kind": "usr",
+    "region": "Sicilia"
+  },
+  {
+    "name": "USR Toscana",
+    "url": "https://www.mim.gov.it/web/miur-usr-toscana/notizie",
+    "type": "html",
+    "kind": "usr",
+    "region": "Toscana"
+  },
+  {
+    "name": "USR Umbria",
+    "url": "https://www.istruzione.umbria.it/feed/",
+    "type": "rss",
+    "kind": "usr",
+    "region": "Umbria"
+  },
+  {
+    "name": "USR Veneto",
+    "url": "https://istruzioneveneto.gov.it/feed/",
+    "type": "rss",
+    "kind": "usr",
+    "region": "Veneto"
+  },
+  {
+    "name": "USP Bologna",
+    "url": "https://bo.istruzioneer.gov.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Emilia-Romagna",
+    "province": "Bologna"
+  },
+  {
+    "name": "USP Ferrara",
+    "url": "https://fe.istruzioneer.gov.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Emilia-Romagna",
+    "province": "Ferrara"
+  },
+  {
+    "name": "USP Forlì-Cesena",
+    "url": "https://fc.istruzioneer.gov.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Emilia-Romagna",
+    "province": "Forlì-Cesena"
+  },
+  {
+    "name": "USP Modena",
+    "url": "https://mo.istruzioneer.gov.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Emilia-Romagna",
+    "province": "Modena"
+  },
+  {
+    "name": "USP Parma",
+    "url": "https://pr.istruzioneer.gov.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Emilia-Romagna",
+    "province": "Parma"
+  },
+  {
+    "name": "USP Piacenza",
+    "url": "https://pc.istruzioneer.gov.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Emilia-Romagna",
+    "province": "Piacenza"
+  },
+  {
+    "name": "USP Ravenna",
+    "url": "https://ra.istruzioneer.gov.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Emilia-Romagna",
+    "province": "Ravenna"
+  },
+  {
+    "name": "USP Reggio Emilia",
+    "url": "https://re.istruzioneer.gov.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Emilia-Romagna",
+    "province": "Reggio Emilia"
+  },
+  {
+    "name": "USP Rimini",
+    "url": "https://rn.istruzioneer.gov.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Emilia-Romagna",
+    "province": "Rimini"
+  },
+  {
+    "name": "USP Belluno",
+    "url": "https://belluno.istruzioneveneto.gov.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Veneto",
+    "province": "Belluno"
+  },
+  {
+    "name": "USP Padova",
+    "url": "https://padova.istruzioneveneto.gov.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Veneto",
+    "province": "Padova"
+  },
+  {
+    "name": "USP Rovigo",
+    "url": "https://rovigo.istruzioneveneto.gov.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Veneto",
+    "province": "Rovigo"
+  },
+  {
+    "name": "USP Treviso",
+    "url": "https://treviso.istruzioneveneto.gov.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Veneto",
+    "province": "Treviso"
+  },
+  {
+    "name": "USP Venezia",
+    "url": "https://venezia.istruzioneveneto.gov.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Veneto",
+    "province": "Venezia"
+  },
+  {
+    "name": "USP Verona",
+    "url": "https://verona.istruzioneveneto.gov.it/index.php/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Veneto",
+    "province": "Verona"
+  },
+  {
+    "name": "USP Vicenza",
+    "url": "https://vicenza.istruzioneveneto.gov.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Veneto",
+    "province": "Vicenza"
+  },
+  {
+    "name": "USP Torino",
+    "url": "https://www.istruzionepiemonte.it/torino/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Piemonte",
+    "province": "Torino"
+  },
+  {
+    "name": "USP Alessandria e Asti",
+    "url": "https://www.istruzionepiemonte.it/alessandria-asti/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Piemonte",
+    "province": [
+      "Alessandria",
+      "Asti"
+    ]
+  },
+  {
+    "name": "USP Biella",
+    "url": "https://www.istruzionepiemonte.it/biella/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Piemonte",
+    "province": "Biella"
+  },
+  {
+    "name": "USP Cuneo",
+    "url": "https://www.istruzionepiemonte.it/cuneo/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Piemonte",
+    "province": "Cuneo"
+  },
+  {
+    "name": "USP Novara",
+    "url": "https://www.istruzionepiemonte.it/novara/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Piemonte",
+    "province": "Novara"
+  },
+  {
+    "name": "USP Vercelli",
+    "url": "https://www.istruzionepiemonte.it/vercelli/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Piemonte",
+    "province": "Vercelli"
+  },
+  {
+    "name": "USP Verbano-Cusio-Ossola",
+    "url": "https://www.istruzionepiemonte.it/verbania/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Piemonte",
+    "province": "Verbano-Cusio-Ossola"
+  },
+  {
+    "name": "UST Milano",
+    "url": "https://www.mim.gov.it/web/milano/comunicazioni",
+    "type": "html",
+    "kind": "usp",
+    "region": "Lombardia",
+    "province": "Milano"
+  },
+  {
+    "name": "UST Bergamo",
+    "url": "https://www.mim.gov.it/web/bergamo/comunicazioni",
+    "type": "html",
+    "kind": "usp",
+    "region": "Lombardia",
+    "province": "Bergamo"
+  },
+  {
+    "name": "UST Brescia",
+    "url": "https://www.mim.gov.it/web/brescia/comunicazioni",
+    "type": "html",
+    "kind": "usp",
+    "region": "Lombardia",
+    "province": "Brescia"
+  },
+  {
+    "name": "UST Como",
+    "url": "https://www.mim.gov.it/web/como/comunicazioni",
+    "type": "html",
+    "kind": "usp",
+    "region": "Lombardia",
+    "province": "Como"
+  },
+  {
+    "name": "UST Cremona",
+    "url": "https://www.mim.gov.it/web/cremona/comunicazioni",
+    "type": "html",
+    "kind": "usp",
+    "region": "Lombardia",
+    "province": "Cremona"
+  },
+  {
+    "name": "UST Lecco",
+    "url": "https://www.mim.gov.it/web/lecco/comunicazioni",
+    "type": "html",
+    "kind": "usp",
+    "region": "Lombardia",
+    "province": "Lecco"
+  },
+  {
+    "name": "UST Lodi",
+    "url": "https://www.mim.gov.it/web/lodi/comunicazioni",
+    "type": "html",
+    "kind": "usp",
+    "region": "Lombardia",
+    "province": "Lodi"
+  },
+  {
+    "name": "UST Mantova",
+    "url": "https://www.mim.gov.it/web/mantova/comunicazioni",
+    "type": "html",
+    "kind": "usp",
+    "region": "Lombardia",
+    "province": "Mantova"
+  },
+  {
+    "name": "UST Monza e Brianza",
+    "url": "https://www.mim.gov.it/web/monza-brianza/comunicazioni",
+    "type": "html",
+    "kind": "usp",
+    "region": "Lombardia",
+    "province": "Monza e Brianza"
+  },
+  {
+    "name": "UST Pavia",
+    "url": "https://www.mim.gov.it/web/pavia/comunicazioni",
+    "type": "html",
+    "kind": "usp",
+    "region": "Lombardia",
+    "province": "Pavia"
+  },
+  {
+    "name": "UST Sondrio",
+    "url": "https://www.mim.gov.it/web/sondrio/comunicazioni",
+    "type": "html",
+    "kind": "usp",
+    "region": "Lombardia",
+    "province": "Sondrio"
+  },
+  {
+    "name": "UST Varese",
+    "url": "https://www.mim.gov.it/web/varese/comunicazioni",
+    "type": "html",
+    "kind": "usp",
+    "region": "Lombardia",
+    "province": "Varese"
+  },
+  {
+    "name": "USP Cosenza",
+    "url": "https://www.istruzione.calabria.it/cosenza/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Calabria",
+    "province": "Cosenza"
+  },
+  {
+    "name": "USP Catanzaro",
+    "url": "https://www.istruzione.calabria.it/catanzaro/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Calabria",
+    "province": "Catanzaro"
+  },
+  {
+    "name": "USP Crotone",
+    "url": "https://www.istruzione.calabria.it/crotone/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Calabria",
+    "province": "Crotone"
+  },
+  {
+    "name": "USP Reggio Calabria",
+    "url": "https://www.istruzioneatprc.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Calabria",
+    "province": "Reggio Calabria"
+  },
+  {
+    "name": "USP Vibo Valentia",
+    "url": "https://www.istruzione.calabria.it/vibovalentia/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Calabria",
+    "province": "Vibo Valentia"
+  },
+  {
+    "name": "USP Agrigento",
+    "url": "https://ag.usr.sicilia.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Sicilia",
+    "province": "Agrigento"
+  },
+  {
+    "name": "USP Caltanissetta ed Enna",
+    "url": "https://cl-en.usr.sicilia.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Sicilia",
+    "province": [
+      "Caltanissetta",
+      "Enna"
+    ]
+  },
+  {
+    "name": "USP Catania",
+    "url": "https://ct.usr.sicilia.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Sicilia",
+    "province": "Catania"
+  },
+  {
+    "name": "USP Messina",
+    "url": "https://me.usr.sicilia.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Sicilia",
+    "province": "Messina"
+  },
+  {
+    "name": "USP Palermo",
+    "url": "https://pa.usr.sicilia.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Sicilia",
+    "province": "Palermo"
+  },
+  {
+    "name": "USP Ragusa",
+    "url": "https://rg.usr.sicilia.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Sicilia",
+    "province": "Ragusa"
+  },
+  {
+    "name": "USP Siracusa",
+    "url": "https://sr.usr.sicilia.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Sicilia",
+    "province": "Siracusa"
+  },
+  {
+    "name": "USP Trapani",
+    "url": "https://tp.usr.sicilia.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Sicilia",
+    "province": "Trapani"
+  },
+  {
+    "name": "USP Cagliari",
+    "url": "https://www.mim.gov.it/web/cagliari/notizie",
+    "type": "html",
+    "kind": "usp",
+    "region": "Sardegna",
+    "province": [
+      "Cagliari",
+      "Sud Sardegna"
+    ]
+  },
+  {
+    "name": "USP Sassari",
+    "url": "https://www.mim.gov.it/web/sassari/notizie",
+    "type": "html",
+    "kind": "usp",
+    "region": "Sardegna",
+    "province": "Sassari"
+  },
+  {
+    "name": "USP Nuoro",
+    "url": "https://www.mim.gov.it/web/nuoro/notizie",
+    "type": "html",
+    "kind": "usp",
+    "region": "Sardegna",
+    "province": "Nuoro"
+  },
+  {
+    "name": "USP Oristano",
+    "url": "https://www.mim.gov.it/web/oristano/notizie",
+    "type": "html",
+    "kind": "usp",
+    "region": "Sardegna",
+    "province": "Oristano"
+  },
+  {
+    "name": "USP Campobasso",
+    "url": "https://www.mim.gov.it/web/campobasso/notizie",
+    "type": "html",
+    "kind": "usp",
+    "region": "Molise",
+    "province": "Campobasso"
+  },
+  {
+    "name": "USP Isernia",
+    "url": "https://www.mim.gov.it/web/isernia/notizie",
+    "type": "html",
+    "kind": "usp",
+    "region": "Molise",
+    "province": "Isernia"
+  },
+  {
+    "name": "USP Arezzo",
+    "url": "https://www.arezzoistruzione.it/usparezzo/index.php?format=feed&type=rss",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Toscana",
+    "province": "Arezzo"
+  },
+  {
+    "name": "USP Firenze",
+    "url": "https://www.ust.fi.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Toscana",
+    "province": "Firenze"
+  },
+  {
+    "name": "USP Livorno",
+    "url": "https://www.ustli.it/usp_livorno/index.php?format=feed&type=rss",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Toscana",
+    "province": "Livorno"
+  },
+  {
+    "name": "USP Lucca",
+    "url": "https://ustlucca.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Toscana",
+    "province": "Lucca"
+  },
+  {
+    "name": "USP Massa-Carrara",
+    "url": "https://www.ustms.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Toscana",
+    "province": "Massa-Carrara"
+  },
+  {
+    "name": "USP Prato",
+    "url": "https://www.ufficioscolasticoprovinciale.prato.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Toscana",
+    "province": "Prato"
+  },
+  {
+    "name": "USP Siena",
+    "url": "https://www.uspsi.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Toscana",
+    "province": "Siena"
+  },
+  {
+    "name": "USP Napoli",
+    "url": "https://www.uat-napoli.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Campania",
+    "province": "Napoli"
+  },
+  {
+    "name": "USP Avellino",
+    "url": "https://atavellino.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Campania",
+    "province": "Avellino"
+  },
+  {
+    "name": "USP Bari",
+    "url": "https://www.uspbari.it/usp/feed",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Puglia",
+    "province": "Bari"
+  },
+  {
+    "name": "USP Barletta-Andria-Trani",
+    "url": "https://www.istruzionebat.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Puglia",
+    "province": "Barletta-Andria-Trani"
+  },
+  {
+    "name": "USP Brindisi",
+    "url": "https://www.istruzionebrindisi.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Puglia",
+    "province": "Brindisi"
+  },
+  {
+    "name": "USP Foggia",
+    "url": "https://www.ustfoggia.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Puglia",
+    "province": "Foggia"
+  },
+  {
+    "name": "USP Taranto",
+    "url": "https://www.usptaranto.it/",
+    "type": "html",
+    "kind": "usp",
+    "region": "Puglia",
+    "province": "Taranto"
+  },
+  {
+    "name": "USP Roma",
+    "url": "https://www.atpromaistruzione.it/atp/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Lazio",
+    "province": "Roma"
+  },
+  {
+    "name": "USP Frosinone",
+    "url": "https://www.uspistruzione.fr.it/wp2/feed",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Lazio",
+    "province": "Frosinone"
+  },
+  {
+    "name": "USP Latina",
+    "url": "https://www.usplatina.it/wp/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Lazio",
+    "province": "Latina"
+  },
+  {
+    "name": "USP Rieti",
+    "url": "https://www.usp-rieti.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Lazio",
+    "province": "Rieti"
+  },
+  {
+    "name": "USP Chieti e Pescara",
+    "url": "https://www.istruzionechietipescara.it/",
+    "type": "html",
+    "kind": "usp",
+    "region": "Abruzzo",
+    "province": [
+      "Chieti",
+      "Pescara"
+    ]
+  },
+  {
+    "name": "USP Teramo",
+    "url": "https://www.csateramo.it/wpusp/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Abruzzo",
+    "province": "Teramo"
+  },
+  {
+    "name": "USP Ancona",
+    "url": "https://www.istruzione-ancona.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Marche",
+    "province": "Ancona"
+  },
+  {
+    "name": "USP Pesaro e Urbino",
+    "url": "https://www.usppesarourbino.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Marche",
+    "province": "Pesaro e Urbino"
+  },
+  {
+    "name": "USP Perugia",
+    "url": "https://istruzione.umbria.it/category/ambito-territoriale-perugia/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Umbria",
+    "province": "Perugia"
+  },
+  {
+    "name": "USP Terni",
+    "url": "https://istruzione.umbria.it/category/ambito-territoriale-terni/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Umbria",
+    "province": "Terni"
+  },
+  {
+    "name": "USP Potenza",
+    "url": "https://www.istruzionepotenza.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Basilicata",
+    "province": "Potenza"
+  },
+  {
+    "name": "USP Matera",
+    "url": "https://www.istruzionematera.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Basilicata",
+    "province": "Matera"
+  },
+  {
+    "name": "USP Trieste",
+    "url": "https://usrfvg.gov.it/it/home/menu/uffici/ufficio-territoriale-di-trieste/notizie/",
+    "type": "html",
+    "kind": "usp",
+    "region": "Friuli-Venezia Giulia",
+    "province": "Trieste"
+  },
+  {
+    "name": "USP L'Aquila",
+    "url": "https://lnx.csalaquila.it/wp/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Abruzzo",
+    "province": "L'Aquila"
+  },
+  {
+    "name": "USP Ascoli Piceno e Fermo",
+    "url": "https://www.uspascolipiceno.it/wordpress/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Marche",
+    "province": [
+      "Ascoli Piceno",
+      "Fermo"
+    ]
+  },
+  {
+    "name": "USP Macerata",
+    "url": "https://www.uspmc.sinp.net/tutte-le-notizie/",
+    "type": "html",
+    "kind": "usp",
+    "region": "Marche",
+    "province": "Macerata"
+  },
+  {
+    "name": "USP Pisa",
+    "url": "https://www.usp-pi.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Toscana",
+    "province": "Pisa"
+  },
+  {
+    "name": "USP Grosseto",
+    "url": "https://www.ufficioscolasticogrosseto.it/uff7/index.php/novita?format=feed&type=rss",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Toscana",
+    "province": "Grosseto"
+  },
+  {
+    "name": "USP Pistoia",
+    "url": "https://www.ufficioscolasticoprovinciale.pistoia.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Toscana",
+    "province": "Pistoia"
+  },
+  {
+    "name": "USP Genova",
+    "url": "https://www.istruzionegenova.gov.it/archivio-news",
+    "type": "html",
+    "kind": "usp",
+    "region": "Liguria",
+    "province": "Genova"
+  },
+  {
+    "name": "USP Imperia",
+    "url": "https://www.istruzioneimperia.gov.it/archivio-news",
+    "type": "html",
+    "kind": "usp",
+    "region": "Liguria",
+    "province": "Imperia"
+  },
+  {
+    "name": "USP La Spezia",
+    "url": "https://www.istruzionelaspezia.gov.it/archivio-news",
+    "type": "html",
+    "kind": "usp",
+    "region": "Liguria",
+    "province": "La Spezia"
+  },
+  {
+    "name": "USP Savona",
+    "url": "https://www.istruzionesavona.gov.it/archivio-news",
+    "type": "html",
+    "kind": "usp",
+    "region": "Liguria",
+    "province": "Savona"
+  },
+  {
+    "name": "USP Caserta",
+    "url": "https://www.uat-caserta.it/feed/",
+    "type": "rss",
+    "kind": "usp",
+    "region": "Campania",
+    "province": "Caserta"
+  }
 ]

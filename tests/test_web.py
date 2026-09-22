@@ -1,6 +1,8 @@
 """Sito pubblico senza account: pagine, preferenze nel browser, configuratore."""
 import re
 
+from markupsafe import Markup
+
 import pytest
 
 from sfm.db_configs import load_config
@@ -159,3 +161,25 @@ def test_telegram_code_requires_sources(client):
 def test_csrf_required_on_every_post(client):
     for path in ("/configura", "/configura/area", "/configura/dimentica"):
         assert client.post(path, data={"sources": ["1"]}).status_code == 403, path
+
+
+# --- catalogo e aree ---------------------------------------------------------------------
+
+def test_every_italian_province_is_offered(client, catalog_db):
+    """L'elenco delle province è quello dell'Italia, non quello delle fonti che abbiamo:
+    chi cerca Udine o Aosta deve trovarle (riceverà le notizie regionali)."""
+    from sfm.catalog import PROVINCES
+    html = client.get("/configura").get_data(as_text=True)
+    assert sum(len(p) for p in PROVINCES.values()) == 107
+    for value in ("Friuli-Venezia Giulia|Udine", "Valle d'Aosta|Aosta", "Campania|Salerno",
+                  "Puglia|Lecce", "Trentino-Alto Adige|Trento", "Emilia-Romagna|Bologna"):
+        assert f'value="{Markup.escape(value)}"' in html, value
+    assert "solo notizie regionali" in html      # avviso sulle province senza ufficio dedicato
+
+
+def test_the_configurator_is_one_form(client):
+    """Una sola compilazione: aree, fonti e parole chiave stanno nello stesso form."""
+    html = client.get("/configura").get_data(as_text=True)
+    assert html.count('<form method="post" action="/configura"') == 1
+    assert 'formaction="/configura/area"' in html
+    assert html.count('name="azione" value="telegram"') == 1

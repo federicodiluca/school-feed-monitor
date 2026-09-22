@@ -2,24 +2,6 @@
   "telegram_token": "INSERISCI_IL_TUO_TOKEN",
   "machine_name": "Server-01",
   "catalog": "italy",
-  "sites": [
-    {
-      "name": "USP Pesaro e Urbino",
-      "url": "https://www.usppesarourbino.it/feed/"
-    },
-    {
-      "name": "USP Rimini",
-      "url": "https://rn.istruzioneer.gov.it/tutte-le-notizie/feed/"
-    },
-    {
-      "name": "USP Bologna",
-      "url": "https://bo.istruzioneer.gov.it/feed/"
-    },
-    {
-      "name": "USP Forlì-Cesena",
-      "url": "https://fc.istruzioneer.gov.it/feed/"
-    }
-  ],
   "daily_report_time": "18:00",
   "polling_minutes": 60,
   "data_retention_days": 10,

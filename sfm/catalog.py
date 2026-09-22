@@ -18,6 +18,38 @@ REGIONS = [
 ]
 
 
+# Le 107 province italiane per regione. È l'elenco che l'utente vede quando sceglie "dove":
+# deve essere quello reale, non quello delle fonti che abbiamo. Per le province senza un
+# ufficio provinciale con sito proprio si ricade sulle notizie regionali dell'USR.
+PROVINCES = {
+    "Abruzzo": ["Chieti", "L'Aquila", "Pescara", "Teramo"],
+    "Basilicata": ["Matera", "Potenza"],
+    "Calabria": ["Catanzaro", "Cosenza", "Crotone", "Reggio Calabria", "Vibo Valentia"],
+    "Campania": ["Avellino", "Benevento", "Caserta", "Napoli", "Salerno"],
+    "Emilia-Romagna": ["Bologna", "Ferrara", "Forlì-Cesena", "Modena", "Parma", "Piacenza",
+                       "Ravenna", "Reggio Emilia", "Rimini"],
+    "Friuli-Venezia Giulia": ["Gorizia", "Pordenone", "Trieste", "Udine"],
+    "Lazio": ["Frosinone", "Latina", "Rieti", "Roma", "Viterbo"],
+    "Liguria": ["Genova", "Imperia", "La Spezia", "Savona"],
+    "Lombardia": ["Bergamo", "Brescia", "Como", "Cremona", "Lecco", "Lodi", "Mantova", "Milano",
+                  "Monza e Brianza", "Pavia", "Sondrio", "Varese"],
+    "Marche": ["Ancona", "Ascoli Piceno", "Fermo", "Macerata", "Pesaro e Urbino"],
+    "Molise": ["Campobasso", "Isernia"],
+    "Piemonte": ["Alessandria", "Asti", "Biella", "Cuneo", "Novara", "Torino",
+                 "Verbano-Cusio-Ossola", "Vercelli"],
+    "Puglia": ["Bari", "Barletta-Andria-Trani", "Brindisi", "Foggia", "Lecce", "Taranto"],
+    "Sardegna": ["Cagliari", "Nuoro", "Oristano", "Sassari", "Sud Sardegna"],
+    "Sicilia": ["Agrigento", "Caltanissetta", "Catania", "Enna", "Messina", "Palermo", "Ragusa",
+                "Siracusa", "Trapani"],
+    "Toscana": ["Arezzo", "Firenze", "Grosseto", "Livorno", "Lucca", "Massa-Carrara", "Pisa",
+                "Pistoia", "Prato", "Siena"],
+    "Trentino-Alto Adige": ["Bolzano", "Trento"],
+    "Umbria": ["Perugia", "Terni"],
+    "Valle d'Aosta": ["Aosta"],
+    "Veneto": ["Belluno", "Padova", "Rovigo", "Treviso", "Venezia", "Verona", "Vicenza"],
+}
+
+
 PROVINCE_SEP = "|"   # un ufficio può coprire più province: "Alessandria|Asti"
 
 
@@ -56,10 +88,48 @@ def load_catalog(name="italy"):
     return out
 
 
+def _norm_url(url):
+    """URL confrontabile: senza schema, senza www., senza barra finale."""
+    u = (url or "").strip().lower()
+    for prefix in ("https://", "http://"):
+        if u.startswith(prefix):
+            u = u[len(prefix):]
+    if u.startswith("www."):
+        u = u[4:]
+    return u.rstrip("/")
+
+
+def _norm_name(name):
+    """Nome confrontabile: solo lettere e cifre minuscole ('USR Emilia Romagna' == 'USR Emilia-Romagna')."""
+    return "".join(c for c in (name or "").lower() if c.isalnum())
+
+
 def merge_sites(config_sites, catalog_entries):
-    """Unisce config e catalogo per URL: le voci di config hanno la precedenza e vengono prima."""
-    config_urls = {s["url"] for s in config_sites}
-    return list(config_sites) + [e for e in catalog_entries if e["url"] not in config_urls]
+    """Unisce le fonti di config.json con il catalogo.
+
+    Una voce di config che corrisponde a una del catalogo — stesso URL o stesso nome — è la
+    *stessa fonte*: tiene il suo URL (le notizie già salvate restano collegate) ma eredita dal
+    catalogo tipo, regione, provincia e il fatto di essere opt-in. Senza questo, gli USP
+    elencati in config.json finivano tra le "Altre fonti", fuori dalla loro regione, e per
+    giunta seguiti da tutti per impostazione predefinita.
+    Le voci di config che non corrispondono a niente restano come sono, in testa all'elenco.
+    """
+    by_url = {_norm_url(e["url"]): e for e in catalog_entries}
+    by_name = {_norm_name(e["name"]): e for e in catalog_entries}
+    merged, used = [], set()
+    for site in config_sites:
+        twin = by_url.get(_norm_url(site.get("url"))) or by_name.get(_norm_name(site.get("name")))
+        if twin is None:
+            merged.append(site)
+            continue
+        used.add(twin["url"])
+        entry = dict(site)
+        for field in ("kind", "region", "province", "default_follow"):
+            if site.get(field) in (None, ""):          # quello che config dice esplicitamente vince
+                entry[field] = twin.get(field)
+        entry.setdefault("name", twin["name"])
+        merged.append(entry)
+    return merged + [e for e in catalog_entries if e["url"] not in used]
 
 
 # --- raggruppamento e scelta per area ---------------------------------------
@@ -91,14 +161,19 @@ def group_sources(sources):
     return out
 
 
-def provinces_by_region(sources):
-    """{regione: [province...]} dalle fonti USP disponibili (per il form 'Dove insegni?')."""
+def provinces_by_region(sources=None):
+    """{regione: [province...]}: tutte le province italiane, non solo quelle con un ufficio
+    provinciale nel catalogo. `sources` è accettato per compatibilità e non viene usato."""
+    return {region: list(provinces) for region, provinces in sorted(PROVINCES.items())}
+
+
+def provinces_with_own_office(sources):
+    """{regione: {province con una fonte USP dedicata}}: il resto è coperto solo dall'USR."""
     out = {}
     for s in sources:
         if s.get("kind") == "usp" and s.get("region"):
-            for p in provinces_of(s):
-                out.setdefault(s["region"], set()).add(p)
-    return {r: sorted(ps) for r, ps in sorted(out.items())}
+            out.setdefault(s["region"], set()).update(provinces_of(s))
+    return out
 
 
 def sources_for_areas(sources, areas):

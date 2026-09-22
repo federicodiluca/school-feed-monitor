@@ -29,3 +29,6 @@ sfm/config.json
 .idea/
 .vscode/
 .claude/
+# prove del sito in jsdom
+node_modules/
+package-lock.json
