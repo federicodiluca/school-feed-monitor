@@ -6,6 +6,7 @@
   <title>{% block title %}{{ app_name }}{% endblock %}</title>
   <meta name="description" content="{% block description %}Le notizie di Ministero, USR e USP raccolte da oltre cento siti e filtrate per le fonti e le parole chiave che scegli. Senza registrazione, anche su Telegram.{% endblock %}">
   <link rel="canonical" href="{{ canonical }}">
+  <meta name="author" content="Federico Di Luca">
   {% block robots %}{% endblock %}
   <meta property="og:site_name" content="{{ app_name }}">
   <meta property="og:type" content="website">
@@ -71,8 +72,8 @@
         Aggrega notizie pubbliche senza garanzia di completezza o tempestività: fa fede sempre la fonte originale
         (<a href="{{ url_for('terms') }}#responsabilita">esclusione di responsabilità</a>).</p>
       <p>
-        Creato da <a href="https://federicodiluca.github.io" rel="noopener" target="_blank">Federico Di Luca</a> ·
-        guarda anche <a href="https://federicodiluca.github.io/vocabe" rel="noopener" target="_blank">Vocabe</a>
+        Creato da <a href="https://federicodiluca.github.io/" rel="author noopener" target="_blank">Federico Di Luca</a> ·
+        <a href="https://federicodiluca.github.io/progetti/" rel="noopener" target="_blank">Guarda i miei altri progetti</a>
       </p>
     </div>
   </footer>
