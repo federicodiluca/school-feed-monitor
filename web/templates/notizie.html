@@ -26,7 +26,7 @@
 <div class="page-head">
 <h1>{% if source %}Notizie da {{ source.name }}{% else %}Ultime notizie dal mondo scuola{% endif %}</h1>
 <p>
-  {% if source %}<a href="{{ source.url }}" rel="noopener nofollow">Sito ufficiale</a> · <a href="{{ url_for('news.sources') }}">Tutte le fonti</a> · <a href="{{ url_for('news.index') }}">Tutte le notizie</a>
+  {% if source %}<a href="{{ source.url }}" rel="noopener nofollow">Sito ufficiale</a>{% if source.region and source.kind in ('usr', 'usp') %} · <a href="{{ region_url(source.region) }}">Tutte le notizie di {{ source.region }}</a>{% endif %} · <a href="{{ url_for('news.sources') }}">Tutte le fonti</a> · <a href="{{ url_for('news.index') }}">Tutte le notizie</a>
   {% else %}Questo è quello che {{ app_name }} raccoglie ogni giorno da <a href="{{ url_for('news.sources') }}">{{ sources | length }} fonti</a>.
   <a href="{{ url_for('config.show') }}">Scegli le tue fonti</a> per vedere solo ciò che ti interessa, qui o su Telegram.{% endif %}
 </p>

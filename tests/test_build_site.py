@@ -116,3 +116,10 @@ def test_pages_say_when_they_were_updated_and_when_the_next_update_is(site):
     assert 'class="freshness"' in html and "Notizie aggiornate il" in html
     assert "Prossimo aggiornamento verso le" in html and "il sito si aggiorna ogni ora" in html
     assert "Notizie aggiornate il" in read(site, "privacy", "index.html")   # nel footer di ogni pagina
+
+
+def test_region_pages_are_generated(site):
+    html = read(site, "notizie", "regione", "emilia-romagna", "index.html")
+    assert "Graduatorie definitive A041" in html
+    assert f'<link rel="canonical" href="{BASE_URL}/notizie/regione/emilia-romagna/">' in html
+    assert f"<loc>{BASE_URL}/notizie/regione/sicilia/</loc>" in read(site, "sitemap.xml")

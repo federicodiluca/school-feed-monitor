@@ -20,6 +20,7 @@ from sfm.logger import log
 from sfm.utils import slugify, strip_html
 from web import create_app
 from web.configurator import catalog_positions
+from web.news import region_url, regions_with_sources
 
 DEFAULT_BASE_URL = "https://federicodiluca.github.io/school-feed-monitor"
 NEWS_IN_DATASET = 1200         # quante notizie finiscono nel JSON usato dal browser
@@ -98,6 +99,13 @@ def build(out_dir="site", base_url=None, bot_username=None):
         _write(os.path.join(out_dir, target), _fetch(client, base_url, path))
 
     sources = get_sources()
+    with app.test_request_context(base_url=base_url):
+        region_paths = [region_url(r) for r in regions_with_sources(sources)]
+    for path in region_paths:
+        # url_for dà il percorso pubblico (prefisso di Pages e barra finale): il client di prova
+        # aggiunge da sé il prefisso, e la route Flask è senza barra
+        path = (path[len(prefix):] if prefix and path.startswith(prefix) else path).rstrip("/")
+        _write(os.path.join(out_dir, path.strip("/"), "index.html"), _fetch(client, base_url, path))
     for s in sources:
         path = f"/notizie/fonte/{s['id']}/{slugify(s['name'])}"
         _write(os.path.join(out_dir, path.lstrip("/"), "index.html"), _fetch(client, base_url, path))

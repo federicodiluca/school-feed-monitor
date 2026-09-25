@@ -23,7 +23,7 @@ from sfm.env import env, env_bool
 from sfm.utils import format_local_datetime, strip_html
 from web import freshness, prefs, seo, security
 from web.configurator import bp as config_bp, telegram_link
-from web.news import bp as news_bp, source_url
+from web.news import bp as news_bp, region_url, regions_with_sources, source_url
 
 APP_NAME = "School Feed Monitor"
 PRIVACY_VERSION = "2026-09-22"
@@ -88,12 +88,13 @@ def create_app(test_config=None):
     app.jinja_env.filters["preview"] = lambda v, n=220: (lambda t: t[:n].rsplit(" ", 1)[0] + "…" if len(t) > n else t)(strip_html(v or ""))
     app.jinja_env.filters["giorno_it"] = giorno_it
     app.jinja_env.globals["source_url"] = source_url
+    app.jinja_env.globals["region_url"] = region_url
     app.jinja_env.globals["absolute_url"] = seo.absolute_url
 
     @app.get("/")
     def index():
         latest, _ = search_news(days=7, page=1, per_page=5)
-        return render_template("index.html", latest=latest)
+        return render_template("index.html", latest=latest, regions=regions_with_sources())
 
     @app.get("/sw.js")
     def service_worker():

@@ -56,6 +56,15 @@
 </section>
 {% endif %}
 
+{% if regions %}
+<section class="section">
+  <h2>Notizie per regione</h2>
+  <ul class="region-links">
+    {% for r in regions %}<li><a href="{{ region_url(r) }}">{{ r }}</a></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
 <section class="section">
   <h2>Perché usarlo</h2>
   <div class="grid cols-2">

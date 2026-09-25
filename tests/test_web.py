@@ -250,3 +250,24 @@ def test_sources_page_says_which_sources_are_working(client, catalog_db):
     assert "in errore: non riusciamo a leggerla da 3 tentativi" in html
     assert "proxy segreto" not in html            # l'errore tecnico resta per l'admin
     assert palermo["name"] in html
+
+
+def test_region_page_collects_the_usr_and_its_provincial_offices(client, catalog_db):
+    from sfm.db_news import add_news
+    bologna, palermo = catalog_db["USP Bologna"], catalog_db["USP Palermo"]
+    add_news("Graduatorie Bologna", "https://x/bo", bologna["name"], "2026-09-20 08:00:00", "c", source_id=bologna["id"])
+    add_news("Nomine Palermo", "https://x/pa", palermo["name"], "2026-09-20 08:00:00", "c", source_id=palermo["id"])
+    html = client.get("/notizie/regione/emilia-romagna").get_data(as_text=True)
+    assert "<h1>Notizie della scuola in Emilia-Romagna</h1>" in html
+    assert "Graduatorie Bologna" in html and "Nomine Palermo" not in html
+    assert "USR Emilia-Romagna" in html and "USP Bologna" in html and "Bologna" in re.search(r'name="description" content="(.*?)"', html, re.S).group(1)
+    assert client.get("/notizie/regione/atlantide").status_code == 404
+
+
+def test_region_pages_are_linked_and_in_the_sitemap(client, catalog_db):
+    assert '<a href="/notizie/regione/sicilia">Sicilia</a>' in client.get("/").get_data(as_text=True)
+    assert '<a href="/notizie/regione/sicilia">Sicilia</a>' in client.get("/fonti").get_data(as_text=True)
+    source = catalog_db["USP Palermo"]
+    page = client.get(f"/notizie/fonte/{source['id']}/usp-palermo").get_data(as_text=True)
+    assert 'href="/notizie/regione/sicilia">Tutte le notizie di Sicilia</a>' in page
+    assert "<loc>https://sfm.example/notizie/regione/sicilia</loc>" in client.get("/sitemap.xml").get_data(as_text=True)

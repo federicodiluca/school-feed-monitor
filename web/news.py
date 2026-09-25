@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta
 
 from flask import Blueprint, abort, redirect, render_template, request, url_for
 
-from sfm.catalog import group_sources
+from sfm.catalog import REGIONS, group_sources
 from sfm.db_news import count_per_source, get_today_news, latest_per_source, search_news
 from sfm.db_sources import get_source, get_sources
 from sfm.digest import annotate
@@ -55,6 +55,27 @@ def source_url(source):
     return url_for("news.by_source", source_id=source["id"], slug=slugify(source["name"]))
 
 
+REGION_NEWS = 40      # notizie mostrate nella pagina di una regione
+REGION_DAYS = 30
+
+
+def region_url(region):
+    return url_for("news.by_region", slug=slugify(region))
+
+
+def region_sources(region, sources=None):
+    """USR e USP della regione, USR prima (stesso ordine di /fonti)."""
+    items = [s for s in (sources if sources is not None else get_sources())
+             if s.get("region") == region and s.get("kind") in ("usr", "usp")]
+    return dict(group_sources(items)).get(region, [])
+
+
+def regions_with_sources(sources=None):
+    """Le regioni che hanno almeno una fonte: solo loro hanno una pagina."""
+    sources = sources if sources is not None else get_sources()
+    return [r for r in REGIONS if region_sources(r, sources)]
+
+
 @bp.get("/notizie")
 def index():
     q, days, page = _filters()
@@ -86,6 +107,7 @@ def sources():
     for s in items:
         by_state.setdefault(s["health"]["state"], []).append(s)
     return render_template("fonti.html", groups=group_sources(items), total=len(items), by_state=by_state,
+                           regions=regions_with_sources(items),
                            silence_days=thresholds()["silence_hours"] // 24, failures=thresholds()["failures"])
 
 
@@ -104,6 +126,23 @@ def by_source(source_id, slug=None):
         return r
     return render_template("notizie.html", news=rows, sources=get_sources(), q=q, days=days, days_choices=DAYS_CHOICES,
                            selected_source=source_id, pages=_pages(total, page), source=source, noindex=bool(q))
+
+
+@bp.get("/notizie/regione/<slug>")
+def by_region(slug):
+    """Tutte le notizie di una regione (USR + uffici provinciali) in una pagina: è quella che
+    risponde a ricerche come «ufficio scolastico Sicilia notizie»."""
+    sources = get_sources()
+    region = next((r for r in regions_with_sources(sources) if slugify(r) == slug), None)
+    if region is None:
+        abort(404)
+    items = region_sources(region, sources)
+    last, counts = latest_per_source(), count_per_source()
+    items = [dict(s, last_news=last.get(s["id"]), n_news=counts.get(s["id"], 0)) for s in items]
+    rows, total = search_news(source_ids={s["id"] for s in items}, days=REGION_DAYS, page=1, per_page=REGION_NEWS)
+    provinces = sorted({p for s in items if s["kind"] == "usp" for p in (s.get("province") or "").split("|") if p})
+    return render_template("regione.html", region=region, region_sources=items, news=rows, total=total,
+                           provinces=provinces, days=REGION_DAYS)
 
 
 # --- le mie notizie (preferenze nel browser, nessun account) ------------------

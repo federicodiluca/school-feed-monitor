@@ -52,7 +52,7 @@
 
 {% for group, items in groups %}
 <section class="card">
-  <h2 id="{{ group | lower | replace(' ', '-') }}">{{ group }}</h2>
+  <h2 id="{{ group | lower | replace(' ', '-') }}">{% if group in regions %}<a href="{{ region_url(group) }}">{{ group }}</a>{% else %}{{ group }}{% endif %}</h2>
   <ul class="source-index">
     {% for s in items %}
     <li>

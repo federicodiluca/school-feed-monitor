@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Notizie scuola {{ region }}: USR e uffici provinciali — {{ app_name }}{% endblock %}
+{% block description %}Le ultime notizie dell'Ufficio Scolastico Regionale {{ region }}{% if provinces %} e degli uffici provinciali di {{ provinces | join(', ') }}{% endif %}: graduatorie, mobilità, nomine e avvisi in un'unica pagina.{% endblock %}
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "name": {{ ("Notizie scuola " ~ region) | tojson }},
+      "url": {{ canonical | tojson }},
+      "inLanguage": "it-IT",
+      "about": {"@type": "AdministrativeArea", "name": {{ region | tojson }}},
+      "hasPart": [
+        {%- for s in region_sources %}
+        {"@type": "WebPage", "name": {{ s.name | tojson }}, "url": {{ absolute_url(source_url(s)) | tojson }}}{% if not loop.last %},{% endif %}
+        {%- endfor %}
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": {{ app_name | tojson }}, "item": {{ absolute_url(url_for('index')) | tojson }}},
+        {"@type": "ListItem", "position": 2, "name": "Fonti", "item": {{ absolute_url(url_for('news.sources')) | tojson }}},
+        {"@type": "ListItem", "position": 3, "name": {{ region | tojson }}, "item": {{ canonical | tojson }}}
+      ]
+    }
+  ]
+}
+</script>
+{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Notizie della scuola in {{ region }}</h1>
+  <p>Quello che pubblicano l'Ufficio Scolastico Regionale{% if provinces %} e gli uffici provinciali (Ambiti
+    Territoriali) di {{ provinces | join(', ') }}{% endif %}, raccolto in un'unica pagina: graduatorie, mobilità,
+    nomine, interpelli, avvisi. Ogni notizia rimanda al sito ufficiale.</p>
+  {% include "_freshness.html" %}
+</div>
+
+<section class="card">
+  <h2>Le fonti di {{ region }}</h2>
+  <ul class="source-index">
+    {% for s in region_sources %}
+    <li>
+      <a href="{{ source_url(s) }}">{{ s.name }}</a>
+      {% if s.kind == 'usp' and s.province %}<small class="muted">{{ s.province.replace('|', ', ') }}</small>{% endif %}
+      <small class="muted">{% if s.n_news %}{{ s.n_news }} notizie{% if s.last_news %}, ultima il {{ s.last_news[:10] }}{% endif %}{% else %}nessuna notizia raccolta finora{% endif %}</small>
+    </li>
+    {% endfor %}
+  </ul>
+  <p><a class="button primary" href="{{ url_for('config.show') }}">Ricevi solo le notizie che ti interessano</a></p>
+</section>
+
+<h2>Ultime notizie{% if total > news | length %} <small class="muted">({{ news | length }} delle {{ total }} degli ultimi {{ days }} giorni)</small>{% endif %}</h2>
+{% include "_news_list.html" %}
+<p class="more"><a class="button" href="{{ url_for('news.index') }}">Cerca fra tutte le notizie →</a></p>
+{% endblock %}
+
+{% block footer_freshness %}{% endblock %}{# già in testa alla pagina #}

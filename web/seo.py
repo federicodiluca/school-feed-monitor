@@ -54,7 +54,7 @@ def canonical_url(req=None):
 
 
 def init_app(app):
-    from web.news import source_url  # import locale: web.news importa web.security
+    from web.news import region_sources, region_url, regions_with_sources, source_url  # import locale: web.news importa web.security
 
     @app.get("/robots.txt")
     def robots():
@@ -72,7 +72,11 @@ def init_app(app):
         # home e /notizie cambiano con l'ultima notizia arrivata, da qualunque fonte
         entries = [(url_for(endpoint), prio, freq, newest if endpoint in ("index", "news.index") else None)
                    for endpoint, prio, freq in PUBLIC_PAGES]
-        entries += [(source_url(s), "0.7", "daily", (last.get(s["id"]) or "")[:10]) for s in get_sources()]
+        sources = get_sources()
+        for region in regions_with_sources(sources):
+            dates = [last.get(s["id"]) or "" for s in region_sources(region, sources)]
+            entries.append((region_url(region), "0.8", "daily", max(dates)[:10] or None))
+        entries += [(source_url(s), "0.7", "daily", (last.get(s["id"]) or "")[:10]) for s in sources]
         host = origin(base)
         urls = "".join(
             f"<url><loc>{host}{path}</loc>"

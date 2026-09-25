@@ -256,3 +256,8 @@ details.source-group .sources { padding: 4px 12px 10px 28px; }
 .state { display: inline-block; font-size: .82rem; padding: 0 .45rem; border-radius: var(--radius-pill); background: var(--surface-2); color: var(--fg-2); }
 .state-failing, .state-drift { background: var(--danger-soft); color: var(--danger); }
 .state-silent { background: var(--accent-soft); color: var(--accent-fg); }
+
+/* Home: link alle pagine per regione */
+.region-links { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.region-links a { display: inline-block; padding: var(--space-1) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); text-decoration: none; }
+.region-links a:hover { border-color: var(--primary); }
