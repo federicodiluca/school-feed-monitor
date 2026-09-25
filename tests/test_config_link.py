@@ -8,7 +8,17 @@ def test_roundtrip_keeps_sources_and_keywords():
     urls = [catalog[0]["url"], catalog[5]["url"], catalog[-1]["url"]]
     payload = config_link.encode(urls, ["A041", "trasferimenti"], catalog=catalog)
     assert payload and len(payload) <= config_link.MAX_PAYLOAD
-    assert config_link.decode(payload, catalog=catalog) == {"urls": urls, "keywords": ["A041", "trasferimenti"]}
+    assert config_link.decode(payload, catalog=catalog) == {"urls": urls, "keywords": ["A041", "trasferimenti"],
+                                                            "excluded": []}
+
+
+def test_excluded_words_travel_with_a_minus_in_front():
+    catalog = load_catalog()
+    words = config_link.words(["A041", " -sostegno"], ["infanzia", "-ATA", " "])
+    assert words == ["A041", "sostegno", "-infanzia", "-ATA"]
+    payload = config_link.encode([catalog[0]["url"]], words, catalog=catalog)
+    decoded = config_link.decode(payload, catalog=catalog)
+    assert decoded["keywords"] == ["A041", "sostegno"] and decoded["excluded"] == ["infanzia", "ATA"]
 
 
 def test_payload_of_a_whole_region_still_fits():

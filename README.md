@@ -38,7 +38,7 @@ nessun certificato da rinnovare. Pubblica e basta.
 ## Niente account, niente dati dei visitatori
 
 Il sito non ha registrazione e non salva nulla di chi lo visita: le fonti e le parole chiave
-scelte restano in **due cookie tecnici** nel browser (`sfm_fonti`, `sfm_parole`). Per portare
+scelte restano in **tre cookie tecnici** nel browser (`sfm_fonti`, `sfm_parole`, `sfm_escludi`). Per portare
 la stessa configurazione sul bot non serve un account: la configurazione viaggia **dentro il
 link** di Telegram (`sfm/config_link.py`), impacchettata in meno di 64 caratteri.
 
@@ -86,6 +86,7 @@ Per riempire il database senza aspettare lo scheduler: `python scripts/fetch_now
 | `/start CODICE` | applica la configurazione creata sul sito |
 | `/stop` | sospende le notifiche |
 | `/setkeywords a, b` · `/removekeywords a` · `/keywords` | gestione delle parole chiave |
+| `/exclude a, b` · `/removeexclude a` | parole da escludere: le notizie che le contengono non arrivano |
 | `/sources` · `/follow n, m` · `/unfollow n, m` | quali fonti seguire |
 | `/addsource URL [nome]` · `/removesource n` | fonti aggiunte da te |
 | `/latest [n]` · `/fetch` · `/report` | ultime notizie, aggiornamento manuale, riepilogo |

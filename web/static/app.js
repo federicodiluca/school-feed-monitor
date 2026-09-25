@@ -65,11 +65,13 @@
   var prefs = {
     sources: function () { return readCookie("sfm_fonti").map(Number).filter(function (n) { return !isNaN(n); }); },
     keywords: function () { return readCookie("sfm_parole").slice(0, 30); },
-    save: function (sources, keywords) {
+    excluded: function () { return readCookie("sfm_escludi").slice(0, 30); },
+    save: function (sources, keywords, excluded) {
       writeCookie("sfm_fonti", sources.map(String));
       writeCookie("sfm_parole", keywords);
+      writeCookie("sfm_escludi", excluded || []);
     },
-    forget: function () { prefs.save([], []); }
+    forget: function () { prefs.save([], [], []); }
   };
 
   // --- dati -----------------------------------------------------------------------------
@@ -236,6 +238,7 @@
     if (!empty || !bodyEl) return;
     var chosen = prefs.sources();
     var keywords = prefs.keywords();
+    var excluded = prefs.excluded();
     if (!chosen.length) return;
     empty.hidden = true;
     bodyEl.hidden = false;
@@ -250,6 +253,7 @@
       var names = src.items.filter(function (s) { return chosen.indexOf(s.id) !== -1; }).length;
       intro.innerHTML = "Dalle <strong>" + names + " fonti</strong> che hai scelto in questo browser" +
         (keywords.length ? ", con evidenziate le tue parole chiave: <strong>" + escapeHtml(keywords.join(", ")) + "</strong>" : "") +
+        (excluded.length ? ", senza quelle che parlano di <strong>" + escapeHtml(excluded.join(", ")) + "</strong>" : "") +
         '. <a href="' + BASE + '/configura/">Modifica la selezione</a>.';
     });
 
@@ -259,7 +263,7 @@
           query: (form.querySelector("[name=q]") || {}).value,
           days: Number((form.querySelector("[name=giorni]") || {}).value || 7),
           sources: chosen
-        });
+        }).filter(function (i) { return !excluded.length || !matchedKeywords(i, excluded).length; });
         var matched = keywords.length ? items.filter(function (i) { return matchedKeywords(i, keywords).length; }).length : 0;
         renderNews(results, items.slice(0, 200), keywords, "Nessuna notizia dalle tue fonti in questo periodo.");
         if (count) count.textContent = items.length + " notizie" + (matched ? ", " + matched + " con le tue parole chiave" : "");
@@ -279,12 +283,14 @@
     if (!formSources) return;
     var boxes = Array.prototype.slice.call(formSources.querySelectorAll("input[name=sources]"));
     var keywordsField = document.getElementById("keywords");
+    var excludedField = document.getElementById("excluded");
     var status = document.getElementById("save-status");
 
     // 1. ripristina la scelta salvata nel browser
     var chosen = prefs.sources();
     boxes.forEach(function (b) { b.checked = chosen.indexOf(Number(b.value)) !== -1; });
     if (keywordsField) keywordsField.value = prefs.keywords().join(", ");
+    if (excludedField) excludedField.value = prefs.excluded().join(", ");
     refreshGroups();
     data("sources").then(restoreAreas);
 
@@ -303,20 +309,24 @@
       return boxes.filter(function (b) { return b.checked; });
     }
 
-    function currentKeywords() {
-      return (keywordsField ? keywordsField.value : "").split(",")
+    function words(field) {
+      return (field ? field.value : "").split(",")
         .map(function (k) { return k.trim().slice(0, 60); }).filter(Boolean).slice(0, 30);
     }
+    function currentKeywords() { return words(keywordsField); }
+    function currentExcluded() { return words(excludedField); }
 
     // 2. salvataggio automatico
     function save() {
       var picked = selected();
       var keywords = currentKeywords();
-      prefs.save(picked.map(function (b) { return Number(b.value); }), keywords);
+      var excluded = currentExcluded();
+      prefs.save(picked.map(function (b) { return Number(b.value); }), keywords, excluded);
       updateNav();
       if (status) {
         status.textContent = "✓ Salvato in questo browser: " + picked.length + " fonti" +
-          (keywords.length ? " e " + keywords.length + " parole chiave" : "") + ".";
+          (keywords.length ? ", " + keywords.length + " parole chiave" : "") +
+          (excluded.length ? ", " + excluded.length + " parole escluse" : "") + ".";
         status.className = "save-status saved";
       }
     }
@@ -328,12 +338,13 @@
       refreshGroups();          // anche i «tutte/nessuna» di un gruppo (sources.js), che non hanno name
       save();
     });
-    if (keywordsField) {
-      keywordsField.addEventListener("input", function () {
+    [keywordsField, excludedField].forEach(function (field) {
+      if (!field) return;
+      field.addEventListener("input", function () {
         clearTimeout(typing);
         typing = setTimeout(save, 500);
       });
-    }
+    });
 
     // 3. scorciatoia per area: tocca solo le fonti della regione cambiata, così i ritocchi
     //    fatti a mano sulle altre restano. Il Ministero si aggiunge alla prima area scelta.
@@ -411,16 +422,18 @@
         flash("Scegli almeno una fonte prima di portare la configurazione su Telegram.", "error");
         return;
       }
-      showTelegram(picked, currentKeywords());
+      showTelegram(picked, currentKeywords(), currentExcluded());
     });
 
-    function showTelegram(picked, keywords) {
+    function showTelegram(picked, keywords, excluded) {
       var out = document.getElementById("telegram-out");
       var hint = document.getElementById("telegram-hint");
       if (!out) return;
       data("sources").then(function (src) {
         var indexes = picked.map(function (b) { return Number(b.dataset.catalog); }).filter(function (i) { return i >= 0; });
-        var payload = encodePayload(indexes, src.catalog_size, keywords);
+        // le parole da escludere viaggiano con un "-" davanti (vedi sfm/config_link.py)
+        var allWords = keywords.concat(excluded.map(function (w) { return "-" + w.replace(/^-+/, ""); }));
+        var payload = encodePayload(indexes, src.catalog_size, allWords);
         var withoutKeywords = payload ? null : encodePayload(indexes, src.catalog_size, []);
         var code = payload || withoutKeywords;
         if (!code) {
@@ -435,9 +448,11 @@
         var html = "<p>La tua configurazione è pronta: apri il bot e viene applicata da sola.</p>";
         if (link) html += '<p><a class="button primary" href="' + link + '" rel="noopener" target="_blank">Apri il bot e configura</a></p>';
         html += '<p class="muted">Oppure scrivi al bot questo comando:</p><p><span class="code">/start ' + escapeHtml(code) + "</span></p>";
-        if (!payload && keywords.length) {
-          html += '<p class="muted">Le parole chiave non stavano nel link: dopo aver aperto il bot incolla anche questo comando.</p>' +
-            '<p><span class="code">/setkeywords ' + escapeHtml(keywords.join(", ")) + "</span></p>";
+        if (!payload && allWords.length) {
+          html += '<p class="muted">Le parole non stavano nel link: dopo aver aperto il bot incolla anche ' +
+            (keywords.length && excluded.length ? "questi comandi" : "questo comando") + ".</p>";
+          if (keywords.length) html += '<p><span class="code">/setkeywords ' + escapeHtml(keywords.join(", ")) + "</span></p>";
+          if (excluded.length) html += '<p><span class="code">/exclude ' + escapeHtml(excluded.join(", ")) + "</span></p>";
         }
         html += '<p class="muted">Il link contiene solo le fonti e le parole che hai scelto: nessun dato tuo, niente salvato da nessuna parte.</p>';
         out.innerHTML = html;
@@ -457,7 +472,8 @@
           var payload = {
             fonti: src.items.filter(function (s) { return chosenIds.indexOf(s.id) !== -1; })
               .map(function (s) { return { id: s.id, nome: s.name }; }),
-            parole_chiave: prefs.keywords()
+            parole_chiave: prefs.keywords(),
+            parole_escluse: prefs.excluded()
           };
           var blob = new Blob([JSON.stringify(payload, null, 1)], { type: "application/json" });
           var a = document.createElement("a");
@@ -481,6 +497,7 @@
         });
         if (status) { status.textContent = "Preferenze cancellate da questo browser."; status.className = "save-status"; }
         if (keywordsField) keywordsField.value = "";
+        if (excludedField) excludedField.value = "";
         refreshGroups();
         updateNav();
         flash("Preferenze cancellate da questo browser.", "info");

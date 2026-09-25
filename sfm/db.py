@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
     telegram_id INTEGER UNIQUE,
     username TEXT,
     keywords TEXT,
+    excluded_keywords TEXT NOT NULL DEFAULT '',
     active INTEGER NOT NULL DEFAULT 1,
     digest_time TEXT,
     last_digest_date TEXT,

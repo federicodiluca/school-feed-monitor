@@ -8,8 +8,8 @@
 
 <h2>In breve</h2>
 <p><strong>Sul sito non ti chiediamo nulla e non salviamo nulla di tuo.</strong> Non ci sono account, email o password.
-Le fonti e le parole chiave che scegli restano in due cookie tecnici <em>nel tuo browser</em>
-(<code>sfm_fonti</code>, <code>sfm_parole</code>): il server non li conserva e non li collega a nessuno. Puoi
+Le fonti, le parole chiave e le parole da escludere che scegli restano in tre cookie tecnici <em>nel tuo browser</em>
+(<code>sfm_fonti</code>, <code>sfm_parole</code>, <code>sfm_escludi</code>): il server non li conserva e non li collega a nessuno. Puoi
 cancellarli in qualsiasi momento dalla pagina <a href="{{ url_for('config.show') }}">Scegli le fonti</a> o dalle
 impostazioni del browser. Non usiamo cookie di profilazione né servizi di terze parti nelle pagine: per questo non
 vedi banner sui cookie.</p>
@@ -19,7 +19,7 @@ vedi banner sui cookie.</p>
 
 <h2>Se usi il bot Telegram</h2>
 <p>Il bot, per poterti avvisare, conserva l'<strong>identificativo della tua chat Telegram</strong> (ed eventualmente
-lo username), le <strong>parole chiave</strong> e le <strong>fonti</strong> che hai scelto, e l'elenco delle notizie
+lo username), le <strong>parole chiave</strong>, le <strong>parole da escludere</strong> e le <strong>fonti</strong> che hai scelto, e l'elenco delle notizie
 già inviate (per non ripeterle). Base giuridica: esecuzione del servizio che hai richiesto avviando il bot.
 Conservazione: finché usi il bot. Con <code>/stop</code> sospendi le notifiche, con <code>/cancellami</code> elimini
 tutto subito; <code>/dati</code> ti mostra cosa è memorizzato. I messaggi transitano su Telegram secondo la sua

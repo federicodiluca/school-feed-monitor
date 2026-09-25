@@ -137,6 +137,12 @@ def _v7_drop_web_accounts(conn):
         """)
 
 
+def _v8_excluded_keywords(conn):
+    """Parole da escludere: una notizia che ne contiene una non arriva all'utente."""
+    if not column_exists(conn, "users", "excluded_keywords"):
+        conn.execute("ALTER TABLE users ADD COLUMN excluded_keywords TEXT NOT NULL DEFAULT ''")
+
+
 MIGRATIONS = [
     (1, _v1_multi_channel),
     (2, _v2_digest_guard),
@@ -145,6 +151,7 @@ MIGRATIONS = [
     (5, _v5_source_geo),
     (6, _v6_fix_future_dates),
     (7, _v7_drop_web_accounts),
+    (8, _v8_excluded_keywords),
 ]
 
 

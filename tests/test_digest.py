@@ -97,3 +97,19 @@ def test_manual_report_does_not_consume_daily_guard(sent_messages):
     assert get_user_by_id(1)["last_digest_date"] is None
 
 
+
+
+def test_excluded_words_keep_news_out_of_alerts_and_digest():
+    from sfm.db_user import set_excluded
+    from sfm.matching import match_users
+    add_user(1)
+    update_keywords(1, ["graduatorie"])
+    set_excluded(1, ["infanzia"])
+    user = get_user_by_id(1)
+    insert_today("Graduatorie scuola dell'Infanzia", "https://x/inf")
+    insert_today("Graduatorie secondaria", "https://x/sec")
+    titles = [n["title"] for n in digest.build_user_digest(user)]
+    assert titles == ["Graduatorie secondaria"]
+    # anche se contiene la parola chiave, l'esclusione vince
+    assert match_users({"title": "Graduatorie infanzia", "content": ""}, [user]) == []
+    assert match_users({"title": "Graduatorie primaria", "content": ""}, [user])[0][1] == ["graduatorie"]

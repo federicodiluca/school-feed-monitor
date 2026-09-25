@@ -72,6 +72,11 @@
     <p class="muted">Separate da virgola. Cerchiamo la parola intera, senza distinguere maiuscole:
       <em>A041, trasferimenti, graduatorie provinciali</em>. Sul sito le evidenziano; sul bot fanno scattare l'avviso.</p>
     <textarea name="keywords" id="keywords" aria-label="Parole chiave">{{ keywords | join(', ') }}</textarea>
+    <h3><label for="excluded">Parole da escludere <small class="muted">(facoltative)</small></label></h3>
+    <p class="muted">Le notizie che contengono una di queste parole non le vedi in «Le mie notizie» e il bot non te le
+      manda, nemmeno se hanno una tua parola chiave. Utile per togliere quello che non ti riguarda:
+      <em>infanzia, ATA, dirigenti</em>.</p>
+    <textarea name="excluded" id="excluded" aria-label="Parole da escludere">{{ excluded | join(', ') }}</textarea>
   </section>
 
   <div class="card actions{% if static_mode %} sticky-actions{% endif %}">
@@ -110,7 +115,7 @@
 
 <section class="card">
   <h2>Le tue preferenze</h2>
-  <p class="muted">Sono due cookie tecnici in questo browser (<code>sfm_fonti</code>, <code>sfm_parole</code>): sul
+  <p class="muted">Sono tre cookie tecnici in questo browser (<code>sfm_fonti</code>, <code>sfm_parole</code>, <code>sfm_escludi</code>): sul
     server non resta niente. Se cambi dispositivo o cancelli i dati del browser, dovrai rifare la scelta.</p>
   <p>
     <a class="button" id="export-prefs" href="{{ url_for('config.export') }}">{{ icon('download', 18) }} Scarica le tue preferenze</a>

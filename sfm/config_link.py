@@ -12,6 +12,9 @@ Il bit i-esimo corrisponde alla i-esima voce del catalogo: le voci si aggiungono
 *in fondo*, mai in mezzo, altrimenti i link già generati punterebbero ad altre fonti
 (vale comunque solo per i link ancora aperti in un browser, non c'è nulla di salvato).
 
+Le parole da escludere viaggiano nella stessa lista con un "-" davanti ("A041,-infanzia"):
+vedi words() e il campo "excluded" di decode().
+
 Telegram accetta payload di /start fino a 64 caratteri di [A-Za-z0-9_-]: se le parole
 chiave non ci stanno, encode() ritorna None e il sito propone il comando /setkeywords.
 """
@@ -42,6 +45,12 @@ def encode_indexes(indexes, catalog_size, keywords=()):
     text = ",".join(k.strip() for k in keywords if k and k.strip())
     payload = MAGIC + _b64encode(bytes([catalog_size]) + bytes(bitmap) + text.encode("utf-8"))
     return payload if len(payload) <= MAX_PAYLOAD else None
+
+
+def words(keywords=(), excluded=()):
+    """Parole chiave + parole da escludere (con "-" davanti) in un'unica lista da codificare."""
+    clean = lambda w: w.strip().lstrip("-").strip()    # noqa: E731
+    return [clean(k) for k in keywords if k and clean(k)] + ["-" + clean(w) for w in excluded if w and clean(w)]
 
 
 def encode(source_urls, keywords=(), catalog=None):
@@ -75,9 +84,11 @@ def decode(payload, catalog=None):
     urls = [entry["url"] for i, entry in enumerate(catalog)
             if i < catalog_size and bitmap[i // 8] & (1 << (7 - i % 8))]
     try:
-        keywords = [k.strip() for k in text.decode("utf-8").split(",") if k.strip()]
+        items = [k.strip() for k in text.decode("utf-8").split(",") if k.strip()]
     except UnicodeDecodeError:
         return None
     if not urls:
         return None
-    return {"urls": urls, "keywords": keywords}
+    keywords = [k for k in items if not k.startswith("-")]
+    excluded = [k[1:].strip() for k in items if k.startswith("-") and k[1:].strip()]
+    return {"urls": urls, "keywords": keywords, "excluded": excluded}

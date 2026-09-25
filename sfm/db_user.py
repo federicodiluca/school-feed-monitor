@@ -7,7 +7,7 @@ from datetime import datetime
 
 from sfm.db import get_conn
 
-USER_COLUMNS = "id, telegram_id, username, keywords, active, digest_time, last_digest_date, created_at"
+USER_COLUMNS = "id, telegram_id, username, keywords, excluded_keywords, active, digest_time, last_digest_date, created_at"
 
 
 def _split_keywords(raw):
@@ -22,6 +22,7 @@ def _row_to_user(row):
         "telegram_id": row["telegram_id"],
         "username": row["username"],
         "keywords": _split_keywords(row["keywords"]),
+        "excluded": _split_keywords(row["excluded_keywords"]),
         "active": bool(row["active"]),
         "digest_time": row["digest_time"],
         "last_digest_date": row["last_digest_date"],
@@ -138,6 +139,10 @@ def _clean_keywords(keywords):
 
 def set_keywords(user_id, keywords):
     _exec("UPDATE users SET keywords=? WHERE id=?", (",".join(_clean_keywords(keywords)), user_id))
+
+
+def set_excluded(user_id, words):
+    _exec("UPDATE users SET excluded_keywords=? WHERE id=?", (",".join(_clean_keywords(words)), user_id))
 
 
 def update_keywords(telegram_id, keywords):

@@ -14,7 +14,7 @@ from sfm.db_news import get_today_news
 from sfm.db_sources import get_followed_source_ids
 from sfm.db_user import get_users, set_last_digest_date
 from sfm.logger import log
-from sfm.matching import news_text
+from sfm.matching import is_excluded, news_text
 from sfm.utils import find_matching_keywords
 
 
@@ -33,8 +33,9 @@ def annotate(news_list, user, alerted_ids=None):
 
 
 def build_user_digest(user, now=None):
-    """Lista annotata delle notizie di oggi per l'utente (fonti seguite)."""
+    """Lista annotata delle notizie di oggi per l'utente (fonti seguite, senza le escluse)."""
     news = get_today_news(now=now, source_ids=get_followed_source_ids(user.get("id")))
+    news = [n for n in news if not is_excluded(n, user)]
     alerted = delivered_news_ids(user["id"], kind="alert", news_ids=[n["id"] for n in news]) if user.get("id") else set()
     return annotate(news, user, alerted)
 

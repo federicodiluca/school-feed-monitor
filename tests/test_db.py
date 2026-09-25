@@ -33,7 +33,7 @@ def test_new_user_has_empty_keyword_list_not_blank_string():
     assert len(users) == 1 and users[0]["telegram_id"] == 1 and users[0]["keywords"] == []
     assert users[0]["id"] == 1 and users[0]["active"] is True
     # l'utente del bot nasce senza campi extra: niente account, niente email
-    assert set(users[0]) == {"id", "telegram_id", "username", "keywords", "active",
+    assert set(users[0]) == {"id", "telegram_id", "username", "keywords", "excluded", "active",
                              "digest_time", "last_digest_date", "created_at"}
 
 

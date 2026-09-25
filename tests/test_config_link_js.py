@@ -39,13 +39,13 @@ def node_required():
 
 def test_browser_and_bot_agree_on_the_payload(tmp_path):
     catalog = load_catalog()
-    cases = [([0], ["A041"]), ([0, 5, len(catalog) - 1], ["A041", "trasf"]), ([1, 2, 3], [])]
+    cases = [([0], ["A041"]), ([0, 5, len(catalog) - 1], ["A041", "trasf"]), ([1, 2, 3], []), ([4], ["A041", "-infanzia"])]
     for indexes, keywords in cases:
         from_js = js_payload(tmp_path, indexes, len(catalog), keywords)
         assert from_js == config_link.encode_indexes(indexes, len(catalog), keywords)
         decoded = config_link.decode(from_js, catalog=catalog)
         assert decoded["urls"] == [catalog[i]["url"] for i in indexes]
-        assert decoded["keywords"] == keywords
+        assert decoded["keywords"] + ["-" + w for w in decoded["excluded"]] == keywords
 
 
 def test_browser_refuses_payloads_the_bot_could_not_receive(tmp_path):

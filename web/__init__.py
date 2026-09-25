@@ -26,7 +26,7 @@ from web.configurator import bp as config_bp, telegram_link
 from web.news import bp as news_bp, region_url, regions_with_sources, source_url
 
 APP_NAME = "School Feed Monitor"
-PRIVACY_VERSION = "2026-09-22"
+PRIVACY_VERSION = "2026-09-25"
 
 _GIORNI = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"]
 _MESI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto",

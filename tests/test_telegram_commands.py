@@ -554,3 +554,37 @@ def test_callback_error_is_answered_not_raised(sent_messages, callback_calls, mo
     monkeypatch.setattr(tc, "set_user_source", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("db")))
     tc.handle_update(callback("src:t:1"))
     assert callback_calls["answers"][-1]["text"] == "Errore, riprova"
+
+
+# --- parole da escludere ----------------------------------------------------
+
+def test_exclude_and_removeexclude(sent_messages):
+    add_user(1)
+    tc.handle_update(update("/exclude infanzia, ATA"))
+    assert get_user(1)["excluded"] == ["infanzia", "ATA"]
+    assert "Non ti arriveranno più le notizie con: infanzia, ATA" in sent_messages[-1]["text"]
+    tc.handle_update(update("/exclude Infanzia"))
+    assert "già escluse" in sent_messages[-1]["text"]
+    tc.handle_update(update("/keywords"))
+    assert "Parole escluse (2)" in sent_messages[-1]["text"]
+    tc.handle_update(update("/removeexclude ata"))
+    assert get_user(1)["excluded"] == ["infanzia"]
+    tc.handle_update(update("/removeexclude boh"))
+    assert "Nessuna di queste parole" in sent_messages[-1]["text"]
+    tc.handle_update(update("/exclude"))
+    assert "Usa: /exclude" in sent_messages[-1]["text"]
+    tc.handle_update(update("/dati"))
+    assert "Parole escluse: infanzia" in sent_messages[-1]["text"]
+
+
+def test_start_payload_carries_excluded_words(sent_messages):
+    from sfm import config_link
+    from sfm.catalog import load_catalog
+    from sfm.db_sources import sync_config_sources
+    catalog = load_catalog()
+    sync_config_sources(catalog)
+    payload = config_link.encode([catalog[0]["url"]], config_link.words(["A041"], ["infanzia"]), catalog=catalog)
+    tc.handle_update(update(f"/start {payload}"))
+    user = get_user(1)
+    assert user["keywords"] == ["A041"] and user["excluded"] == ["infanzia"]
+    assert "escludo le notizie con <b>infanzia</b>" in sent_messages[-2]["text"]

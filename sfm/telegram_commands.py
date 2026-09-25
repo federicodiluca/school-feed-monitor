@@ -7,6 +7,7 @@ from sfm.db_user import (
     delete_user,
     export_user_data,
     get_user,
+    set_excluded,
     set_keywords,
     update_keywords,
     user_id_for_telegram,
@@ -45,6 +46,8 @@ LATEST_MAX = 50
 
 USAGE_SETKEYWORDS = "❗ Usa: /setkeywords parola1, parola2, PAROLA COMPOSTA, ..."
 USAGE_REMOVEKEYWORDS = "❗ Usa: /removekeywords parola1, parola2, PAROLA COMPOSTA, ..."
+USAGE_EXCLUDE = "❗ Usa: /exclude parola1, parola2 — non ti arriveranno le notizie che le contengono"
+USAGE_REMOVEEXCLUDE = "❗ Usa: /removeexclude parola1, parola2"
 USAGE_FOLLOW = "❗ Usa: /follow 1, 3 (numeri da /sources) oppure /follow all"
 USAGE_UNFOLLOW = "❗ Usa: /unfollow 2 (numeri da /sources) oppure /unfollow all"
 USAGE_ADDSOURCE = "❗ Usa: /addsource https://sito.it/notizie/ [Nome fonte]"
@@ -75,7 +78,9 @@ def build_help_message(telegram_id=None):
 /stop — sospende le notifiche per questo utente
 /setkeywords parola1, parola2, PAROLA COMPOSTA — aggiunge parole chiave (separate da virgole)
 /removekeywords parola1, parola2, PAROLA COMPOSTA — rimuove keyword specifiche
-/keywords — mostra le tue keyword attive
+/keywords — mostra le tue keyword attive e le parole escluse
+/exclude parola1, parola2 — non ricevere le notizie che contengono queste parole
+/removeexclude parola1, parola2 — togli parole dall'elenco delle escluse
 /fetch — aggiorna manualmente le notizie
 /report — genera e invia il report giornaliero
 /latest [n] — mostra le ultime n notizie (default {LATEST_DEFAULT}, max {LATEST_MAX})
@@ -106,7 +111,9 @@ COMMANDS_MESSAGE = f"""
 /stop — sospende le notifiche
 /setkeywords parola1, parola2, PAROLA COMPOSTA — aggiunge keyword (separate da virgole)
 /removekeywords parola1, parola2, PAROLA COMPOSTA — rimuove keyword specifiche
-/keywords — mostra le tue keyword attive
+/keywords — mostra le tue keyword attive e le parole escluse
+/exclude parola1, parola2 — non ricevere le notizie che contengono queste parole
+/removeexclude parola1, parola2 — togli parole dall'elenco delle escluse
 /fetch — aggiorna notizie manualmente
 /report — genera report giornaliero
 /latest [n] — mostra ultime n notizie (default {LATEST_DEFAULT}, max {LATEST_MAX})
@@ -169,7 +176,7 @@ def resolve_config(code):
         if link is None:
             return None
         ids = [s["id"] for url in link["urls"] if (s := get_source_by_url(url))]
-        return {"sources": ids, "keywords": link["keywords"]} if ids else None
+        return {"sources": ids, "keywords": link["keywords"], "excluded": link["excluded"]} if ids else None
     return load_config(code.strip().upper())
 
 
@@ -187,12 +194,17 @@ def apply_config_code(telegram_id, code):
     for source in sources:
         set_user_source(user_id, source["id"], source["id"] in chosen)
     keywords = config.get("keywords") or []
+    excluded = config.get("excluded") or []
     if keywords:
         set_keywords(user_id, keywords)
+    if excluded:
+        set_excluded(user_id, excluded)
     n = sum(1 for s in sources if s["id"] in chosen)
     message = f"✅ Configurazione applicata: <b>{n} fonti</b>"
     if keywords:
         message += f" e parole chiave <b>{escape_html(', '.join(keywords))}</b>"
+    if excluded:
+        message += f"; escludo le notizie con <b>{escape_html(', '.join(excluded))}</b>"
     message += ".\nTi avviso quando esce una notizia con le tue parole, più un riepilogo giornaliero."
     send_message(message, parse_mode="HTML", chat_id=telegram_id)
     return True
@@ -280,13 +292,64 @@ def cmd_removekeywords(telegram_id, args):
 
 def cmd_keywords(telegram_id, args):
     user = get_user(telegram_id)
-    if not user or not user["keywords"]:
+    if not user or not (user["keywords"] or user["excluded"]):
         send_message("❌ Non hai keyword impostate.\n💡 Usa /setkeywords per aggiungerne alcune!", chat_id=telegram_id)
         return
-    keywords_list = user["keywords"]
-    keywords_text = "\n".join([f"• {escape_html(kw)}" for kw in keywords_list])
-    message = f"📝 <b>Le tue keyword attive ({len(keywords_list)}):</b>\n\n{keywords_text}\n\n💡 Usa /setkeywords per modificare o /removekeywords per rimuovere."
-    send_message(message, parse_mode="HTML", chat_id=telegram_id)
+    parts = []
+    if user["keywords"]:
+        keywords_text = "\n".join([f"• {escape_html(kw)}" for kw in user["keywords"]])
+        parts.append(f"📝 <b>Le tue keyword attive ({len(user['keywords'])}):</b>\n\n{keywords_text}\n\n"
+                     "💡 Usa /setkeywords per modificare o /removekeywords per rimuovere.")
+    if user["excluded"]:
+        excluded_text = "\n".join([f"• {escape_html(w)}" for w in user["excluded"]])
+        parts.append(f"🚫 <b>Parole escluse ({len(user['excluded'])}):</b> le notizie che le contengono non ti "
+                     f"arrivano\n\n{excluded_text}\n\n💡 /exclude per aggiungerne, /removeexclude per toglierle.")
+    send_message("\n\n".join(parts), parse_mode="HTML", chat_id=telegram_id)
+
+
+def _merge_words(existing, new):
+    """(finale, aggiunte, già presenti), senza doppioni e senza distinguere maiuscole."""
+    known = {w.lower() for w in existing}
+    added, skipped = [], []
+    for w in new:
+        (skipped if w.lower() in known else added).append(w)
+        known.add(w.lower())
+    return existing + added, added, skipped
+
+
+def cmd_exclude(telegram_id, args):
+    words = parse_keywords(args)
+    if not words:
+        send_message(USAGE_EXCLUDE, chat_id=telegram_id)
+        return
+    user_id = _ensure_user_id(telegram_id)
+    final, added, skipped = _merge_words(get_user(telegram_id)["excluded"], words)
+    if added:
+        set_excluded(user_id, final)
+    message = (f"🚫 Non ti arriveranno più le notizie con: {', '.join(added)}" if added
+               else "❌ Queste parole erano già escluse.")
+    if skipped and added:
+        message += f"\n⚠️ Già escluse: {', '.join(skipped)}"
+    message += f"\n📝 Parole escluse: {', '.join(final)}"
+    send_message(message, chat_id=telegram_id)
+
+
+def cmd_removeexclude(telegram_id, args):
+    to_remove = {w.lower() for w in parse_keywords(args)}
+    if not to_remove:
+        send_message(USAGE_REMOVEEXCLUDE, chat_id=telegram_id)
+        return
+    user = get_user(telegram_id)
+    current = user["excluded"] if user else []
+    removed = [w for w in current if w.lower() in to_remove]
+    if not removed:
+        send_message("❌ Nessuna di queste parole era esclusa." + (f"\n📝 Parole escluse: {', '.join(current)}" if current else ""),
+                     chat_id=telegram_id)
+        return
+    final = [w for w in current if w not in removed]
+    set_excluded(user["id"], final)
+    send_message(f"✅ Di nuovo ammesse: {', '.join(removed)}\n📝 Parole escluse: {', '.join(final) or 'nessuna'}",
+                 chat_id=telegram_id)
 
 
 def cmd_commands(telegram_id, args):
@@ -643,6 +706,7 @@ def cmd_dati(telegram_id, args):
         "🔎 <b>Quello che conservo su questa chat</b>",
         f"• Identificativo Telegram: <code>{user['telegram_id']}</code>" + (f" (@{escape_html(user['username'])})" if user["username"] else ""),
         f"• Parole chiave: {escape_html(', '.join(user['keywords'])) if user['keywords'] else '—'}",
+        f"• Parole escluse: {escape_html(', '.join(user['excluded'])) if user['excluded'] else '—'}",
         f"• Notifiche: {'attive' if user['active'] else 'sospese'}",
         f"• Riepilogo: {user['digest_time'] or 'orario predefinito'}",
         f"• Fonti seguite ({len(followed)}): {escape_html(', '.join(followed[:20])) if followed else '—'}" + (" …" if len(followed) > 20 else ""),
@@ -679,6 +743,8 @@ HANDLERS = {
     "setkeywords": cmd_setkeywords,
     "removekeywords": cmd_removekeywords,
     "keywords": cmd_keywords,
+    "exclude": cmd_exclude,
+    "removeexclude": cmd_removeexclude,
     "commands": cmd_commands,
     "help": cmd_commands,
     "fetch": cmd_fetch,

@@ -20,7 +20,7 @@ Ai sensi dell'art. 30 GDPR. Documento interno del titolare; da aggiornare quando
 | **Finalità** | Erogare il servizio richiesto: inviare su Telegram le notizie delle fonti e delle parole chiave scelte dall'utente |
 | **Base giuridica** | Esecuzione del contratto / richiesta dell'interessato (art. 6.1.b): il trattamento nasce dal comando `/start` inviato dall'utente |
 | **Interessati** | Personale scolastico e altri utenti che avviano il bot (maggiorenni) |
-| **Categorie di dati** | Identificativo Telegram (chat id) e username; fonti seguite; parole chiave; orario del digest e data dell'ultimo invio |
+| **Categorie di dati** | Identificativo Telegram (chat id) e username; fonti seguite; parole chiave; parole da escludere; orario del digest e data dell'ultimo invio |
 | **Dove** | Tabelle `users`, `user_sources` del database SQLite (`data/sfm.db`) sulla macchina virtuale di hosting |
 | **Destinatari / responsabili** | Google Cloud (hosting della VM, Stati Uniti — responsabile del trattamento, DPA e clausole contrattuali standard nei termini Google Cloud); Telegram (titolare autonomo, secondo la propria informativa) |
 | **Trasferimenti extra-UE** | Stati Uniti, verso il fornitore di hosting, sulla base delle clausole contrattuali standard incluse nel contratto Google Cloud; Telegram secondo la propria informativa |
@@ -33,7 +33,7 @@ Ai sensi dell'art. 30 GDPR. Documento interno del titolare; da aggiornare quando
 |---|---|
 | **Finalità** | Ricordare nel browser le fonti e le parole chiave scelte, per mostrare "Le mie notizie" alle visite successive |
 | **Base giuridica** | Nessun consenso richiesto: cookie tecnici strettamente necessari a fornire una funzione esplicitamente richiesta dall'utente (art. 122 Codice privacy; linee guida Garante cookie 2021) |
-| **Dati** | `sfm_fonti` (elenco di identificativi numerici di fonti), `sfm_parole` (parole chiave), più il cookie di sessione usato solo per il token anti-CSRF dei moduli |
+| **Dati** | `sfm_fonti` (elenco di identificativi numerici di fonti), `sfm_parole` (parole chiave), `sfm_escludi` (parole da escludere), più il cookie di sessione usato solo per il token anti-CSRF dei moduli |
 | **Dove** | Solo nel browser dell'utente. Il server **non** li memorizza, non li associa a nessun identificativo e non tiene profili |
 | **Conservazione** | 1 anno o fino a quando l'utente usa "Dimentica le mie scelte" / cancella i cookie del browser |
 | **Diritti** | Esercitabili dall'utente stesso: esportazione (`/configura/esporta.json`), cancellazione (`/configura/dimentica`) |

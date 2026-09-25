@@ -31,7 +31,7 @@ def _sources_with_selection():
 def show():
     sources = _sources_with_selection()
     return render_template("configura.html", sources=sources, groups=group_sources(sources),
-                           keywords=prefs.selected_keywords(), regions=REGIONS,
+                           keywords=prefs.selected_keywords(), excluded=prefs.selected_excluded(), regions=REGIONS,
                            provinces_by_region=provinces_by_region(),
                            provinces_with_office={r: sorted(p) for r, p in provinces_with_own_office(sources).items()},
                            code=request.args.get("codice"), ttl_hours=TTL_HOURS)
@@ -43,17 +43,18 @@ def save():
     valid = {s["id"] for s in get_sources()}
     source_ids = [int(v) for v in request.form.getlist("sources") if v.isdigit() and int(v) in valid]
     keywords = prefs.clean_keywords(parse_keywords(request.form.get("keywords", "")))
+    excluded = prefs.clean_keywords(parse_keywords(request.form.get("excluded", "")))
 
     if request.form.get("azione") == "telegram":
         if not source_ids:
             flash("Scegli almeno una fonte prima di portare la configurazione su Telegram.", "error")
-            return prefs.store(redirect(url_for("config.show")), source_ids, keywords)
+            return prefs.store(redirect(url_for("config.show")), source_ids, keywords, excluded)
         code = save_config(source_ids, keywords)
         response = redirect(url_for("config.show", codice=code) + "#telegram")
     else:
         flash(f"Fatto: {len(source_ids)} fonti e {len(keywords)} parole chiave, salvate in questo browser.", "success")
         response = redirect(url_for("news.mine"))
-    return prefs.store(response, source_ids, keywords)
+    return prefs.store(response, source_ids, keywords, excluded)
 
 
 @bp.post("/configura/area")
@@ -87,7 +88,7 @@ def export():
     sources = {s["id"]: s["name"] for s in get_sources()}
     chosen = prefs.selected_source_ids()
     data = {"fonti": [{"id": i, "nome": sources.get(i)} for i in sorted(chosen)],
-            "parole_chiave": prefs.selected_keywords()}
+            "parole_chiave": prefs.selected_keywords(), "parole_escluse": prefs.selected_excluded()}
     resp = current_app.response_class(response=json.dumps(data, ensure_ascii=False, indent=1),
                                       mimetype="application/json")
     resp.headers["Content-Disposition"] = "attachment; filename=school-feed-monitor-preferenze.json"

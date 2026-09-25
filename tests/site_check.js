@@ -91,6 +91,10 @@ const click = (w, el) => el.dispatchEvent(new w.MouseEvent("click", { bubbles: t
     kw.value = "A041, sostegno"; kw.dispatchEvent(new w.Event("input", { bubbles: true }));
     await wait(700);
     check("le parole chiave si salvano mentre scrivi", /sfm_parole=A041/.test(doc.cookie), doc.cookie.slice(0, 120));
+    const ex = doc.getElementById("excluded");
+    ex.value = "Convocazione"; ex.dispatchEvent(new w.Event("input", { bubbles: true }));
+    await wait(700);
+    check("anche le parole da escludere", /sfm_escludi=Convocazione/.test(doc.cookie));
 
     const group = Array.from(doc.querySelectorAll("details.source-group"))
       .find(g => g.querySelector("input[name=sources]:not(:checked)"));
@@ -105,6 +109,9 @@ const click = (w, el) => el.dispatchEvent(new w.MouseEvent("click", { bubbles: t
     const out = doc.getElementById("telegram-out");
     check("il link a Telegram compare", !out.hidden && /t\.me\/SfmBot\?start=C1/.test(out.innerHTML),
           (out.textContent.match(/\/start \S+/) || [""])[0]);
+    const code = (out.textContent.match(/\/start (\S+)/) || [])[1] || "";
+    const raw = Buffer.from(code.slice(2).replace(/-/g, "+").replace(/_/g, "/"), "base64").toString("latin1");
+    check("le parole escluse viaggiano nel link o come comando", /-Convocazione/.test(raw) || /\/exclude Convocazione/.test(out.textContent));
   }
 
   // riaprendo la pagina (stessi cookie), fonti, parole e aree salvate tornano com'erano
@@ -112,9 +119,20 @@ const click = (w, el) => el.dispatchEvent(new w.MouseEvent("click", { bubbles: t
     await wait(200);
     check("nessun errore JS alla riapertura", errors.length === 0, errors.join("; "));
     check("le parole chiave tornano", doc.getElementById("keywords").value === "A041, sostegno");
+    check("e le parole escluse", doc.getElementById("excluded").value === "Convocazione");
     check("la regione torna spuntata", doc.querySelector('input[name=regions][value="Sicilia"]').checked);
     check("e anche la provincia scelta", doc.querySelector('input[name=provinces][value="Sicilia|Palermo"]').checked &&
           !doc.querySelector('input[name=provinces][value="Sicilia|Catania"]').checked);
+  }
+  // /le-mie-notizie con le stesse preferenze: niente notizie con parole escluse
+  console.log("pagina /le-mie-notizie");
+  { const { errors, doc } = open("le-mie-notizie/index.html", BASE + "/le-mie-notizie/", jar);
+    await wait(200);
+    check("nessun errore JS", errors.length === 0, errors.join("; "));
+    const titles = Array.from(doc.querySelectorAll("#mine-results .news-title")).map(e => e.textContent);
+    check("ci sono le notizie delle fonti scelte", titles.length > 0, titles.length + " notizie");
+    check("ma non quelle con parole escluse", !titles.some(t => /Convocazione/.test(t)));
+    check("e l'intro lo dice", /senza quelle che parlano di/.test(doc.getElementById("mine-intro").textContent));
   }
   process.exit(ok ? 0 : 1);
 })();

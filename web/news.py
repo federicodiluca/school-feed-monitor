@@ -8,6 +8,7 @@ from sfm.catalog import REGIONS, group_sources
 from sfm.db_news import count_per_source, get_today_news, latest_per_source, search_news
 from sfm.db_sources import get_source, get_sources
 from sfm.digest import annotate
+from sfm.matching import is_excluded
 from sfm.utils import slugify
 from sfm.watchdog import source_states, thresholds
 from web import prefs
@@ -158,7 +159,7 @@ def _parse_day(value):
 def mine():
     """Notizie dalle fonti scelte in questo browser, con le parole chiave evidenziate."""
     followed = prefs.selected_source_ids()
-    user = {"id": None, "keywords": prefs.selected_keywords()}
+    user = {"id": None, "keywords": prefs.selected_keywords(), "excluded": prefs.selected_excluded()}
     q, days, page = _filters()
     view = request.args.get("vista") or "oggi"
     if not followed:
@@ -170,7 +171,7 @@ def mine():
         rows, total = search_news(source_ids=followed, query=q, days=days, page=page, per_page=PER_PAGE)
         if (r := _clamp_page(total, page)):
             return r
-        rows = annotate(rows, user)
+        rows = annotate([r for r in rows if not is_excluded(r, user)], user)
         rows.sort(key=lambda n: (n.get("published_at") or ""), reverse=True)
         return render_template("le_mie_notizie.html", user=user, view="tutte", news=rows, q=q, days=days,
                                days_choices=DAYS_CHOICES, pages=_pages(total, page), day=None, n_sources=len(followed))
@@ -179,7 +180,7 @@ def mine():
     if day > date.today():
         day = date.today()
     at = datetime.combine(day, datetime.min.time()).astimezone() + timedelta(hours=12)
-    rows = annotate(get_today_news(now=at, source_ids=followed), user)
+    rows = annotate([r for r in get_today_news(now=at, source_ids=followed) if not is_excluded(r, user)], user)
     return render_template("le_mie_notizie.html", user=user, view="oggi", news=rows, day=day,
                            prev_day=day - timedelta(days=1), next_day=(day + timedelta(days=1)) if day < date.today() else None,
                            q="", days=None, days_choices=DAYS_CHOICES, pages=None, n_sources=len(followed))
