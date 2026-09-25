@@ -123,3 +123,10 @@ def test_region_pages_are_generated(site):
     assert "Graduatorie definitive A041" in html
     assert f'<link rel="canonical" href="{BASE_URL}/notizie/regione/emilia-romagna/">' in html
     assert f"<loc>{BASE_URL}/notizie/regione/sicilia/</loc>" in read(site, "sitemap.xml")
+
+
+def test_link_previews_have_an_image(site):
+    html = read(site, "index.html")
+    assert f'<meta property="og:image" content="{BASE_URL}/static/og-image.png">' in html
+    assert 'name="twitter:card" content="summary_large_image"' in html
+    assert os.path.getsize(os.path.join(site, "static", "og-image.png")) > 10_000

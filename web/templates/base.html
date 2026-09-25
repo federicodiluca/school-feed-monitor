@@ -13,7 +13,11 @@
   <meta property="og:description" content="{{ self.description() }}">
   <meta property="og:url" content="{{ canonical }}">
   <meta property="og:locale" content="it_IT">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="{{ absolute_url(url_for('static', filename='og-image.png')) }}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="{{ app_name }}: le notizie di Ministero, USR e USP filtrate per le fonti e le parole che scegli">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#1e3a8a" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
