@@ -10,7 +10,7 @@ NAME = "telegram"
 
 def no_news_message():
     return ("🗓️ Nessuna notizia per oggi dalle fonti che segui.\n"
-            f"Tutte le notizie, anche delle altre fonti: {site_url()}/notizie")
+            f"Tutte le notizie, anche delle altre fonti: {site_url()}/notizie/")
 
 
 def format_alert(news):
@@ -45,7 +45,7 @@ def build_report(news_list):
             hint += " · <i>già segnalata</i>"
         lines.append(f"{icon} <a href=\"{link}\">{source}</a> — {published}{hint}\n<b>{title}</b>\n<i>{preview}</i>\n")
 
-    lines.append(f"🌐 Cerca fra tutte le notizie, anche delle fonti che non segui: {site_url()}/notizie")
+    lines.append(f"🌐 Cerca fra tutte le notizie, anche delle fonti che non segui: {site_url()}/notizie/")
     return "\n".join(lines).strip()
 
 

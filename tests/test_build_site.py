@@ -48,7 +48,7 @@ def test_every_public_page_becomes_a_file(site):
 def test_links_and_canonical_carry_the_pages_prefix(site):
     html = read(site, "index.html")
     assert f'<link rel="canonical" href="{BASE_URL}/">' in html
-    assert f'href="{PREFIX}/notizie"' in html and f'href="{PREFIX}/static/style.css"' in html
+    assert f'href="{PREFIX}/notizie/"' in html and f'href="{PREFIX}/static/style.css"' in html
     assert 'data-base="/school-feed-monitor"' in html and 'data-static="1"' in html
     # niente riferimenti alla radice del dominio, che su Pages è di un altro sito
     assert 'href="/notizie"' not in html and 'src="/static/' not in html
@@ -56,10 +56,22 @@ def test_links_and_canonical_carry_the_pages_prefix(site):
 
 def test_sitemap_is_absolute_and_not_doubled(site):
     xml = read(site, "sitemap.xml")
-    assert f"<loc>{BASE_URL}/notizie</loc>" in xml
+    assert f"<loc>{BASE_URL}/notizie/</loc>" in xml
     assert f"{PREFIX}{PREFIX}" not in xml
     robots = read(site, "robots.txt")
     assert f"Disallow: {PREFIX}/le-mie-notizie" in robots and f"Sitemap: {BASE_URL}/sitemap.xml" in robots
+
+
+def test_page_urls_end_with_a_slash_like_github_pages_wants(site):
+    """Pages porta /notizie su /notizie/ con un 301: canonical e sitemap devono già avere la
+    barra, altrimenti Google trova un canonical che punta a un redirect."""
+    html = read(site, "notizie", "index.html")
+    assert f'<link rel="canonical" href="{BASE_URL}/notizie/">' in html
+    xml = read(site, "sitemap.xml")
+    assert "/usp-bologna/</loc>" in xml and "/sitemap.xml/" not in xml
+    home = read(site, "index.html")
+    assert f'"url": "{BASE_URL}/"' in home          # JSON-LD senza il prefisso doppio
+    assert f'href="{PREFIX}/static/style.css"' in home and f'href="{PREFIX}/privacy/"' in home
 
 
 def test_source_pages_are_generated_and_indexable(site):
@@ -97,3 +109,10 @@ def test_configurator_has_no_forms_to_post_to(site):
     html = read(site, "configura", "index.html")
     assert "_csrf" not in html and 'method="post"' not in html
     assert 'data-catalog="' in html            # serve a costruire il link di Telegram nel browser
+
+
+def test_pages_say_when_they_were_updated_and_when_the_next_update_is(site):
+    html = read(site, "notizie", "index.html")
+    assert 'class="freshness"' in html and "Notizie aggiornate il" in html
+    assert "Prossimo aggiornamento verso le" in html and "il sito si aggiorna ogni ora" in html
+    assert "Notizie aggiornate il" in read(site, "privacy", "index.html")   # nel footer di ogni pagina

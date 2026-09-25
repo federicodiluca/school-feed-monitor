@@ -174,7 +174,8 @@ Due dettagli:
 
 ```bash
 crontab -e
-# sito aggiornato ogni ora, 10 minuti dopo lo scraping
+# sito aggiornato ogni ora, 10 minuti dopo lo scraping (se cambi la frequenza, allinea
+# SITE_PUBLISH_MINUTES in .env: le pagine dicono quando arriva il prossimo aggiornamento)
 10 * * * * cd /opt/sfm && ./scripts/publish_site.sh >> data/logs/publish.log 2>&1
 # backup del database ogni notte alle 3 (14 giorni di copie in /opt/sfm/backup)
 0 3 * * * cd /opt/sfm && sh scripts/backup.sh backup >> data/logs/backup.log 2>&1

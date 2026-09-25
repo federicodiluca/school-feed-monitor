@@ -28,7 +28,7 @@ def test_the_help_message_carries_the_site(sent_messages):
 
 def test_the_daily_report_ends_with_the_site(sent_messages):
     report = build_report([{"title": "T", "link": "https://x/1", "source": "S", "content": "c"}])
-    assert report.rstrip().endswith(f"{SITE}/notizie")
+    assert report.rstrip().endswith(f"{SITE}/notizie/")
     assert f"{SITE}/notizie" in no_news_message()
 
 

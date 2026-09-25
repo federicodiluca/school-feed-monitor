@@ -54,7 +54,8 @@ def test_start_registers_user_and_sends_help(sent_messages):
     assert "Benvenuto" in sent_messages[0]["text"] and "Scegli le fonti sul sito" in sent_messages[1]["text"]
     help_text = sent_messages[-1]["text"]
     assert sent_messages[-1]["parse_mode"] == "HTML"
-    assert "• ✅ Feed Uno" in help_text and "• ✅ Feed Due" in help_text
+    # solo il conteggio: con 100+ fonti l'elenco rendeva il messaggio lunghissimo
+    assert "segui <b>2</b> su 2" in help_text and "Feed Uno" not in help_text
     assert "/sources" in help_text and "/addsource" in help_text
     assert "Fetch ogni 15 minuti" in help_text
     assert "Report giornaliero alle 18:00" in help_text
@@ -302,9 +303,28 @@ def test_sources_lists_with_marks(sent_messages):
     add_user(1)
     tc.handle_update(update("/sources"))
     text = sent_messages[-1]["text"]
-    assert "2/2 seguite" in text
+    assert "Segui 2 fonti su 2" in text
     assert "✅ <b>1</b>. Feed Uno" in text and "✅ <b>2</b>. Feed Due" in text
     assert sent_messages[-1]["parse_mode"] == "HTML"
+
+
+def test_sources_lists_only_the_followed_ones(sent_messages):
+    """Con il catalogo intero il messaggio elencava 100+ fonti: ora solo quelle seguite."""
+    add_user(1)
+    tc.handle_update(update("/unfollow 2"))
+    tc.handle_update(update("/sources"))
+    text = sent_messages[-1]["text"]
+    assert "Segui 1 fonti su 2" in text and "Feed Uno" in text and "Feed Due" not in text
+    tc.handle_update(update("/unfollow all"))
+    tc.handle_update(update("/sources"))
+    assert "Non ne segui ancora nessuna" in sent_messages[-1]["text"]
+
+
+def test_sources_truncates_a_long_followed_list(sent_messages, monkeypatch):
+    add_user(1)
+    monkeypatch.setattr(tc, "SOURCES_SHOWN", 1)
+    tc.handle_update(update("/sources"))
+    assert "…e altre 1" in sent_messages[-1]["text"]
 
 
 def test_follow_unfollow_flow(sent_messages):
@@ -312,11 +332,11 @@ def test_follow_unfollow_flow(sent_messages):
     tc.handle_update(update("/unfollow 2"))
     assert get_followed_source_ids(1) == {1}
     assert "Non segui più: Feed Due" in sent_messages[-1]["text"]
-    assert "❌ <b>2</b>. Feed Due" in sent_messages[-1]["text"]
+    assert "Segui 1 fonti su 2" in sent_messages[-1]["text"]
 
     tc.handle_update(update("/unfollow all"))
     assert get_followed_source_ids(1) == set()
-    assert "0/2 seguite" in sent_messages[-1]["text"]
+    assert "Segui 0 fonti su 2" in sent_messages[-1]["text"]
 
     tc.handle_update(update("/follow 1, 2, 99, x"))
     assert get_followed_source_ids(1) == {1, 2}
@@ -441,10 +461,48 @@ def test_sources_sends_inline_keyboard(sent_messages):
     add_user(1)
     tc.handle_update(update("/sources"))
     kb = sent_messages[-1]["reply_markup"]["inline_keyboard"]
-    assert [b["text"] for row in kb[:-1] for b in row] == ["✅ Feed Uno", "✅ Feed Due"]
-    assert [b["callback_data"] for row in kb[:-1] for b in row] == ["src:t:1", "src:t:2"]
-    assert [b["callback_data"] for b in kb[-1]] == ["src:all:1", "src:all:0"]
-    assert "Tocca una fonte" in sent_messages[-1]["text"]
+    # un pulsante per area (qui le fonti di prova non hanno regione: "Altre fonti"), poi il sito
+    assert [b["text"] for row in kb[:-1] for b in row] == ["✅ Altre fonti · 2/2"]
+    assert [b["callback_data"] for row in kb[:-1] for b in row] == ["src:g:Altre fonti"]
+    assert kb[-1][0]["url"].endswith("/configura/")
+    assert "Tocca un'area" in sent_messages[-1]["text"]
+
+
+def test_sources_groups_the_catalog_by_area(sent_messages):
+    from sfm.catalog import load_catalog
+    from sfm.db_sources import sync_config_sources
+    sync_config_sources([e for e in load_catalog() if e["kind"] == "mim" or e["region"] in ("Sicilia", "Molise")])
+    add_user(1)
+    tc.handle_update(update("/sources"))
+    labels = [b["text"] for row in sent_messages[-1]["reply_markup"]["inline_keyboard"][:-1] for b in row]
+    assert labels[0].startswith("Nazionali") or labels[0].startswith("✅ Nazionali")
+    assert any("Sicilia" in label for label in labels) and any("Molise" in label for label in labels)
+    assert all(len(row) <= 2 for row in sent_messages[-1]["reply_markup"]["inline_keyboard"])
+
+
+def test_callback_opens_an_area_and_goes_back(sent_messages, callback_calls):
+    add_user(1)
+    tc.handle_update(callback("src:g:Altre fonti"))
+    edit = callback_calls["edits"][-1]
+    assert "Altre fonti</b> — 2 su 2 seguite" in edit["text"] and "✅ <b>2</b>. Feed Due" in edit["text"]
+    kb = edit["reply_markup"]["inline_keyboard"]
+    assert [row[0]["callback_data"] for row in kb[:2]] == ["src:t:2", "src:t:1"]   # per nome: Due, Uno
+    assert [b["callback_data"] for b in kb[2]] == ["src:ga:1:Altre fonti", "src:ga:0:Altre fonti"]
+    assert kb[-1][0]["callback_data"] == "src:home"
+    tc.handle_update(callback("src:home"))
+    assert "Segui 2 fonti su 2" in callback_calls["edits"][-1]["text"]
+    tc.handle_update(callback("src:g:Area che non esiste"))   # vecchio pulsante: torna all'inizio
+    assert "Segui 2 fonti su 2" in callback_calls["edits"][-1]["text"]
+
+
+def test_callback_area_all_and_none(sent_messages, callback_calls):
+    add_user(1)
+    tc.handle_update(callback("src:ga:0:Altre fonti"))
+    assert get_followed_source_ids(1) == set()
+    assert callback_calls["answers"][-1]["text"] == "❌ Nessuna fonte: Altre fonti"
+    assert "0 su 2 seguite" in callback_calls["edits"][-1]["text"]
+    tc.handle_update(callback("src:ga:1:Altre fonti"))
+    assert get_followed_source_ids(1) == {1, 2}
 
 
 def test_callback_toggle_updates_message_and_answers(sent_messages, callback_calls):
@@ -454,8 +512,9 @@ def test_callback_toggle_updates_message_and_answers(sent_messages, callback_cal
     assert callback_calls["answers"] == [{"id": "cq1", "text": "❌ Non segui più: Feed Due"}]
     edit = callback_calls["edits"][-1]
     assert edit["chat_id"] == 1 and edit["message_id"] == 555
-    assert "1/2 seguite" in edit["text"] and "❌ <b>2</b>. Feed Due" in edit["text"]
-    assert [b["text"] for row in edit["reply_markup"]["inline_keyboard"][:-1] for b in row] == ["✅ Feed Uno", "❌ Feed Due"]
+    # resta sulla schermata dell'area della fonte toccata
+    assert "1 su 2 seguite" in edit["text"] and "❌ <b>2</b>. Feed Due" in edit["text"]
+    assert [row[0]["text"] for row in edit["reply_markup"]["inline_keyboard"][:2]] == ["❌ Feed Due", "✅ Feed Uno"]
 
     tc.handle_update(callback("src:t:2", cq_id="cq2"))
     assert get_followed_source_ids(1) == {1, 2}

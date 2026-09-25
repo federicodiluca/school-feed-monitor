@@ -25,6 +25,7 @@ from sfm.db_sources import (
     remove_source,
     set_user_source,
 )
+from sfm.catalog import group_sources
 from sfm.news_fetcher import fetch_news, fetch_source
 from sfm.source_parser import SourceError, detect_source
 from sfm.report_generator import generate_report
@@ -55,12 +56,16 @@ def build_help_message(telegram_id=None):
     polling = cfg.get("polling_minutes", 10)
     report_time = cfg.get("daily_report_time", "18:00")
     retention = cfg.get("data_retention_days", 7)
+    # solo il conteggio: l'elenco completo (100+ fonti) rendeva il messaggio lunghissimo
     if telegram_id is not None:
         sources = get_user_sources(user_id_for_telegram(telegram_id))
-        feed_list = "\n".join(f"• {'✅' if s['followed'] else '❌'} {escape_html(s['name'])}" for s in sources)
+        n = sum(1 for s in sources if s["followed"])
+        feed_summary = f"segui <b>{n}</b> su {len(sources)} — vedile e cambiale con /sources"
     else:
-        feed_list = "\n".join(f"• {escape_html(s['name'])}" for s in get_sources())
-    feed_list = feed_list or "⚠️ Nessuna fonte configurata."
+        sources = get_sources()
+        feed_summary = f"{len(sources)} monitorate — vedile con /sources"
+    if not sources:
+        feed_summary = "⚠️ nessuna fonte configurata."
     site = site_url()
     return f"""
 🤖 <b>School Feed Monitor</b> — servizio attivo.
@@ -74,7 +79,7 @@ def build_help_message(telegram_id=None):
 /fetch — aggiorna manualmente le notizie
 /report — genera e invia il report giornaliero
 /latest [n] — mostra le ultime n notizie (default {LATEST_DEFAULT}, max {LATEST_MAX})
-/sources — elenco fonti con pulsanti per attivarle/disattivarle
+/sources — le tue fonti, con un pulsante per area per attivarle/disattivarle
 /follow n, m — segui le fonti indicate (o "all")
 /unfollow n, m — smetti di seguire le fonti indicate (o "all")
 /addsource URL [nome] — aggiungi una fonte (RSS o pagina notizie)
@@ -90,8 +95,7 @@ def build_help_message(telegram_id=None):
 • Report giornaliero alle {report_time}
 • Retention notizie e log: {retention} giorni
 
-<b>Fonti monitorate</b> (✅ seguita, ❌ non seguita — gestisci con /sources):
-{feed_list}
+📡 <b>Fonti</b>: {feed_summary}
 """.strip()
 
 
@@ -151,7 +155,7 @@ def cmd_start(telegram_id, args, username=None):
     if code:
         apply_config_code(telegram_id, code)
     elif added:
-        send_message(f"Scegli le fonti sul sito — è più comodo: {site_url()}/configura\n"
+        send_message(f"Scegli le fonti sul sito — è più comodo: {site_url()}/configura/\n"
                      "In fondo alla pagina premi «Salva e porta su Telegram» e torni qui con tutto pronto.\n"
                      "Oppure fai da qui con /sources e /setkeywords parola1, parola2.", chat_id=telegram_id)
     send_message(build_help_message(telegram_id), parse_mode="HTML", chat_id=telegram_id)
@@ -334,43 +338,98 @@ def _ensure_user_id(telegram_id):
     return user_id_for_telegram(telegram_id)
 
 
-def format_sources_list(telegram_id):
+SOURCES_SHOWN = 25   # fonti seguite elencate per nome nella schermata di /sources, poi "…e altre N"
+
+
+def _source_line(s, user_id, failing):
+    extra = " · HTML" if s["type"] == "html" else ""
+    if s["id"] in failing:
+        extra += " ⚠️ in errore"
+    if s["origin"] == "user":
+        extra += " · custom" + (" (tua)" if s["added_by"] == user_id else "")
+    return f"<b>{s['id']}</b>. {escape_html(s['name'])}{extra}"
+
+
+def _groups_for(telegram_id):
     user_id = user_id_for_telegram(telegram_id)
-    sources = get_user_sources(user_id)
+    return user_id, group_sources(get_user_sources(user_id))
+
+
+def format_sources_list(telegram_id):
+    """Schermata iniziale di /sources: solo le fonti seguite, non tutto il catalogo
+    (con 100+ fonti il messaggio diventava lunghissimo). Il resto si sceglie per area."""
+    user_id, groups = _groups_for(telegram_id)
+    sources = [s for _, items in groups for s in items]
     if not sources:
         return "⚠️ Nessuna fonte configurata. Aggiungine una con /addsource URL [nome]."
-    followed = sum(1 for s in sources if s["followed"])
-    lines = [f"📡 <b>Fonti disponibili ({followed}/{len(sources)} seguite)</b>\n"]
+    followed = [s for s in sources if s["followed"]]
     failing = get_failing_source_ids(SOURCE_WARN_FAILURES)
-    for s in sources:
-        mark = "✅" if s["followed"] else "❌"
-        extra = " · HTML" if s["type"] == "html" else ""
-        if s["id"] in failing:
-            extra += " ⚠️ in errore"
-        if s["origin"] == "user":
-            extra += " · custom" + (" (tua)" if s["added_by"] == user_id else "")
-        lines.append(f"{mark} <b>{s['id']}</b>. {escape_html(s['name'])}{extra}")
-    lines.append("\n👇 Tocca una fonte per attivarla/disattivarla. In alternativa: /follow n, m · /unfollow n, m · /addsource URL [nome]")
+    lines = [f"📡 <b>Segui {len(followed)} fonti su {len(sources)}</b>"]
+    if followed:
+        lines.append("")
+        lines += [f"✅ {_source_line(s, user_id, failing)}" for s in followed[:SOURCES_SHOWN]]
+        if len(followed) > SOURCES_SHOWN:
+            lines.append(f"…e altre {len(followed) - SOURCES_SHOWN}")
+    else:
+        lines.append("Non ne segui ancora nessuna.")
+    lines.append("\n👇 Tocca un'area per vedere le sue fonti e attivarle o disattivarle. "
+                 f"Per sceglierne tante insieme è più comodo il sito: {site_url()}/configura/")
     return "\n".join(lines)
 
 
-CB_PREFIX = "src"  # callback_data: "src:t:<id>" toggle, "src:all:1|0" tutte/nessuna
+def format_group(telegram_id, group):
+    user_id, groups = _groups_for(telegram_id)
+    items = dict(groups).get(group)
+    if not items:
+        return None
+    failing = get_failing_source_ids(SOURCE_WARN_FAILURES)
+    n = sum(1 for s in items if s["followed"])
+    lines = [f"📍 <b>{escape_html(group)}</b> — {n} su {len(items)} seguite", ""]
+    lines += [f"{'✅' if s['followed'] else '❌'} {_source_line(s, user_id, failing)}" for s in items]
+    lines.append("\n👇 Tocca una fonte per attivarla o disattivarla.")
+    return "\n".join(lines)
+
+
+CB_PREFIX = "src"
+# callback_data (max 64 byte):
+#   src:home            schermata iniziale        src:g:<area>        fonti di un'area
+#   src:t:<id>          attiva/disattiva una fonte (poi mostra la sua area)
+#   src:ga:1|0:<area>   tutte/nessuna dell'area   src:all:1|0         tutte/nessuna (vecchi messaggi)
+
+
+def _site_button():
+    return [{"text": "🌐 Scegli le fonti sul sito", "url": f"{site_url()}/configura/"}]
 
 
 def build_sources_keyboard(telegram_id):
-    """Tastiera inline con un pulsante per fonte (✅/❌) più "Tutte" e "Nessuna"."""
-    sources = get_user_sources(user_id_for_telegram(telegram_id))
-    if not sources:
+    """Un pulsante per area con il conteggio delle fonti seguite, due per riga."""
+    _, groups = _groups_for(telegram_id)
+    if not groups:
         return None
-    rows = []
-    for s in sources:
-        mark = "✅" if s["followed"] else "❌"
-        rows.append([{"text": f"{mark} {s['name']}"[:64], "callback_data": f"{CB_PREFIX}:t:{s['id']}"}])
-    rows.append([
-        {"text": "✅ Tutte", "callback_data": f"{CB_PREFIX}:all:1"},
-        {"text": "❌ Nessuna", "callback_data": f"{CB_PREFIX}:all:0"},
-    ])
+    buttons = []
+    for group, items in groups:
+        n = sum(1 for s in items if s["followed"])
+        label = f"{'✅ ' if n else ''}{group} · {n}/{len(items)}"
+        buttons.append({"text": label[:64], "callback_data": f"{CB_PREFIX}:g:{group}"[:64]})
+    rows = [buttons[i:i + 2] for i in range(0, len(buttons), 2)]
+    rows.append(_site_button())
     return {"inline_keyboard": rows}
+
+
+def build_group_keyboard(telegram_id, group):
+    _, groups = _groups_for(telegram_id)
+    items = dict(groups).get(group) or []
+    rows = [[{"text": f"{'✅' if s['followed'] else '❌'} {s['name']}"[:64],
+              "callback_data": f"{CB_PREFIX}:t:{s['id']}"}] for s in items]
+    if len(items) > 1:
+        rows.append([{"text": "✅ Tutte", "callback_data": f"{CB_PREFIX}:ga:1:{group}"[:64]},
+                     {"text": "❌ Nessuna", "callback_data": f"{CB_PREFIX}:ga:0:{group}"[:64]}])
+    rows.append([{"text": "⬅️ Tutte le aree", "callback_data": f"{CB_PREFIX}:home"}])
+    return {"inline_keyboard": rows}
+
+
+def _group_of(source):
+    return next(g for g, items in group_sources([source]))
 
 
 def cmd_sources(telegram_id, args):
@@ -378,25 +437,50 @@ def cmd_sources(telegram_id, args):
                  reply_markup=build_sources_keyboard(telegram_id))
 
 
+def _show(telegram_id, chat_id, message_id, group=None):
+    if group is not None:
+        text = format_group(telegram_id, group)
+        if text:
+            edit_message_text(chat_id, message_id, text, parse_mode="HTML",
+                              reply_markup=build_group_keyboard(telegram_id, group))
+            return
+    edit_message_text(chat_id, message_id, format_sources_list(telegram_id), parse_mode="HTML",
+                      reply_markup=build_sources_keyboard(telegram_id))
+
+
 def handle_sources_callback(telegram_id, chat_id, message_id, data):
     """Gestisce il tap su un pulsante di /sources. Ritorna il testo per il popup di conferma."""
-    parts = data.split(":")
-    if len(parts) != 3 or parts[0] != CB_PREFIX:
+    parts = data.split(":", 3)
+    if len(parts) < 2 or parts[0] != CB_PREFIX:
         return None
-    action, value = parts[1], parts[2]
-
+    action = parts[1]
     user_id = _ensure_user_id(telegram_id)
-    before = get_followed_source_ids(user_id)
 
-    if action == "t" and value.isdigit():
-        source = get_source(int(value))
+    if action == "home" and len(parts) == 2:
+        _show(telegram_id, chat_id, message_id)
+        return None
+    if action == "g" and len(parts) == 3:
+        _show(telegram_id, chat_id, message_id, parts[2])
+        return None
+
+    before = get_followed_source_ids(user_id)
+    group = None
+    if action == "t" and len(parts) == 3 and parts[2].isdigit():
+        source = get_source(int(parts[2]))
         if not source or not source["enabled"]:
             return "Fonte non più disponibile"
         currently = source["id"] in before
         set_user_source(user_id, source["id"], not currently)
         feedback = f"{'❌ Non segui più' if currently else '✅ Ora segui'}: {source['name']}"
-    elif action == "all" and value in ("0", "1"):
-        follow = value == "1"
+        group = _group_of(source)
+    elif action == "ga" and len(parts) == 4 and parts[2] in ("0", "1"):
+        follow, group = parts[2] == "1", parts[3]
+        items = dict(group_sources(get_sources())).get(group) or []
+        for s in items:
+            set_user_source(user_id, s["id"], follow)
+        feedback = f"{'✅ Segui tutte' if follow else '❌ Nessuna fonte'}: {group}"
+    elif action == "all" and len(parts) == 3 and parts[2] in ("0", "1"):
+        follow = parts[2] == "1"
         for s in get_sources():
             set_user_source(user_id, s["id"], follow)
         feedback = "✅ Segui tutte le fonti" if follow else "❌ Non segui nessuna fonte"
@@ -405,8 +489,7 @@ def handle_sources_callback(telegram_id, chat_id, message_id, data):
 
     if get_followed_source_ids(user_id) != before:
         # Telegram rifiuta un edit senza modifiche ("message is not modified"): lo evitiamo
-        edit_message_text(chat_id, message_id, format_sources_list(telegram_id), parse_mode="HTML",
-                          reply_markup=build_sources_keyboard(telegram_id))
+        _show(telegram_id, chat_id, message_id, group)
     return feedback
 
 

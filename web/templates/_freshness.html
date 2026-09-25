@@ -1,0 +1,10 @@
+{# Ultimo aggiornamento e prossimo previsto (web/freshness.py). app.js aggiunge "N minuti fa"
+   e avvisa se il prossimo non è arrivato in tempo. #}
+{% if freshness %}
+<p class="freshness" data-updated="{{ freshness.updated.iso }}" data-next="{{ freshness.next.iso }}" data-late-after="{{ freshness.late_after_minutes }}">
+  Notizie aggiornate il <time datetime="{{ freshness.updated.iso }}">{{ freshness.updated.date }} alle {{ freshness.updated.time }}</time><span class="freshness-ago"></span>{% if freshness.fetched %}
+  (ultima lettura delle fonti: {{ freshness.fetched.date }} alle {{ freshness.fetched.time }}){% endif %}.
+  Prossimo aggiornamento verso le <time datetime="{{ freshness.next.iso }}">{{ freshness.next.time }}</time>{% if freshness.next.date != freshness.updated.date %} del {{ freshness.next.date }}{% endif %}:
+  {% if static_mode %}il sito si aggiorna {{ freshness.every }}, le fonti vengono lette {{ freshness.polling }}{% else %}le fonti vengono lette {{ freshness.polling }}{% endif %}.
+</p>
+{% endif %}

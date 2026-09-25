@@ -62,6 +62,7 @@
         <a href="{{ url_for('terms') }}">Termini</a>
         <a href="https://github.com/federicodiluca/school-feed-monitor" rel="noopener">Codice sorgente (AGPL-3.0)</a>
       </nav>
+      {% block footer_freshness %}{% include "_freshness.html" %}{% endblock %}
       <p>{{ app_name }} è un progetto indipendente, non affiliato al Ministero dell'Istruzione e del Merito né agli Uffici Scolastici.
         Aggrega notizie pubbliche senza garanzia di completezza o tempestività: fa fede sempre la fonte originale
         (<a href="{{ url_for('terms') }}#responsabilita">esclusione di responsabilità</a>).</p>

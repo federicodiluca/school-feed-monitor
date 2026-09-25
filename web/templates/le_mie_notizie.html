@@ -6,6 +6,7 @@
 <div class="page-head">
 <h1>Le mie notizie</h1>
 <p id="mine-intro">Dalle fonti che hai scelto in questo browser. <a href="{{ url_for('config.show') }}">Modifica la selezione</a>.</p>
+{% include "_freshness.html" %}
 </div>
 
 <div class="card" id="mine-empty">
@@ -80,3 +81,5 @@
 {% endif %}
 {% endif %}
 {% endblock %}
+
+{% block footer_freshness %}{% endblock %}{# già in testa alla pagina #}

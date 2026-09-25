@@ -216,6 +216,8 @@ def test_sitemap_has_the_sources_index_and_dates(client, catalog_db):
     xml = client.get("/sitemap.xml").get_data(as_text=True)
     assert "<loc>https://sfm.example/fonti</loc>" in xml
     assert f"<loc>https://sfm.example/notizie/fonte/{source['id']}/usp-bologna</loc><lastmod>2026-09-20</lastmod>" in xml
+    assert "<loc>https://sfm.example/notizie</loc><lastmod>2026-09-20</lastmod>" in xml
+    assert "<loc>https://sfm.example/privacy</loc><changefreq>" in xml
 
 
 def test_the_default_description_matches_the_current_product(client):
@@ -223,3 +225,14 @@ def test_the_default_description_matches_the_current_product(client):
     html = client.get("/notizie").get_data(as_text=True)
     description = re.search(r'name="description" content="(.*?)"', html, re.S).group(1)
     assert "email" not in description.lower()
+
+
+def test_freshness_follows_the_last_read_of_the_sources(client, monkeypatch):
+    from datetime import datetime, timezone
+    from sfm.db_health import record_job_end
+    assert "Notizie aggiornate" not in client.get("/notizie").get_data(as_text=True)   # mai lette: niente
+    record_job_end("fetch_news", now=datetime(2026, 9, 25, 10, 0, tzinfo=timezone.utc))
+    monkeypatch.setattr("web.freshness.get_config", lambda: {"polling_minutes": 30})
+    html = client.get("/notizie").get_data(as_text=True)
+    assert 'data-updated="2026-09-25T10:00:00Z"' in html and 'data-next="2026-09-25T10:30:00Z"' in html
+    assert "le fonti vengono lette ogni 30 minuti" in html

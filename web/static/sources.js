@@ -24,13 +24,14 @@
       var on = btn.getAttribute("data-group-all") === "1";
       g.querySelectorAll("input[type=checkbox]").forEach(function (c) { c.checked = on; });
       var count = g.querySelector(".group-count");
-      if (count) count.textContent = (on ? g.querySelectorAll("input[type=checkbox]").length : 0) + " seguite";
+      if (count) count.textContent = (on ? g.querySelectorAll("input[type=checkbox]").length : 0) + " selezionate";
+      g.dispatchEvent(new Event("change", { bubbles: true }));   // il sito statico salva a ogni cambio
     });
   });
   groups.forEach(function (g) {
     g.addEventListener("change", function () {
       var count = g.querySelector(".group-count");
-      if (count) count.textContent = g.querySelectorAll("input[type=checkbox]:checked").length + " seguite";
+      if (count) count.textContent = g.querySelectorAll("input[type=checkbox]:checked").length + " selezionate";
     });
   });
 })();

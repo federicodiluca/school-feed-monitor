@@ -3,7 +3,7 @@
 // (che si salta se node o jsdom non ci sono).
 //
 //   node tests/site_check.js <cartella del sito generato>
-const { JSDOM, VirtualConsole } = require("jsdom");
+const { JSDOM, VirtualConsole, CookieJar } = require("jsdom");
 const fs = require("fs");
 const path = require("path");
 
@@ -12,11 +12,11 @@ const BASE = "https://esempio.github.io/school-feed-monitor";
 const read = (p) => fs.readFileSync(path.join(SITE, p), "utf8");
 const scripts = ["static/app.js", "static/area.js", "static/sources.js"].map(read);
 
-function open(pagePath, url) {
+function open(pagePath, url, cookieJar) {
   // jsdom non sa navigare: il salvataggio fa location.href = ... ed è normale che protesti
   const quiet = new VirtualConsole();
   quiet.on("jsdomError", (e) => { if (!/Not implemented: navigation/.test(e.message)) console.error(e.message); });
-  const dom = new JSDOM(read(pagePath), { url, runScripts: "outside-only", pretendToBeVisual: true,
+  const dom = new JSDOM(read(pagePath), { url, runScripts: "outside-only", pretendToBeVisual: true, cookieJar,
                                           virtualConsole: quiet });
   const w = dom.window;
   w.fetch = (u) => {
@@ -58,29 +58,63 @@ const click = (w, el) => el.dispatchEvent(new w.MouseEvent("click", { bubbles: t
 
   // --- /configura: area -> fonti -> salva -> telegram
   console.log("pagina /configura");
-  { const { w, errors, doc } = open("configura/index.html", BASE + "/configura");
+  const jar = new CookieJar();
+  { const { w, errors, doc } = open("configura/index.html", BASE + "/configura/", jar);
     await wait(100);
     check("nessun errore JS", errors.length === 0, errors.join("; "));
+    check("niente pulsanti «Salva» né «Spunta»: si salva da solo",
+          !doc.querySelector('button[value="area"]') && doc.querySelectorAll("#fonti button[type=submit]").length === 1);
     const region = doc.querySelector('input[name=regions][value="Sicilia"]');
     region.checked = true; region.dispatchEvent(new w.Event("change", { bubbles: true }));
     const provFieldset = doc.querySelector('fieldset.provinces[data-region="Sicilia"]');
     check("le province della regione si mostrano", provFieldset && !provFieldset.hidden);
-    const areaBtn = doc.querySelector('button[value="area"]');
-    areaBtn.click ? areaBtn.click() : click(w, areaBtn);
     await wait(200);
     const checked = doc.querySelectorAll('input[name=sources]:checked').length;
-    check("il pulsante area spunta le fonti", checked > 0, checked + " fonti");
+    check("spuntare la regione spunta subito le sue fonti", checked > 0, checked + " fonti");
     check("il contatore si aggiorna", doc.getElementById("sources-selected").textContent === String(checked));
-    doc.getElementById("keywords").value = "A041, sostegno";
-    doc.querySelector('button.primary[type=submit]').click();
+    check("e le salva nei cookie senza premere nulla", /sfm_fonti=/.test(doc.cookie), doc.cookie.slice(0, 60));
+    check("lo stato dice che è salvato", /Salvato/.test(doc.getElementById("save-status").textContent));
+
+    const palermo = doc.querySelector('input[name=provinces][value="Sicilia|Palermo"]');
+    palermo.checked = true; palermo.dispatchEvent(new w.Event("change", { bubbles: true }));
     await wait(200);
-    check("le preferenze finiscono nei cookie", /sfm_fonti=/.test(doc.cookie) && /sfm_parole=/.test(doc.cookie), doc.cookie.slice(0, 80));
+    const names = Array.from(doc.querySelectorAll('input[name=sources]:checked')).map(b => b.parentNode.textContent);
+    check("scegliere una provincia lascia solo il suo USP", names.some(n => /Palermo/.test(n)) && !names.some(n => /USP Catania/.test(n)),
+          names.length + " fonti");
+
+    const one = doc.querySelector('input[name=sources]:not(:checked)');
+    one.checked = true; one.dispatchEvent(new w.Event("change", { bubbles: true }));
+    await wait(50);
+    check("un clic su una fonte si salva subito", decodeURIComponent(doc.cookie).includes(one.value));
+
+    const kw = doc.getElementById("keywords");
+    kw.value = "A041, sostegno"; kw.dispatchEvent(new w.Event("input", { bubbles: true }));
+    await wait(700);
+    check("le parole chiave si salvano mentre scrivi", /sfm_parole=A041/.test(doc.cookie), doc.cookie.slice(0, 120));
+
+    const group = Array.from(doc.querySelectorAll("details.source-group"))
+      .find(g => g.querySelector("input[name=sources]:not(:checked)"));
+    const before = doc.cookie;
+    group.querySelector('[data-group-all="1"]').click();
+    await wait(50);
+    check("«tutte» di un gruppo si salva", doc.cookie !== before);
+
     const tg = doc.querySelector('button[value="telegram"]');
     tg.click();
     await wait(200);
     const out = doc.getElementById("telegram-out");
     check("il link a Telegram compare", !out.hidden && /t\.me\/SfmBot\?start=C1/.test(out.innerHTML),
           (out.textContent.match(/\/start \S+/) || [""])[0]);
+  }
+
+  // riaprendo la pagina (stessi cookie), fonti, parole e aree salvate tornano com'erano
+  { const { errors, doc } = open("configura/index.html", BASE + "/configura/", jar);
+    await wait(200);
+    check("nessun errore JS alla riapertura", errors.length === 0, errors.join("; "));
+    check("le parole chiave tornano", doc.getElementById("keywords").value === "A041, sostegno");
+    check("la regione torna spuntata", doc.querySelector('input[name=regions][value="Sicilia"]').checked);
+    check("e anche la provincia scelta", doc.querySelector('input[name=provinces][value="Sicilia|Palermo"]').checked &&
+          !doc.querySelector('input[name=provinces][value="Sicilia|Catania"]').checked);
   }
   process.exit(ok ? 0 : 1);
 })();

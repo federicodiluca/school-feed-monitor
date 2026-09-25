@@ -14,9 +14,6 @@ tiene solo quello che riguarda la versione in produzione; il resto è lì.
 
 ## Da fare tu (fuori dal repo)
 
-- [ ] **SEO — sitemap dichiarata alla radice del dominio.** Il sito sta in una sottocartella,
-  quindi il `robots.txt` che Google legge è quello del repo `federicodiluca.github.io`:
-  aggiungere lì `Sitemap: https://federicodiluca.github.io/school-feed-monitor/sitemap.xml`
 - [ ] **Google Search Console**: registrare la proprietà come *prefisso URL*
   (`https://federicodiluca.github.io/school-feed-monitor/`) e inviare la sitemap
 - [ ] **Cron sulla VM**: pubblicazione oraria del sito + backup notturno (righe in
@@ -67,6 +64,13 @@ tiene solo quello che riguarda la versione in produzione; il resto è lì.
       fuori regione e di quelle "seguite da tutti")
 - [x] SEO: pagina `/fonti` (113 link interni), JSON-LD, `lastmod` nella sitemap, meta description
 - [x] Chi blocca il bot viene sospeso invece di essere ritentato a ogni notizia
+- [x] SEO: sitemap dichiarata nel `robots.txt` alla radice del dominio; URL con la barra finale
+      (canonical, sitemap e link interni puntavano a indirizzi che Pages rimanda con un 301);
+      JSON-LD della home senza il prefisso ripetuto
+- [x] `/sources` e `/start` sul bot: niente più elenco di 113 fonti, solo quelle seguite e un
+      pulsante per area
+- [x] Configuratore: si salva a ogni clic, resta solo «Porta su Telegram»
+- [x] Ogni pagina dice quando è stata aggiornata e quando arriva il prossimo aggiornamento
 - [x] Ponte europeo (`deploy/eu-proxy/`) per le fonti che rifiutano gli IP esteri — non serve
       finché la macchina sta in Italia, ma è pronto
 - [x] Licenza AGPL-3.0 con consenso di tutti i contributor

@@ -5,8 +5,9 @@
 {% block content %}
 <div class="page-head">
   <h1>Le tue fonti e le tue parole</h1>
-  <p>Nessun account: quello che scegli resta <strong>nel tuo browser</strong>. Compili una volta sola e salvi in fondo;
-    se poi vuoi ricevere gli avvisi, porti la stessa configurazione sul bot Telegram con un clic.</p>
+  <p>Nessun account: quello che scegli resta <strong>nel tuo browser</strong>{% if static_mode %} e viene salvato a ogni
+    clic, senza pulsanti da premere{% endif %}. Se poi vuoi ricevere gli avvisi, porti la stessa configurazione sul bot
+    Telegram con un clic.</p>
 </div>
 
 <form {% if not static_mode %}method="post" action="{{ url_for('config.save') }}"{% endif %} id="fonti">
@@ -15,7 +16,8 @@
   <section class="card">
     <h2>1. Da dove vuoi le notizie?</h2>
     <p class="muted">Seleziona una o più regioni — dove lavori e, se ti interessa, dove vorresti trasferirti — e le
-      province. È una scorciatoia: spunta per te le fonti qui sotto, che puoi comunque ritoccare.</p>
+      province. È una scorciatoia: spunta per te le fonti qui sotto{% if static_mode %} (Ministero compreso){% endif %},
+      che puoi comunque ritoccare.</p>
     <fieldset>
       <legend>Regioni</legend>
       <ul class="sources regions">
@@ -35,10 +37,12 @@
       </ul>
     </fieldset>
     {% endfor %}
+    {% if not static_mode %}
     <button type="submit" name="azione" value="area" class="button"
-            {% if not static_mode %}formaction="{{ url_for('config.area') }}" formmethod="post"{% endif %}>
+            formaction="{{ url_for('config.area') }}" formmethod="post">
       Spunta le fonti di queste aree
     </button>
+    {% endif %}
   </section>
 
   <section class="card" id="fonti-elenco">
@@ -70,9 +74,15 @@
     <textarea name="keywords" id="keywords" aria-label="Parole chiave">{{ keywords | join(', ') }}</textarea>
   </section>
 
-  <div class="card actions">
+  <div class="card actions{% if static_mode %} sticky-actions{% endif %}">
+    {% if static_mode %}
+    <p class="save-status" id="save-status" role="status" aria-live="polite">Le scelte vengono salvate in questo browser a ogni clic.</p>
+    <a class="button" id="go-mine" href="{{ url_for('news.mine') }}">Vedi le mie notizie</a>
+    <button type="submit" name="azione" value="telegram" class="button primary">{{ icon('send', 18) }} Porta su Telegram</button>
+    {% else %}
     <button type="submit" class="button primary">Salva in questo browser</button>
     <button type="submit" name="azione" value="telegram" class="button">{{ icon('send', 18) }} Salva e porta su Telegram</button>
+    {% endif %}
   </div>
 </form>
 
@@ -82,7 +92,7 @@
     <div id="telegram-out" hidden></div>
     <p id="telegram-hint">Sul sito le notizie le leggi quando vuoi. Il bot Telegram invece <strong>ti avvisa</strong>:
       subito quando esce una notizia con le tue parole chiave, e con un riepilogo una volta al giorno.
-      Usa «Salva e porta su Telegram» qui sopra.</p>
+      Usa «Porta su Telegram» qui sopra.</p>
   {% elif code %}
     <p>La tua configurazione è pronta. Apri il bot e il codice verrà applicato da solo:</p>
     {% set link = telegram_link(code) %}

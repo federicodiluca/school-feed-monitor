@@ -240,3 +240,12 @@ details.source-group summary .group-count { font-weight: 400; font-size: .85rem;
 details.source-group summary .group-actions { margin-left: auto; font-weight: 400; font-size: .85rem; }
 details.source-group .sources { padding: 4px 12px 10px 28px; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* Configuratore: le scelte si salvano da sole, la barra con lo stato e «Porta su Telegram» resta a vista */
+.sticky-actions { position: sticky; bottom: var(--space-3); z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); box-shadow: var(--shadow); }
+.save-status { margin: 0; flex: 1 1 16rem; color: var(--muted); font-size: .92rem; }
+.save-status.saved { color: var(--fg-2); }
+
+/* Ultimo aggiornamento, in fondo a ogni pagina */
+.freshness { font-size: .9rem; }
+.freshness.late { color: var(--accent-fg); }

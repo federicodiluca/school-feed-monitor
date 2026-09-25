@@ -14,6 +14,30 @@
       navigator.serviceWorker.register(BASE + "/sw.js").catch(function () { /* niente PWA, pazienza */ });
     });
   }
+  // --- ultimo aggiornamento: "N minuti fa" e avviso se il prossimo non è arrivato -------
+  // L'ora è scritta nella pagina quando viene generata: se il sito non si aggiorna, solo il
+  // browser può accorgersene (vedi web/freshness.py e _freshness.html).
+  function ago(minutes) {
+    if (minutes < 2) return "poco fa";
+    if (minutes < 60) return minutes + " minuti fa";
+    var hours = Math.floor(minutes / 60);
+    if (hours < 48) return hours === 1 ? "un'ora fa" : hours + " ore fa";
+    return Math.floor(hours / 24) + " giorni fa";
+  }
+
+  document.querySelectorAll(".freshness[data-updated]").forEach(function (el) {
+    var updated = Date.parse(el.dataset.updated);
+    if (isNaN(updated)) return;
+    var minutes = Math.max(0, Math.round((Date.now() - updated) / 60000));
+    var slot = el.querySelector(".freshness-ago");
+    if (slot) slot.textContent = " (" + ago(minutes) + ")";
+    if (minutes > Number(el.dataset.lateAfter || 90)) {
+      el.classList.add("late");
+      el.appendChild(document.createTextNode(" L'aggiornamento previsto non è ancora arrivato: " +
+        "le notizie più recenti potrebbero mancare, controlla anche i siti ufficiali."));
+    }
+  });
+
   if (!STATIC) return;
 
   // --- preferenze nei cookie (stessi nomi del server: sfm_fonti, sfm_parole) ------------
@@ -226,7 +250,7 @@
       var names = src.items.filter(function (s) { return chosen.indexOf(s.id) !== -1; }).length;
       intro.innerHTML = "Dalle <strong>" + names + " fonti</strong> che hai scelto in questo browser" +
         (keywords.length ? ", con evidenziate le tue parole chiave: <strong>" + escapeHtml(keywords.join(", ")) + "</strong>" : "") +
-        '. <a href="' + BASE + '/configura">Modifica la selezione</a>.';
+        '. <a href="' + BASE + '/configura/">Modifica la selezione</a>.';
     });
 
     function apply() {
@@ -249,20 +273,20 @@
   }
 
   // --- pagina /configura -------------------------------------------------------------------
+  // Niente pulsante «Salva»: ogni clic finisce subito nei cookie. Resta solo «Porta su Telegram».
   function initConfigPage() {
     var formSources = document.getElementById("fonti");
     if (!formSources) return;
     var boxes = Array.prototype.slice.call(formSources.querySelectorAll("input[name=sources]"));
     var keywordsField = document.getElementById("keywords");
+    var status = document.getElementById("save-status");
 
     // 1. ripristina la scelta salvata nel browser
     var chosen = prefs.sources();
     boxes.forEach(function (b) { b.checked = chosen.indexOf(Number(b.value)) !== -1; });
     if (keywordsField) keywordsField.value = prefs.keywords().join(", ");
     refreshGroups();
-    formSources.addEventListener("change", function (e) {
-      if (e.target && e.target.name === "sources") refreshGroups();
-    });
+    data("sources").then(restoreAreas);
 
     function refreshGroups() {
       var total = document.getElementById("sources-selected");
@@ -284,54 +308,110 @@
         .map(function (k) { return k.trim().slice(0, 60); }).filter(Boolean).slice(0, 30);
     }
 
-    // 2. scorciatoia per area: spunta le fonti, senza ricaricare né salvare
-    function applyArea() {
-      var regions = Array.prototype.slice.call(formSources.querySelectorAll("input[name=regions]:checked"))
-        .map(function (b) { return b.value; });
-      if (!regions.length) { flash("Scegli almeno una regione.", "error"); return; }
-      var wanted = {};
-      regions.forEach(function (r) { wanted[r] = []; });
-      formSources.querySelectorAll("input[name=provinces]:checked").forEach(function (b) {
-        var parts = b.value.split("|");
-        if (wanted[parts[0]]) wanted[parts[0]].push(parts[1]);
-      });
-      data("sources").then(function (src) {
-        var ids = src.items.filter(function (s) {
-          if (s.kind === "mim") return true;
-          if (!s.region || !wanted[s.region]) return false;
-          if (s.kind === "usr") return true;
-          if (s.kind !== "usp") return false;
-          var asked = wanted[s.region];
-          return !asked.length || (s.province || "").split("|").some(function (p) { return asked.indexOf(p) !== -1; });
-        }).map(function (s) { return s.id; });
-        boxes.forEach(function (b) { b.checked = ids.indexOf(Number(b.value)) !== -1; });
-        refreshGroups();
-        flash("Spuntate " + ids.length + " fonti per: " + regions.join(", ") + ". Controllale e salva in fondo.");
-        var list = document.getElementById("fonti-elenco");
-        if (list && list.scrollIntoView) list.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
-
-    // 3. salvataggio nel browser e passaggio a Telegram
-    formSources.addEventListener("submit", function (e) {
-      e.preventDefault();
-      var azione = (e.submitter && e.submitter.value) || "";
-      if (azione === "area") { applyArea(); return; }
-      var wantTelegram = azione === "telegram";
+    // 2. salvataggio automatico
+    function save() {
       var picked = selected();
       var keywords = currentKeywords();
       prefs.save(picked.map(function (b) { return Number(b.value); }), keywords);
       updateNav();
-      if (!wantTelegram) {
-        flash("Fatto: " + picked.length + " fonti e " + keywords.length + " parole chiave, salvate in questo browser.");
-        location.href = BASE + "/le-mie-notizie";
-        return;
+      if (status) {
+        status.textContent = "✓ Salvato in questo browser: " + picked.length + " fonti" +
+          (keywords.length ? " e " + keywords.length + " parole chiave" : "") + ".";
+        status.className = "save-status saved";
       }
+    }
+
+    var typing = null;
+    formSources.addEventListener("change", function (e) {
+      var name = e.target && e.target.name;
+      if (name === "regions" || name === "provinces") { applyArea(e.target); return; }
+      refreshGroups();          // anche i «tutte/nessuna» di un gruppo (sources.js), che non hanno name
+      save();
+    });
+    if (keywordsField) {
+      keywordsField.addEventListener("input", function () {
+        clearTimeout(typing);
+        typing = setTimeout(save, 500);
+      });
+    }
+
+    // 3. scorciatoia per area: tocca solo le fonti della regione cambiata, così i ritocchi
+    //    fatti a mano sulle altre restano. Il Ministero si aggiunge alla prima area scelta.
+    function wantedProvinces(region) {
+      return Array.prototype.slice.call(formSources.querySelectorAll("input[name=provinces]:checked"))
+        .map(function (b) { return b.value.split("|"); })
+        .filter(function (p) { return p[0] === region; })
+        .map(function (p) { return p[1]; });
+    }
+
+    function applyArea(input) {
+      var region = input.value.split("|")[0];
+      var regionBox = formSources.querySelector('input[name=regions][value="' + region.replace(/"/g, '\\"') + '"]');
+      var on = !!(regionBox && regionBox.checked);
+      data("sources").then(function (src) {
+        var asked = on ? wantedProvinces(region) : [];
+        var set = {};
+        src.items.forEach(function (s) {
+          if (s.region !== region || (s.kind !== "usr" && s.kind !== "usp")) return;
+          var want = on && (s.kind === "usr" || !asked.length ||
+            (s.province || "").split("|").some(function (p) { return asked.indexOf(p) !== -1; }));
+          set[s.id] = want;
+        });
+        if (on) src.items.forEach(function (s) { if (s.kind === "mim" && !selected().length) set[s.id] = true; });
+        var changed = 0;
+        boxes.forEach(function (b) {
+          var id = Number(b.value);
+          if (id in set && b.checked !== set[id]) { b.checked = set[id]; changed++; }
+        });
+        refreshGroups();
+        save();
+        if (status && changed) {
+          status.textContent += " " + (on ? "Aggiornate le fonti di " : "Tolte le fonti di ") + region + ".";
+        }
+      });
+    }
+
+    // alla riapertura rispunta le regioni (e le province) che corrispondono alle fonti salvate
+    function restoreAreas(src) {
+      var ids = prefs.sources();
+      if (!ids.length) return;
+      var byRegion = {};
+      src.items.forEach(function (s) {
+        if (!s.region || (s.kind !== "usr" && s.kind !== "usp")) return;
+        var r = byRegion[s.region] || (byRegion[s.region] = { any: false, usp: [], picked: [] });
+        if (ids.indexOf(s.id) !== -1) r.any = true;
+        if (s.kind === "usp") {
+          r.usp.push(s);
+          if (ids.indexOf(s.id) !== -1) r.picked.push(s);
+        }
+      });
+      Object.keys(byRegion).forEach(function (region) {
+        var r = byRegion[region];
+        var box = formSources.querySelector('input[name=regions][value="' + region.replace(/"/g, '\\"') + '"]');
+        if (!box || !r.any) return;
+        box.checked = true;
+        box.dispatchEvent(new Event("change", { bubbles: false }));   // area.js mostra le province
+        if (r.picked.length && r.picked.length < r.usp.length) {
+          r.picked.forEach(function (s) {
+            (s.province || "").split("|").forEach(function (p) {
+              var pb = formSources.querySelector('input[name=provinces][value="' + (region + "|" + p).replace(/"/g, '\\"') + '"]');
+              if (pb) pb.checked = true;
+            });
+          });
+        }
+      });
+    }
+
+    // 4. passaggio a Telegram
+    formSources.addEventListener("submit", function (e) {
+      e.preventDefault();
+      save();
+      var picked = selected();
       if (!picked.length) {
         flash("Scegli almeno una fonte prima di portare la configurazione su Telegram.", "error");
         return;
       }
-      showTelegram(picked, keywords);
+      showTelegram(picked, currentKeywords());
     });
 
     function showTelegram(picked, keywords) {
@@ -367,7 +447,7 @@
       });
     }
 
-    // 4. esporta e dimentica
+    // 5. esporta e dimentica
     var exportBtn = document.getElementById("export-prefs");
     if (exportBtn) {
       exportBtn.addEventListener("click", function (e) {
@@ -395,6 +475,11 @@
         e.preventDefault();
         prefs.forget();
         boxes.forEach(function (b) { b.checked = false; });
+        formSources.querySelectorAll("input[name=regions]:checked").forEach(function (b) {
+          b.checked = false;
+          b.dispatchEvent(new Event("change", { bubbles: false }));   // area.js nasconde le province
+        });
+        if (status) { status.textContent = "Preferenze cancellate da questo browser."; status.className = "save-status"; }
         if (keywordsField) keywordsField.value = "";
         refreshGroups();
         updateNav();

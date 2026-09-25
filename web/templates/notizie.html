@@ -30,6 +30,7 @@
   {% else %}Questo è quello che {{ app_name }} raccoglie ogni giorno da <a href="{{ url_for('news.sources') }}">{{ sources | length }} fonti</a>.
   <a href="{{ url_for('config.show') }}">Scegli le tue fonti</a> per vedere solo ciò che ti interessa, qui o su Telegram.{% endif %}
 </p>
+{% include "_freshness.html" %}
 </div>
 
 <form method="get" class="filters" role="search" id="news-filters"{% if static_mode %} data-live="1"{% endif %}>
@@ -62,3 +63,5 @@
 </nav>
 {% endif %}
 {% endblock %}
+
+{% block footer_freshness %}{% endblock %}{# già in testa alla pagina #}

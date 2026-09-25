@@ -21,7 +21,7 @@ from sfm.db_news import search_news
 from sfm.db_sources import sync_config_sources
 from sfm.env import env, env_bool
 from sfm.utils import format_local_datetime, strip_html
-from web import prefs, seo, security
+from web import freshness, prefs, seo, security
 from web.configurator import bp as config_bp, telegram_link
 from web.news import bp as news_bp, source_url
 
@@ -38,8 +38,17 @@ def giorno_it(d):
     return f"{_GIORNI[d.weekday()].capitalize()} {d.day} {_MESI[d.month - 1]} {d.year}"
 
 
+class SiteFlask(Flask):
+    """Sul sito statico gli URL delle pagine finiscono con la barra (vedi seo.page_path).
+    Passa da qui sia url_for nei template sia quello chiamato dal codice Python."""
+
+    def url_for(self, endpoint, *args, **values):
+        url = super().url_for(endpoint, *args, **values)
+        return seo.page_path(url) if self.config.get("STATIC") else url
+
+
 def create_app(test_config=None):
-    app = Flask(__name__, template_folder="templates", static_folder="static")
+    app = SiteFlask(__name__, template_folder="templates", static_folder="static")
 
     secret = env("SECRET_KEY")
     debug = env_bool("FLASK_DEBUG", False)
@@ -120,6 +129,7 @@ def create_app(test_config=None):
                 "bot_username": app.config.get("TELEGRAM_BOT_USERNAME", ""),
                 "contact_email": app.config.get("CONTACT_EMAIL", ""),
                 "telegram_link": telegram_link,
+                "freshness": freshness.freshness(),
                 "has_prefs": prefs.has_preferences(),
                 "n_prefs_sources": len(prefs.selected_source_ids())}
 

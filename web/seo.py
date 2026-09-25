@@ -25,9 +25,24 @@ def origin(base):
     return f"{parts.scheme}://{parts.netloc}" if parts.scheme and parts.netloc else base.rstrip("/")
 
 
+def page_path(url):
+    """Sul sito statico ogni pagina è una cartella con index.html, e GitHub Pages porta
+    /notizie su /notizie/ con un 301: canonical, sitemap e link interni devono usare già
+    l'indirizzo con la barra, o Google trova un canonical che punta a un redirect.
+    I file veri (style.css, sitemap.xml, esporta.json...) restano come sono."""
+    path, sep, rest = url.partition("?") if "?" in url else url.partition("#")
+    last = path.rsplit("/", 1)[-1]
+    if path.endswith("/") or "." in last:
+        return url
+    return path + "/" + sep + rest
+
+
 def canonical_url(req=None):
     """URL canonico della pagina corrente (senza query string), basato su APP_BASE_URL se impostato."""
     req = req or request
+    if current_app.config.get("STATIC"):
+        # BASE_URL porta già il prefisso di Pages, che è anche in script_root
+        return origin(current_app.config["BASE_URL"]) + page_path(req.script_root + req.path)
     base = current_app.config.get("BASE_URL") or req.url_root.rstrip("/")
     return base + req.path
 
@@ -46,9 +61,11 @@ def init_app(app):
     @app.get("/sitemap.xml")
     def sitemap():
         base = app.config.get("BASE_URL") or request.url_root.rstrip("/")
-        entries = [(url_for(endpoint), prio, freq) for endpoint, prio, freq in PUBLIC_PAGES]
-        entries = [(path, prio, freq, None) for path, prio, freq in entries]
         last = latest_per_source()
+        newest = max((d or "" for d in last.values()), default="")[:10] or None
+        # home e /notizie cambiano con l'ultima notizia arrivata, da qualunque fonte
+        entries = [(url_for(endpoint), prio, freq, newest if endpoint in ("index", "news.index") else None)
+                   for endpoint, prio, freq in PUBLIC_PAGES]
         entries += [(source_url(s), "0.7", "daily", (last.get(s["id"]) or "")[:10]) for s in get_sources()]
         host = origin(base)
         urls = "".join(
