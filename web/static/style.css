@@ -249,3 +249,10 @@ details.source-group .sources { padding: 4px 12px 10px 28px; }
 /* Ultimo aggiornamento, in fondo a ogni pagina */
 .freshness { font-size: .9rem; }
 .freshness.late { color: var(--accent-fg); }
+
+/* Stato delle fonti (/fonti) */
+.source-status-list { margin: 0 0 var(--space-3); padding-left: 1.2rem; }
+.source-status-list li { margin-bottom: var(--space-1); }
+.state { display: inline-block; font-size: .82rem; padding: 0 .45rem; border-radius: var(--radius-pill); background: var(--surface-2); color: var(--fg-2); }
+.state-failing, .state-drift { background: var(--danger-soft); color: var(--danger); }
+.state-silent { background: var(--accent-soft); color: var(--accent-fg); }

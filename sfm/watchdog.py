@@ -132,33 +132,63 @@ def _hours_ago(value, now):
     return None if dt is None else (now - dt).total_seconds() / 3600
 
 
+# Stati di una fonte, dal peggiore al migliore. Li usano sia gli avvisi all'admin sia la pagina
+# pubblica /fonti, così i due dicono sempre la stessa cosa.
+STATE_DRIFT, STATE_FAILING, STATE_SILENT, STATE_NEW, STATE_OK = "drift", "failing", "silent", "new", "ok"
+
+
+def source_states(now=None, sources=None):
+    """{source_id: {"state", "failures", "silent_hours", "last_success_at", "last_new_item_at", "error"}}.
+    'new' = mai letta finora (fonte appena aggiunta o bot mai partito)."""
+    now = now or datetime.now(timezone.utc)
+    th = thresholds()
+    health = {h["source_id"]: h for h in get_source_health()}
+    states = {}
+    for source in (sources if sources is not None else get_sources()):
+        h = health.get(source["id"]) or {}
+        info = {"state": STATE_OK, "failures": h.get("consecutive_failures") or 0, "silent_hours": None,
+                "last_success_at": h.get("last_success_at"), "last_new_item_at": h.get("last_new_item_at"),
+                "last_items": h.get("last_items"), "error": h.get("last_error")}
+        if source_drift(source):
+            info["state"] = STATE_DRIFT
+        elif not h:
+            info["state"] = STATE_NEW
+        elif info["failures"] >= th["failures"]:
+            info["state"] = STATE_FAILING      # se fallisce, la silenziosità è una conseguenza
+        else:
+            # silenzio misurato fino all'ultima lettura riuscita, non fino ad adesso: se si ferma
+            # il bot (se ne occupa l'avviso sul job), le fonti non diventano tutte "silenziose"
+            checked = min(now, _parse_utc(h.get("last_success_at")) or now)
+            since = _hours_ago(h.get("last_new_item_at") or h.get("first_seen_at"), checked)
+            if since is not None and since >= th["silence_hours"]:
+                info["state"], info["silent_hours"] = STATE_SILENT, since
+        states[source["id"]] = info
+    return states
+
+
 def find_problems(now=None):
     """Ritorna {key: messaggio} dei problemi attuali."""
     now = now or datetime.now(timezone.utc)
     th = thresholds()
     problems = {}
 
-    health = {h["source_id"]: h for h in get_source_health()}
-    for source in get_sources():
-        name = source["name"]
-        if source_drift(source):
+    sources = get_sources()
+    states = source_states(now, sources)
+    for source in sources:
+        name, info = source["name"], states[source["id"]]
+        if info["state"] == STATE_DRIFT:
             problems[f"source:{source['id']}:drift"] = (
                 f"la fonte «{name}» pubblica notizie che puntano a un altro sito "
                 f"(atteso {site_of(source['url'])}): dominio scaduto o feed cambiato?"
             )
-        h = health.get(source["id"])
-        if not h:
-            continue
-        if h["consecutive_failures"] >= th["failures"]:
+        if info["state"] == STATE_FAILING or (info["state"] == STATE_DRIFT and info["failures"] >= th["failures"]):
             problems[f"source:{source['id']}:failing"] = (
-                f"la fonte «{name}» fallisce da {h['consecutive_failures']} letture consecutive: {h.get('last_error') or '?'}"
+                f"la fonte «{name}» fallisce da {info['failures']} letture consecutive: {info['error'] or '?'}"
             )
-            continue  # se fallisce, la silenziosità è una conseguenza
-        since = _hours_ago(h.get("last_new_item_at") or h.get("first_seen_at"), now)
-        if since is not None and since >= th["silence_hours"]:
+        elif info["state"] == STATE_SILENT:
             problems[f"source:{source['id']}:silent"] = (
-                f"la fonte «{name}» non produce notizie nuove da {int(since)} ore "
-                f"(letture ok, {h.get('last_items') or 0} elementi): forse è cambiata la struttura della pagina"
+                f"la fonte «{name}» non produce notizie nuove da {int(info['silent_hours'])} ore "
+                f"(letture ok, {info['last_items'] or 0} elementi): forse è cambiata la struttura della pagina"
             )
 
     runs = get_job_runs()

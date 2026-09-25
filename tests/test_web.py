@@ -236,3 +236,17 @@ def test_freshness_follows_the_last_read_of_the_sources(client, monkeypatch):
     html = client.get("/notizie").get_data(as_text=True)
     assert 'data-updated="2026-09-25T10:00:00Z"' in html and 'data-next="2026-09-25T10:30:00Z"' in html
     assert "le fonti vengono lette ogni 30 minuti" in html
+
+
+def test_sources_page_says_which_sources_are_working(client, catalog_db):
+    from sfm.db_health import record_source_failure, record_source_success
+    bologna, palermo = catalog_db["USP Bologna"], catalog_db["USP Palermo"]
+    for s in catalog_db.values():
+        record_source_success(s["id"], 5, 1)
+    for _ in range(3):
+        record_source_failure(bologna["id"], "HTTPSConnectionPool(host='10.0.0.1'): proxy segreto")
+    html = client.get("/fonti").get_data(as_text=True)
+    assert 'id="stato"' in html and f"{len(catalog_db) - 1} fonti su {len(catalog_db)}" in html
+    assert "in errore: non riusciamo a leggerla da 3 tentativi" in html
+    assert "proxy segreto" not in html            # l'errore tecnico resta per l'admin
+    assert palermo["name"] in html

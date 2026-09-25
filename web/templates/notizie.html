@@ -14,8 +14,8 @@
   "breadcrumb": {
     "@context": "https://schema.org", "@type": "BreadcrumbList",
     "itemListElement": [
-      {"@type": "ListItem", "position": 1, "name": {{ app_name | tojson }}, "item": {{ (config.BASE_URL ~ url_for('index')) | tojson }}},
-      {"@type": "ListItem", "position": 2, "name": "Fonti", "item": {{ (config.BASE_URL ~ url_for('news.sources')) | tojson }}},
+      {"@type": "ListItem", "position": 1, "name": {{ app_name | tojson }}, "item": {{ absolute_url(url_for('index')) | tojson }}},
+      {"@type": "ListItem", "position": 2, "name": "Fonti", "item": {{ absolute_url(url_for('news.sources')) | tojson }}},
       {"@type": "ListItem", "position": 3, "name": {{ source.name | tojson }}, "item": {{ canonical | tojson }}}
     ]
   }{% endif %}

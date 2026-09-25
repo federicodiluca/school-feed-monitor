@@ -14,7 +14,7 @@
     "numberOfItems": {{ total }},
     "itemListElement": [
       {%- for group, items in groups %}{% for s in items %}
-      {"@type": "ListItem", "name": {{ s.name | tojson }}, "url": {{ (config.BASE_URL ~ source_url(s)) | tojson }}}{% if not loop.last %},{% endif %}
+      {"@type": "ListItem", "name": {{ s.name | tojson }}, "url": {{ absolute_url(source_url(s)) | tojson }}}{% if not loop.last %},{% endif %}
       {%- endfor %}{% if not loop.last %},{% endif %}{% endfor %}
     ]
   }
@@ -30,6 +30,26 @@
     per vedere solo le loro notizie, qui o su Telegram.</p>
 </div>
 
+{% set n_ok = (by_state.get('ok') or []) | length %}
+{% set suspicious = (by_state.get('failing') or []) + (by_state.get('drift') or []) + (by_state.get('silent') or []) %}
+<section class="card" id="stato">
+  <h2>Stato delle fonti</h2>
+  <p><strong>{{ n_ok }} fonti su {{ total }}</strong> funzionano regolarmente{% if suspicious %}, <strong>{{ suspicious | length }}</strong> sono da tenere d'occhio{% endif %}{% if by_state.get('new') %}, {{ by_state.new | length }} non sono ancora state lette{% endif %}.</p>
+  {% if suspicious %}
+  <ul class="source-status-list">
+    {% for s in suspicious %}
+    <li><a href="{{ source_url(s) }}">{{ s.name }}</a> — {% include "_source_state.html" %}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  <p class="muted">Come lo sappiamo: il bot legge ogni fonte a ogni giro e registra se la lettura riesce e se arrivano
+    notizie nuove. Una fonte è <em>in errore</em> dopo {{ failures }} letture fallite di fila; è <em>silenziosa</em>
+    se non pubblica niente di nuovo da {{ silence_days }} giorni — per un ufficio piccolo può essere normale, ma può anche
+    voler dire che il sito è cambiato e non riusciamo più a leggerlo. In più, ogni lunedì un
+    <a href="https://github.com/federicodiluca/school-feed-monitor/actions/workflows/check-sources.yml" rel="noopener" target="_blank">controllo automatico pubblico</a>
+    rilegge l'intero catalogo. Nel dubbio fa sempre fede il sito ufficiale.</p>
+</section>
+
 {% for group, items in groups %}
 <section class="card">
   <h2 id="{{ group | lower | replace(' ', '-') }}">{{ group }}</h2>
@@ -38,6 +58,7 @@
     <li>
       <a href="{{ source_url(s) }}">{{ s.name }}</a>
       {% if s.kind == 'usp' and s.province %}<small class="muted">{{ s.province.replace('|', ', ') }}</small>{% endif %}
+      {% if s.health.state != 'ok' %}<small class="state state-{{ s.health.state }}">{% include "_source_state.html" %}</small>{% endif %}
       <small class="muted">{% if s.n_news %}{{ s.n_news }} notizie{% if s.last_news %}, ultima il {{ s.last_news[:10] }}{% endif %}{% else %}nessuna notizia raccolta finora{% endif %}</small>
     </li>
     {% endfor %}

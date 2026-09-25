@@ -88,7 +88,8 @@ def test_tracked_fetch_pings_healthcheck(admin_env, monkeypatch):
 
 def test_find_problems_failing_silent_and_stale(admin_env):
     old = NOW - timedelta(hours=80)
-    record_source_success(1, 10, 1, now=old)                # muta da 80h
+    record_source_success(1, 10, 1, now=old)                # ultima novità 80h fa...
+    record_source_success(1, 10, 0, now=NOW)                # ...e letta anche ora, senza novità
     for _ in range(3):
         record_source_failure(2, "HTTP 500", now=NOW)      # 3 fallimenti
     record_job_start(watchdog.JOB_FETCH, now=NOW - timedelta(minutes=60))
@@ -184,3 +185,12 @@ def test_weekly_summary_reports_counts(admin_env, sent_messages):
     assert "Utenti iscritti al bot: 1 (1 attivi)" in lines[2]
     assert any("In errore: Feed Due" in l for l in lines)
     assert sent_messages and "Riepilogo settimanale" in sent_messages[-1]["text"]
+
+
+def test_a_stopped_bot_does_not_make_every_source_silent(admin_env):
+    """Il silenzio si misura fino all'ultima lettura riuscita: se il bot è fermo da giorni,
+    il problema è il job (avviso a parte), non le fonti."""
+    record_source_success(1, 10, 1, now=NOW - timedelta(hours=100))
+    states = watchdog.source_states(NOW)
+    assert states[1]["state"] == watchdog.STATE_OK
+    assert states[2]["state"] == watchdog.STATE_NEW          # mai letta

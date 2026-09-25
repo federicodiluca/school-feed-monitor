@@ -1,0 +1,13 @@
+{#- Stato di una fonte `s` (s.health da sfm.watchdog.source_states), in una frase. -#}
+{%- set h = s.health -%}
+{%- if h.state == 'failing' -%}
+⚠️ in errore: non riusciamo a leggerla da {{ h.failures }} tentativi{% if h.last_success_at %} (ultima lettura riuscita il {{ h.last_success_at | local_datetime }}){% endif %}
+{%- elif h.state == 'drift' -%}
+⚠️ da verificare: le ultime notizie puntano a un altro sito
+{%- elif h.state == 'silent' -%}
+⏸ silenziosa: nessuna notizia nuova da {{ (h.silent_hours // 24) | int }} giorni
+{%- elif h.state == 'new' -%}
+non ancora letta
+{%- else -%}
+✓ attiva
+{%- endif -%}

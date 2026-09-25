@@ -37,6 +37,12 @@ def page_path(url):
     return path + "/" + sep + rest
 
 
+def absolute_url(path):
+    """URL assoluto per un percorso di url_for, che porta già il prefisso di Pages:
+    non va attaccato a BASE_URL, che lo contiene anche lui (prefisso doppio)."""
+    return origin(current_app.config.get("BASE_URL") or request.url_root) + path
+
+
 def canonical_url(req=None):
     """URL canonico della pagina corrente (senza query string), basato su APP_BASE_URL se impostato."""
     req = req or request

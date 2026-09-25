@@ -9,6 +9,7 @@ from sfm.db_news import count_per_source, get_today_news, latest_per_source, sea
 from sfm.db_sources import get_source, get_sources
 from sfm.digest import annotate
 from sfm.utils import slugify
+from sfm.watchdog import source_states, thresholds
 from web import prefs
 
 bp = Blueprint("news", __name__)
@@ -78,8 +79,14 @@ def sources():
     lettore come a un motore di ricerca — le oltre cento pagine per fonte."""
     items = get_sources()
     last, counts = latest_per_source(), count_per_source()
-    items = [dict(s, last_news=last.get(s["id"]), n_news=counts.get(s["id"], 0)) for s in items]
-    return render_template("fonti.html", groups=group_sources(items), total=len(items))
+    states = source_states(sources=items)
+    items = [dict(s, last_news=last.get(s["id"]), n_news=counts.get(s["id"], 0), health=states[s["id"]])
+             for s in items]
+    by_state = {}
+    for s in items:
+        by_state.setdefault(s["health"]["state"], []).append(s)
+    return render_template("fonti.html", groups=group_sources(items), total=len(items), by_state=by_state,
+                           silence_days=thresholds()["silence_hours"] // 24, failures=thresholds()["failures"])
 
 
 @bp.get("/notizie/fonte/<int:source_id>")
