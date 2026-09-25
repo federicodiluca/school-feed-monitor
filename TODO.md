@@ -14,6 +14,8 @@ tiene solo quello che riguarda la versione in produzione; il resto è lì.
 
 ## Da fare tu (fuori dal repo)
 
+- [ ] **Dominio**: registrare `school-feed-monitor.it` (libero al 25/09/2026, ~10 €/anno) e
+  seguire [docs/deploy.md](docs/deploy.md#dominio-personalizzato-es-school-feed-monitorit)
 - [ ] **Google Search Console**: registrare la proprietà come *prefisso URL*
   (`https://federicodiluca.github.io/school-feed-monitor/`) e inviare la sitemap
 - [ ] **Cron sulla VM**: pubblicazione oraria del sito + backup notturno (righe in
@@ -71,6 +73,11 @@ tiene solo quello che riguarda la versione in produzione; il resto è lì.
       pulsante per area
 - [x] Configuratore: si salva a ogni clic, resta solo «Porta su Telegram»
 - [x] Ogni pagina dice quando è stata aggiornata e quando arriva il prossimo aggiornamento
+- [x] Stato pubblico delle fonti su /fonti (attive, in errore, silenziose)
+- [x] Pagine per regione (`/notizie/regione/<regione>/`), immagine di anteprima (og:image)
+- [x] Parole da escludere (bot `/exclude` e configuratore)
+- [x] Anteprima presa dalla pagina della notizia per le fonti HTML che danno solo il titolo
+- [x] Il build scrive il `CNAME` se il sito ha un dominio proprio (passi in docs/deploy.md)
 - [x] Ponte europeo (`deploy/eu-proxy/`) per le fonti che rifiutano gli IP esteri — non serve
       finché la macchina sta in Italia, ma è pronto
 - [x] Licenza AGPL-3.0 con consenso di tutti i contributor

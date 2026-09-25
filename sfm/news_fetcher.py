@@ -1,12 +1,15 @@
 from sfm import notifier
 from sfm.db_deliveries import record_delivery
 from sfm.db_health import record_source_failure, record_source_success
-from sfm.db_news import add_news
+from sfm.db_news import add_news, drop_repeated_content, set_news_content
 from sfm.db_sources import get_followers_map, get_sources
 from sfm.db_user import get_users
 from sfm.logger import log
 from sfm.matching import match_users
-from sfm.source_parser import SourceError, read_source
+from sfm.source_parser import PREVIEW_MIN_CHARS, SourceError, fetch_preview, read_source
+from sfm.utils import strip_html
+
+MAX_PREVIEWS_PER_READ = 10   # pagine di notizie aperte per fonte a ogni giro, per le anteprime
 
 
 def notify_users(users, news):
@@ -25,6 +28,20 @@ def notify_users(users, news):
     return notified
 
 
+def add_preview(source, item, news_id):
+    """Fonti HTML: se la pagina-elenco non dava un testo, lo prende dalla pagina della notizia
+    (idea dal fork di simonkolaaa). Ritorna l'item, con il contenuto se trovato."""
+    preview = fetch_preview(item["link"], item["title"])
+    if not preview or drop_repeated_content(source["id"], preview, news_id):
+        return item
+    set_news_content(news_id, preview)
+    return {**item, "content": preview}
+
+
+def _needs_preview(source, item):
+    return source.get("type") == "html" and len(strip_html(item.get("content") or "").strip()) < PREVIEW_MIN_CHARS
+
+
 def fetch_source(source, followers=None, notify=True):
     """Legge una fonte, salva le news nuove e (se notify) avvisa i follower.
     Ritorna il numero di news nuove."""
@@ -40,13 +57,19 @@ def fetch_source(source, followers=None, notify=True):
         record_source_failure(source["id"], e)
         return 0
 
-    new_count = 0
+    new_count = previews = 0
     for item in items:
         news_id = add_news(item["title"], item["link"], source["name"], item["published"], item["content"],
                            source_id=source["id"])
         if not news_id:
             continue  # news già presente → niente notifica
         new_count += 1
+        if previews < MAX_PREVIEWS_PER_READ and _needs_preview(source, item):
+            previews += 1
+            try:
+                item = add_preview(source, item, news_id)   # prima dell'avviso: anche il testo conta per le parole chiave
+            except Exception as e:
+                log(f"⚠️ Anteprima non disponibile per '{item['title']}': {e}")
 
         if notify and followers:
             news = {**item, "id": news_id, "source": source["name"], "source_id": source["id"]}

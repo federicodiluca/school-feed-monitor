@@ -361,3 +361,78 @@ def read_source(source):
     if not items:
         raise SourceError("nessuna notizia trovata")
     return items
+
+
+# --- anteprima dalla pagina della notizia -----------------------------------------------
+# Molte pagine-elenco HTML danno solo il titolo (circa 3 notizie su 4 nel catalogo). Per le
+# notizie nuove si apre la pagina e si prende la descrizione o il primo paragrafo vero. Tante
+# pagine però contengono solo l'allegato o il numero di protocollo: meglio nessuna anteprima
+# che una di rumore, quindi i filtri sono severi.
+
+PREVIEW_MIN_CHARS = 60
+PREVIEW_MAX_CHARS = 400
+_NOISE = re.compile(r"\.(pdf|docx?|xlsx?|odt|zip|p7m)\b|m_pi\.|\bAOO|protocollo|registro (ufficiale|decreti)|"
+                    r"https?://|www\.|\S@\S|\bPEC\b|cookie|privacy|copyright|©|tutti i diritti|collegamento esterno",
+                    re.IGNORECASE)
+_BOILERPLATE_TAGS = ["script", "style", "nav", "header", "footer", "aside", "form", "noscript", "iframe"]
+_BODY_CLASSES = re.compile(r"entry-content|post-content|article-body|articolo|contenuto|testo|journal-content|field--name-body",
+                           re.IGNORECASE)
+
+
+def _squash(text):
+    return re.sub(r"\s+", " ", text or "").strip()
+
+
+def _useful(text, title):
+    """True se il testo dice qualcosa in più del titolo e non è un allegato, un protocollo o un menu."""
+    if len(text) < PREVIEW_MIN_CHARS or _NOISE.search(text):
+        return False
+    low, title_low = text.lower(), _squash(title).lower()
+    if low == title_low or low in title_low or (title_low and low.startswith(title_low) and len(low) < len(title_low) + 30):
+        return False
+    words = re.findall(r"[^\W\d_]{2,}", text)
+    if len(words) < 8:
+        return False
+    capitalized = sum(1 for w in words if w[0].isupper())
+    return capitalized / len(words) < 0.5          # un menu è fatto quasi solo di Voci Maiuscole
+
+
+def _clip(text):
+    if len(text) <= PREVIEW_MAX_CHARS:
+        return text
+    return text[:PREVIEW_MAX_CHARS].rsplit(" ", 1)[0] + "…"
+
+
+def article_preview(html_data, title=""):
+    """Testo di anteprima dalla pagina di una notizia, oppure "" se non c'è niente di utile."""
+    soup = BeautifulSoup(html_data, "html.parser")
+    for attrs in ({"property": "og:description"}, {"name": "description"}):
+        meta = soup.find("meta", attrs=attrs)
+        text = _squash(meta.get("content") if meta else "")
+        if _useful(text, title):
+            return _clip(text)
+    for tag in soup(_BOILERPLATE_TAGS):
+        tag.decompose()
+    root = soup.find("article") or soup.find(class_=_BODY_CLASSES) or soup.find("main") or soup.body or soup
+    parts = []
+    for p in root.find_all("p"):
+        text = _squash(p.get_text(" "))
+        if _useful(text, title):
+            parts.append(text)
+            if sum(len(x) for x in parts) >= 200:
+                break
+    return _clip(" ".join(parts))
+
+
+def fetch_preview(link, title=""):
+    """Scarica la pagina della notizia e ne estrae l'anteprima; "" se non si riesce."""
+    try:
+        data, content_type = fetch_url(link)
+    except SourceError:
+        return ""
+    if not _looks_like_html(data, content_type):
+        return ""                                   # il link è direttamente un PDF o simili
+    try:
+        return article_preview(data, title)
+    except Exception:
+        return ""

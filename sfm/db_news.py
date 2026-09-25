@@ -168,3 +168,24 @@ def cleanup_old_news(days=7):
     conn.close()
     log(f"🧽 Pulite {deleted} notizie più vecchie di {days} giorni.")
     return deleted
+
+
+def set_news_content(news_id, content):
+    conn = get_conn()
+    conn.execute("UPDATE news SET content=? WHERE id=?", ((content or "")[:MAX_CONTENT_LEN], news_id))
+    conn.commit()
+    conn.close()
+
+
+def drop_repeated_content(source_id, content, news_id):
+    """Se un'altra notizia della stessa fonte ha già questo testo, è testo fisso del sito
+    (presentazione dell'ufficio, piè di pagina...), non un'anteprima: lo toglie a tutte e
+    ritorna True."""
+    conn = get_conn()
+    hit = conn.execute("SELECT 1 FROM news WHERE source_id=? AND content=? AND id<>? LIMIT 1",
+                       (source_id, content, news_id)).fetchone()
+    if hit:
+        conn.execute("UPDATE news SET content='' WHERE source_id=? AND content=?", (source_id, content))
+        conn.commit()
+    conn.close()
+    return bool(hit)
