@@ -170,6 +170,26 @@ Due dettagli:
   `federicodiluca.github.io`: aggiungi lì la riga
   `Sitemap: https://federicodiluca.github.io/school-feed-monitor/sitemap.xml`.
 
+### Dominio personalizzato (es. `school-feed-monitor.it`)
+
+1. **Registra il dominio** da un registrar qualunque (servono circa 10 €/anno; non ci sono .it gratis).
+2. **DNS** del dominio, dal pannello del registrar:
+   - quattro record `A` sulla radice (`@`): `185.199.108.153`, `185.199.109.153`,
+     `185.199.110.153`, `185.199.111.153` (gli IP di GitHub Pages);
+   - un `CNAME` per `www` → `federicodiluca.github.io`.
+3. **In `.env` sulla VM**: `SITE_BASE_URL=https://school-feed-monitor.it` e
+   `APP_BASE_URL=https://school-feed-monitor.it` (la seconda serve ai link nei messaggi del bot),
+   poi riavvia il bot e pubblica. Il build scrive da solo il file `CNAME` a ogni pubblicazione
+   (senza, GitHub dimenticherebbe il dominio al primo aggiornamento).
+4. **Su GitHub**: *Settings → Pages → Custom domain* → `school-feed-monitor.it`; quando il
+   certificato è pronto spunta **Enforce HTTPS**. Conviene prima verificare il dominio
+   (*Settings del profilo → Pages → Add a domain*), così nessun altro può agganciarlo.
+5. **Dopo**: i vecchi indirizzi `federicodiluca.github.io/school-feed-monitor/...` vengono
+   rimandati da GitHub al nuovo dominio. In Search Console aggiungi la proprietà del nuovo
+   dominio, invia `https://school-feed-monitor.it/sitemap.xml` e usa «Cambio di indirizzo».
+   La riga `Sitemap:` nel `robots.txt` di `federicodiluca.github.io` si può togliere: col dominio
+   proprio vale il `robots.txt` generato.
+
 ## 7. Automatismi
 
 ```bash

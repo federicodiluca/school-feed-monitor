@@ -130,3 +130,15 @@ def test_link_previews_have_an_image(site):
     assert f'<meta property="og:image" content="{BASE_URL}/static/og-image.png">' in html
     assert 'name="twitter:card" content="summary_large_image"' in html
     assert os.path.getsize(os.path.join(site, "static", "og-image.png")) > 10_000
+
+
+def test_a_custom_domain_gets_its_cname_file(tmp_path, monkeypatch):
+    monkeypatch.setattr("web.get_config", lambda: {"sites": _sample_catalog()})
+    out = build(str(tmp_path / "dom"), base_url="https://school-feed-monitor.it")
+    assert read(out, "CNAME") == "school-feed-monitor.it\n"
+    assert "Sitemap: https://school-feed-monitor.it/sitemap.xml" in read(out, "robots.txt")
+    assert '<link rel="canonical" href="https://school-feed-monitor.it/notizie/">' in read(out, "notizie", "index.html")
+
+
+def test_github_pages_has_no_cname(site):
+    assert not os.path.exists(os.path.join(site, "CNAME"))

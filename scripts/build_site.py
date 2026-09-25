@@ -122,6 +122,11 @@ def build(out_dir="site", base_url=None, bot_username=None):
                json.dumps(payload, ensure_ascii=False, separators=(",", ":")))
 
     _write(os.path.join(out_dir, ".nojekyll"), "")       # niente Jekyll: i file passano così come sono
+    host = urlsplit(base_url).hostname or ""
+    if host and not host.endswith(".github.io"):
+        # dominio personalizzato: gh-pages viene riscritto a ogni pubblicazione, quindi il CNAME
+        # va rigenerato ogni volta, o GitHub Pages dimentica il dominio al primo aggiornamento
+        _write(os.path.join(out_dir, "CNAME"), host + "\n")
     # spiega a chi capita sul branch gh-pages che è roba generata (non si modifica lì)
     shutil.copy(os.path.join(os.path.dirname(__file__), "..", "web", "site_meta", "README.md"),
                 os.path.join(out_dir, "README.md"))
