@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scegli le tue fonti — School Feed Monitor</title>
+  <meta name="description" content="Scegli gli Uffici Scolastici che ti interessano e le tue parole chiave: le notizie filtrate compaiono sul sito e, se vuoi, sul bot Telegram. Senza registrazione.">
+  <link rel="canonical" href="https://schoolfeedmonitor.federicodiluca.com/configura/">
+  <meta name="author" content="Federico Di Luca">
+  
+  <meta property="og:site_name" content="School Feed Monitor">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Scegli le tue fonti — School Feed Monitor">
+  <meta property="og:description" content="Scegli gli Uffici Scolastici che ti interessano e le tue parole chiave: le notizie filtrate compaiono sul sito e, se vuoi, sul bot Telegram. Senza registrazione.">
+  <meta property="og:url" content="https://schoolfeedmonitor.federicodiluca.com/configura/">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:image" content="https://schoolfeedmonitor.federicodiluca.com/static/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="School Feed Monitor: le notizie di Ministero, USR e USP filtrate per le fonti e le parole che scegli">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#1e3a8a" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/favicon-16x16.png" type="image/png" sizes="16x16">
+  <link rel="icon" href="/static/favicon-32x32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <link rel="mask-icon" href="/static/mask-icon.svg" color="#1e3a8a">
+  <link rel="manifest" href="/static/site.webmanifest">
+  
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/theme.js"></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body data-base="" data-static="1" data-bot="CheckFeedBot">
+  <a class="skip" href="#main">Vai al contenuto</a>
+  <header class="site-header">
+    <nav aria-label="Principale">
+      <a class="brand" href="/"><img src="/static/favicon.svg" alt="" width="28" height="28" class="brand-logo">School Feed Monitor</a>
+      <ul>
+        <li><a href="/notizie/">Notizie</a></li>
+        <li id="nav-mine" hidden><a href="/le-mie-notizie/">Le mie notizie</a></li>
+        <li><a class="button primary" href="/configura/"><span id="nav-config-label">Scegli le fonti</span></a></li>
+        <li><button type="button" id="theme-toggle" class="icon" aria-label="Cambia tema chiaro/scuro" title="Tema chiaro/scuro"><span class="only-light"><svg class="ico-svg " width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></span><span class="only-dark"><svg class="ico-svg " width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg></span></button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main" class="container">
+    
+      
+    
+    
+<div class="page-head">
+  <h1>Le tue fonti e le tue parole</h1>
+  <p>Nessun account: quello che scegli resta <strong>nel tuo browser</strong> e viene salvato a ogni
+    clic, senza pulsanti da premere. Se poi vuoi ricevere gli avvisi, porti la stessa configurazione sul bot
+    Telegram con un clic.</p>
+</div>
+
+<form  id="fonti">
+  
+
+  <section class="card">
+    <h2>1. Da dove vuoi le notizie?</h2>
+    <p class="muted">Seleziona una o più regioni — dove lavori e, se ti interessa, dove vorresti trasferirti — e le
+      province. È una scorciatoia: spunta per te le fonti qui sotto (Ministero compreso),
+      che puoi comunque ritoccare.</p>
+    <fieldset>
+      <legend>Regioni</legend>
+      <ul class="sources regions">
+        
+        <li><label><input type="checkbox" name="regions" value="Abruzzo" data-region="Abruzzo"> Abruzzo</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Basilicata" data-region="Basilicata"> Basilicata</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Calabria" data-region="Calabria"> Calabria</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Campania" data-region="Campania"> Campania</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Emilia-Romagna" data-region="Emilia-Romagna"> Emilia-Romagna</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Friuli-Venezia Giulia" data-region="Friuli-Venezia Giulia"> Friuli-Venezia Giulia</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Lazio" data-region="Lazio"> Lazio</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Liguria" data-region="Liguria"> Liguria</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Lombardia" data-region="Lombardia"> Lombardia</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Marche" data-region="Marche"> Marche</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Molise" data-region="Molise"> Molise</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Piemonte" data-region="Piemonte"> Piemonte</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Puglia" data-region="Puglia"> Puglia</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Sardegna" data-region="Sardegna"> Sardegna</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Sicilia" data-region="Sicilia"> Sicilia</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Toscana" data-region="Toscana"> Toscana</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Trentino-Alto Adige" data-region="Trentino-Alto Adige"> Trentino-Alto Adige</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Umbria" data-region="Umbria"> Umbria</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Valle d&#39;Aosta" data-region="Valle d&#39;Aosta"> Valle d&#39;Aosta</label></li>
+        
+        <li><label><input type="checkbox" name="regions" value="Veneto" data-region="Veneto"> Veneto</label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Abruzzo" hidden>
+      <legend>Province di Abruzzo <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Abruzzo|Chieti"> Chieti
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Abruzzo|L&#39;Aquila"> L&#39;Aquila
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Abruzzo|Pescara"> Pescara
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Abruzzo|Teramo"> Teramo
+          </label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Basilicata" hidden>
+      <legend>Province di Basilicata <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Basilicata|Matera"> Matera
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Basilicata|Potenza"> Potenza
+          </label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Calabria" hidden>
+      <legend>Province di Calabria <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Calabria|Catanzaro"> Catanzaro
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Calabria|Cosenza"> Cosenza
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Calabria|Crotone"> Crotone
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Calabria|Reggio Calabria"> Reggio Calabria
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Calabria|Vibo Valentia"> Vibo Valentia
+          </label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Campania" hidden>
+      <legend>Province di Campania <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Campania|Avellino"> Avellino
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Campania|Benevento"> Benevento
+          <small class="muted" title="Per questa provincia non esiste un sito dell'ufficio provinciale: riceverai le notizie regionali">— solo notizie regionali</small></label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Campania|Caserta"> Caserta
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Campania|Napoli"> Napoli
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Campania|Salerno"> Salerno
+          <small class="muted" title="Per questa provincia non esiste un sito dell'ufficio provinciale: riceverai le notizie regionali">— solo notizie regionali</small></label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Emilia-Romagna" hidden>
+      <legend>Province di Emilia-Romagna <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Emilia-Romagna|Bologna"> Bologna
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Emilia-Romagna|Ferrara"> Ferrara
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Emilia-Romagna|Forlì-Cesena"> Forlì-Cesena
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Emilia-Romagna|Modena"> Modena
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Emilia-Romagna|Parma"> Parma
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Emilia-Romagna|Piacenza"> Piacenza
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Emilia-Romagna|Ravenna"> Ravenna
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Emilia-Romagna|Reggio Emilia"> Reggio Emilia
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Emilia-Romagna|Rimini"> Rimini
+          </label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Friuli-Venezia Giulia" hidden>
+      <legend>Province di Friuli-Venezia Giulia <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Friuli-Venezia Giulia|Gorizia"> Gorizia
+          <small class="muted" title="Per questa provincia non esiste un sito dell'ufficio provinciale: riceverai le notizie regionali">— solo notizie regionali</small></label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Friuli-Venezia Giulia|Pordenone"> Pordenone
+          <small class="muted" title="Per questa provincia non esiste un sito dell'ufficio provinciale: riceverai le notizie regionali">— solo notizie regionali</small></label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Friuli-Venezia Giulia|Trieste"> Trieste
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Friuli-Venezia Giulia|Udine"> Udine
+          <small class="muted" title="Per questa provincia non esiste un sito dell'ufficio provinciale: riceverai le notizie regionali">— solo notizie regionali</small></label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Lazio" hidden>
+      <legend>Province di Lazio <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Lazio|Frosinone"> Frosinone
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Lazio|Latina"> Latina
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Lazio|Rieti"> Rieti
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Lazio|Roma"> Roma
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Lazio|Viterbo"> Viterbo
+          <small class="muted" title="Per questa provincia non esiste un sito dell'ufficio provinciale: riceverai le notizie regionali">— solo notizie regionali</small></label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Liguria" hidden>
+      <legend>Province di Liguria <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Liguria|Genova"> Genova
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Liguria|Imperia"> Imperia
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Liguria|La Spezia"> La Spezia
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Liguria|Savona"> Savona
+          </label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Lombardia" hidden>
+      <legend>Province di Lombardia <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Lombardia|Bergamo"> Bergamo
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Lombardia|Brescia"> Brescia
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Lombardia|Como"> Como
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Lombardia|Cremona"> Cremona
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Lombardia|Lecco"> Lecco
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Lombardia|Lodi"> Lodi
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Lombardia|Mantova"> Mantova
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Lombardia|Milano"> Milano
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Lombardia|Monza e Brianza"> Monza e Brianza
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Lombardia|Pavia"> Pavia
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Lombardia|Sondrio"> Sondrio
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Lombardia|Varese"> Varese
+          </label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Marche" hidden>
+      <legend>Province di Marche <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Marche|Ancona"> Ancona
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Marche|Ascoli Piceno"> Ascoli Piceno
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Marche|Fermo"> Fermo
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Marche|Macerata"> Macerata
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Marche|Pesaro e Urbino"> Pesaro e Urbino
+          </label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Molise" hidden>
+      <legend>Province di Molise <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Molise|Campobasso"> Campobasso
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Molise|Isernia"> Isernia
+          </label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Piemonte" hidden>
+      <legend>Province di Piemonte <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Piemonte|Alessandria"> Alessandria
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Piemonte|Asti"> Asti
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Piemonte|Biella"> Biella
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Piemonte|Cuneo"> Cuneo
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Piemonte|Novara"> Novara
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Piemonte|Torino"> Torino
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Piemonte|Verbano-Cusio-Ossola"> Verbano-Cusio-Ossola
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Piemonte|Vercelli"> Vercelli
+          </label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Puglia" hidden>
+      <legend>Province di Puglia <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Puglia|Bari"> Bari
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Puglia|Barletta-Andria-Trani"> Barletta-Andria-Trani
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Puglia|Brindisi"> Brindisi
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Puglia|Foggia"> Foggia
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Puglia|Lecce"> Lecce
+          <small class="muted" title="Per questa provincia non esiste un sito dell'ufficio provinciale: riceverai le notizie regionali">— solo notizie regionali</small></label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Puglia|Taranto"> Taranto
+          </label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Sardegna" hidden>
+      <legend>Province di Sardegna <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Sardegna|Cagliari"> Cagliari
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Sardegna|Nuoro"> Nuoro
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Sardegna|Oristano"> Oristano
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Sardegna|Sassari"> Sassari
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Sardegna|Sud Sardegna"> Sud Sardegna
+          </label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Sicilia" hidden>
+      <legend>Province di Sicilia <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Sicilia|Agrigento"> Agrigento
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Sicilia|Caltanissetta"> Caltanissetta
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Sicilia|Catania"> Catania
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Sicilia|Enna"> Enna
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Sicilia|Messina"> Messina
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Sicilia|Palermo"> Palermo
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Sicilia|Ragusa"> Ragusa
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Sicilia|Siracusa"> Siracusa
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Sicilia|Trapani"> Trapani
+          </label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Toscana" hidden>
+      <legend>Province di Toscana <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Toscana|Arezzo"> Arezzo
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Toscana|Firenze"> Firenze
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Toscana|Grosseto"> Grosseto
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Toscana|Livorno"> Livorno
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Toscana|Lucca"> Lucca
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Toscana|Massa-Carrara"> Massa-Carrara
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Toscana|Pisa"> Pisa
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Toscana|Pistoia"> Pistoia
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Toscana|Prato"> Prato
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Toscana|Siena"> Siena
+          </label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Trentino-Alto Adige" hidden>
+      <legend>Province di Trentino-Alto Adige <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Trentino-Alto Adige|Bolzano"> Bolzano
+          <small class="muted" title="Per questa provincia non esiste un sito dell'ufficio provinciale: riceverai le notizie regionali">— solo notizie regionali</small></label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Trentino-Alto Adige|Trento"> Trento
+          <small class="muted" title="Per questa provincia non esiste un sito dell'ufficio provinciale: riceverai le notizie regionali">— solo notizie regionali</small></label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Umbria" hidden>
+      <legend>Province di Umbria <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Umbria|Perugia"> Perugia
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Umbria|Terni"> Terni
+          </label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Valle d&#39;Aosta" hidden>
+      <legend>Province di Valle d&#39;Aosta <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Valle d&#39;Aosta|Aosta"> Aosta
+          <small class="muted" title="Per questa provincia non esiste un sito dell'ufficio provinciale: riceverai le notizie regionali">— solo notizie regionali</small></label></li>
+        
+      </ul>
+    </fieldset>
+    
+    <fieldset class="provinces" data-region="Veneto" hidden>
+      <legend>Province di Veneto <small class="muted">(nessuna selezionata = tutta la regione)</small></legend>
+      <ul class="sources">
+        
+        <li><label><input type="checkbox" name="provinces" value="Veneto|Belluno"> Belluno
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Veneto|Padova"> Padova
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Veneto|Rovigo"> Rovigo
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Veneto|Treviso"> Treviso
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Veneto|Venezia"> Venezia
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Veneto|Verona"> Verona
+          </label></li>
+        
+        <li><label><input type="checkbox" name="provinces" value="Veneto|Vicenza"> Vicenza
+          </label></li>
+        
+      </ul>
+    </fieldset>
+    
+    
+  </section>
+
+  <section class="card" id="fonti-elenco">
+    <h2>2. Le fonti che seguirai</h2>
+    <fieldset>
+      <legend>Fonti <span class="muted">(<span id="sources-selected">0</span> selezionate)</span></legend>
+      <label for="sources-search" class="visually-hidden">Cerca una fonte</label>
+      <input type="search" id="sources-search" placeholder="Cerca una fonte (es. Bologna, USR, Ministero)…" autocomplete="off">
+      
+      
+      <details class="source-group" >
+        <summary><span>Nazionali</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="8" data-catalog="1" >
+            MIM — Comunicati stampa</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="7" data-catalog="0" >
+            MIM — Notizie</label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Abruzzo</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="9" data-catalog="2" >
+            USR Abruzzo</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="96" data-catalog="93" >
+            USP Chieti e Pescara <small class="muted">(Chieti, Pescara)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="104" data-catalog="102" >
+            USP L&#39;Aquila <small class="muted">(L&#39;Aquila)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="97" data-catalog="94" >
+            USP Teramo <small class="muted">(Teramo)</small></label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Basilicata</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="10" data-catalog="3" >
+            USR Basilicata</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="102" data-catalog="100" >
+            USP Matera <small class="muted">(Matera)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="101" data-catalog="99" >
+            USP Potenza <small class="muted">(Potenza)</small></label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Calabria</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="11" data-catalog="4" >
+            USR Calabria</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="60" data-catalog="57" >
+            USP Catanzaro <small class="muted">(Catanzaro)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="59" data-catalog="56" >
+            USP Cosenza <small class="muted">(Cosenza)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="61" data-catalog="58" >
+            USP Crotone <small class="muted">(Crotone)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="62" data-catalog="59" >
+            USP Reggio Calabria <small class="muted">(Reggio Calabria)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="63" data-catalog="60" >
+            USP Vibo Valentia <small class="muted">(Vibo Valentia)</small></label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Campania</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="13" data-catalog="6" >
+            USR Campania — Avvisi</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="12" data-catalog="5" >
+            USR Campania — Notizie</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="86" data-catalog="83" >
+            USP Avellino <small class="muted">(Avellino)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="114" data-catalog="112" >
+            USP Caserta <small class="muted">(Caserta)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="85" data-catalog="82" >
+            USP Napoli <small class="muted">(Napoli)</small></label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Emilia-Romagna</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="1" data-catalog="7" >
+            USR Emilia-Romagna</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="6" data-catalog="21" >
+            USP Bologna <small class="muted">(Bologna)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="26" data-catalog="22" >
+            USP Ferrara <small class="muted">(Ferrara)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="5" data-catalog="23" >
+            USP Forlì-Cesena <small class="muted">(Forlì-Cesena)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="27" data-catalog="24" >
+            USP Modena <small class="muted">(Modena)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="28" data-catalog="25" >
+            USP Parma <small class="muted">(Parma)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="29" data-catalog="26" >
+            USP Piacenza <small class="muted">(Piacenza)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="30" data-catalog="27" >
+            USP Ravenna <small class="muted">(Ravenna)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="31" data-catalog="28" >
+            USP Reggio Emilia <small class="muted">(Reggio Emilia)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="32" data-catalog="29" >
+            USP Rimini <small class="muted">(Rimini)</small></label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Friuli-Venezia Giulia</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="14" data-catalog="8" >
+            USR Friuli-Venezia Giulia</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="103" data-catalog="101" >
+            USP Trieste <small class="muted">(Trieste)</small></label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Lazio</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="15" data-catalog="9" >
+            USR Lazio</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="93" data-catalog="90" >
+            USP Frosinone <small class="muted">(Frosinone)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="94" data-catalog="91" >
+            USP Latina <small class="muted">(Latina)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="95" data-catalog="92" >
+            USP Rieti <small class="muted">(Rieti)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="92" data-catalog="89" >
+            USP Roma <small class="muted">(Roma)</small></label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Liguria</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="16" data-catalog="10" >
+            USR Liguria</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="110" data-catalog="108" >
+            USP Genova <small class="muted">(Genova)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="111" data-catalog="109" >
+            USP Imperia <small class="muted">(Imperia)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="112" data-catalog="110" >
+            USP La Spezia <small class="muted">(La Spezia)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="113" data-catalog="111" >
+            USP Savona <small class="muted">(Savona)</small></label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Lombardia</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="17" data-catalog="11" >
+            USR Lombardia</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="48" data-catalog="45" >
+            UST Bergamo <small class="muted">(Bergamo)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="49" data-catalog="46" >
+            UST Brescia <small class="muted">(Brescia)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="50" data-catalog="47" >
+            UST Como <small class="muted">(Como)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="51" data-catalog="48" >
+            UST Cremona <small class="muted">(Cremona)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="52" data-catalog="49" >
+            UST Lecco <small class="muted">(Lecco)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="53" data-catalog="50" >
+            UST Lodi <small class="muted">(Lodi)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="54" data-catalog="51" >
+            UST Mantova <small class="muted">(Mantova)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="47" data-catalog="44" >
+            UST Milano <small class="muted">(Milano)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="55" data-catalog="52" >
+            UST Monza e Brianza <small class="muted">(Monza e Brianza)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="56" data-catalog="53" >
+            UST Pavia <small class="muted">(Pavia)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="57" data-catalog="54" >
+            UST Sondrio <small class="muted">(Sondrio)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="58" data-catalog="55" >
+            UST Varese <small class="muted">(Varese)</small></label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Marche</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="4" data-catalog="12" >
+            USR Marche</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="98" data-catalog="95" >
+            USP Ancona <small class="muted">(Ancona)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="105" data-catalog="103" >
+            USP Ascoli Piceno e Fermo <small class="muted">(Ascoli Piceno, Fermo)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="106" data-catalog="104" >
+            USP Macerata <small class="muted">(Macerata)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="3" data-catalog="96" >
+            USP Pesaro e Urbino <small class="muted">(Pesaro e Urbino)</small></label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Molise</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="18" data-catalog="13" >
+            USR Molise</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="76" data-catalog="73" >
+            USP Campobasso <small class="muted">(Campobasso)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="77" data-catalog="74" >
+            USP Isernia <small class="muted">(Isernia)</small></label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Piemonte</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="19" data-catalog="14" >
+            USR Piemonte</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="41" data-catalog="38" >
+            USP Alessandria e Asti <small class="muted">(Alessandria, Asti)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="42" data-catalog="39" >
+            USP Biella <small class="muted">(Biella)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="43" data-catalog="40" >
+            USP Cuneo <small class="muted">(Cuneo)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="44" data-catalog="41" >
+            USP Novara <small class="muted">(Novara)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="40" data-catalog="37" >
+            USP Torino <small class="muted">(Torino)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="46" data-catalog="43" >
+            USP Verbano-Cusio-Ossola <small class="muted">(Verbano-Cusio-Ossola)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="45" data-catalog="42" >
+            USP Vercelli <small class="muted">(Vercelli)</small></label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Puglia</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="20" data-catalog="15" >
+            USR Puglia</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="87" data-catalog="84" >
+            USP Bari <small class="muted">(Bari)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="88" data-catalog="85" >
+            USP Barletta-Andria-Trani <small class="muted">(Barletta-Andria-Trani)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="89" data-catalog="86" >
+            USP Brindisi <small class="muted">(Brindisi)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="90" data-catalog="87" >
+            USP Foggia <small class="muted">(Foggia)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="91" data-catalog="88" >
+            USP Taranto <small class="muted">(Taranto)</small></label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Sardegna</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="21" data-catalog="16" >
+            USR Sardegna</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="72" data-catalog="69" >
+            USP Cagliari <small class="muted">(Cagliari, Sud Sardegna)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="74" data-catalog="71" >
+            USP Nuoro <small class="muted">(Nuoro)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="75" data-catalog="72" >
+            USP Oristano <small class="muted">(Oristano)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="73" data-catalog="70" >
+            USP Sassari <small class="muted">(Sassari)</small></label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Sicilia</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="22" data-catalog="17" >
+            USR Sicilia</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="64" data-catalog="61" >
+            USP Agrigento <small class="muted">(Agrigento)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="65" data-catalog="62" >
+            USP Caltanissetta ed Enna <small class="muted">(Caltanissetta, Enna)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="66" data-catalog="63" >
+            USP Catania <small class="muted">(Catania)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="67" data-catalog="64" >
+            USP Messina <small class="muted">(Messina)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="68" data-catalog="65" >
+            USP Palermo <small class="muted">(Palermo)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="69" data-catalog="66" >
+            USP Ragusa <small class="muted">(Ragusa)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="70" data-catalog="67" >
+            USP Siracusa <small class="muted">(Siracusa)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="71" data-catalog="68" >
+            USP Trapani <small class="muted">(Trapani)</small></label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Toscana</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="23" data-catalog="18" >
+            USR Toscana</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="78" data-catalog="75" >
+            USP Arezzo <small class="muted">(Arezzo)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="79" data-catalog="76" >
+            USP Firenze <small class="muted">(Firenze)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="108" data-catalog="106" >
+            USP Grosseto <small class="muted">(Grosseto)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="80" data-catalog="77" >
+            USP Livorno <small class="muted">(Livorno)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="81" data-catalog="78" >
+            USP Lucca <small class="muted">(Lucca)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="82" data-catalog="79" >
+            USP Massa-Carrara <small class="muted">(Massa-Carrara)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="107" data-catalog="105" >
+            USP Pisa <small class="muted">(Pisa)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="109" data-catalog="107" >
+            USP Pistoia <small class="muted">(Pistoia)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="83" data-catalog="80" >
+            USP Prato <small class="muted">(Prato)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="84" data-catalog="81" >
+            USP Siena <small class="muted">(Siena)</small></label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Umbria</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="24" data-catalog="19" >
+            USR Umbria</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="99" data-catalog="97" >
+            USP Perugia <small class="muted">(Perugia)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="100" data-catalog="98" >
+            USP Terni <small class="muted">(Terni)</small></label></li>
+          
+        </ul>
+      </details>
+      
+      
+      <details class="source-group" >
+        <summary><span>Veneto</span> <span class="group-count muted">0 selezionate</span>
+          <span class="group-actions"><button type="button" class="link" data-group-all="1">tutte</button> · <button type="button" class="link" data-group-all="0">nessuna</button></span></summary>
+        <ul class="sources">
+          
+          <li><label><input type="checkbox" name="sources" value="25" data-catalog="20" >
+            USR Veneto</label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="33" data-catalog="30" >
+            USP Belluno <small class="muted">(Belluno)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="34" data-catalog="31" >
+            USP Padova <small class="muted">(Padova)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="35" data-catalog="32" >
+            USP Rovigo <small class="muted">(Rovigo)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="36" data-catalog="33" >
+            USP Treviso <small class="muted">(Treviso)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="37" data-catalog="34" >
+            USP Venezia <small class="muted">(Venezia)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="38" data-catalog="35" >
+            USP Verona <small class="muted">(Verona)</small></label></li>
+          
+          <li><label><input type="checkbox" name="sources" value="39" data-catalog="36" >
+            USP Vicenza <small class="muted">(Vicenza)</small></label></li>
+          
+        </ul>
+      </details>
+      
+    </fieldset>
+  </section>
+
+  <section class="card">
+    <h2>3. Parole chiave <small class="muted">(facoltative)</small></h2>
+    <p class="muted">Separate da virgola. Cerchiamo la parola intera, senza distinguere maiuscole:
+      <em>A041, trasferimenti, graduatorie provinciali</em>. Sul sito le evidenziano; sul bot fanno scattare l'avviso.</p>
+    <textarea name="keywords" id="keywords" aria-label="Parole chiave"></textarea>
+    <h3><label for="excluded">Parole da escludere <small class="muted">(facoltative)</small></label></h3>
+    <p class="muted">Le notizie che contengono una di queste parole non le vedi in «Le mie notizie» e il bot non te le
+      manda, nemmeno se hanno una tua parola chiave. Utile per togliere quello che non ti riguarda:
+      <em>infanzia, ATA, dirigenti</em>.</p>
+    <textarea name="excluded" id="excluded" aria-label="Parole da escludere"></textarea>
+  </section>
+
+  <div class="card actions sticky-actions">
+    
+    <p class="save-status" id="save-status" role="status" aria-live="polite">Le scelte vengono salvate in questo browser a ogni clic.</p>
+    <a class="button" id="go-mine" href="/le-mie-notizie/">Vedi le mie notizie</a>
+    <button type="submit" name="azione" value="telegram" class="button primary"><svg class="ico-svg " width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 3 3.5 10.2c-.9.4-.8 1.6.1 1.9L10 14l2 6.4c.3.9 1.5 1 1.9.1L21 3Z"/><path d="M10 14 21 3"/></svg> Porta su Telegram</button>
+    
+  </div>
+</form>
+
+<section class="card" id="telegram">
+  <h2>Ricevere gli avvisi su Telegram <small class="muted">(facoltativo)</small></h2>
+  
+    <div id="telegram-out" hidden></div>
+    <p id="telegram-hint">Sul sito le notizie le leggi quando vuoi. Il bot Telegram invece <strong>ti avvisa</strong>:
+      subito quando esce una notizia con le tue parole chiave, e con un riepilogo una volta al giorno.
+      Usa «Porta su Telegram» qui sopra.</p>
+  
+</section>
+
+<section class="card">
+  <h2>Le tue preferenze</h2>
+  <p class="muted">Sono tre cookie tecnici in questo browser (<code>sfm_fonti</code>, <code>sfm_parole</code>, <code>sfm_escludi</code>): sul
+    server non resta niente. Se cambi dispositivo o cancelli i dati del browser, dovrai rifare la scelta.</p>
+  <p>
+    <a class="button" id="export-prefs" href="/configura/esporta.json"><svg class="ico-svg " width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 19.5h14"/></svg> Scarica le tue preferenze</a>
+  </p>
+  <form  id="form-forget">
+    
+    <button type="submit" class="button danger"><svg class="ico-svg " width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7h14M9.5 7V5h5v2M8 7l.7 12h6.6L16 7"/></svg> Dimentica tutto da questo browser</button>
+  </form>
+</section>
+<script src="/static/area.js"></script>
+<script src="/static/sources.js"></script>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="inner">
+      <nav aria-label="Footer">
+        <a href="/notizie/">Notizie</a>
+        <a href="/fonti/">Fonti</a>
+        <a href="/chi-siamo/">Chi siamo e contatti</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/termini/">Termini</a>
+        <a href="https://github.com/federicodiluca/school-feed-monitor" rel="noopener">Codice sorgente (AGPL-3.0)</a>
+      </nav>
+      
+
+<p class="freshness" data-updated="2026-09-26T18:10:02Z" data-next="2026-09-26T19:10:02Z" data-late-after="90">
+  Notizie aggiornate il <time datetime="2026-09-26T18:10:02Z">26/09/2026 alle 20:10</time><span class="freshness-ago"></span>
+  (ultima lettura delle fonti: 26/09/2026 alle 19:17).
+  Prossimo aggiornamento verso le <time datetime="2026-09-26T19:10:02Z">21:10</time>:
+  il sito si aggiorna ogni ora, le fonti vengono lette ogni ora.
+</p>
+
+      <p>School Feed Monitor è un progetto indipendente, non affiliato al Ministero dell'Istruzione e del Merito né agli Uffici Scolastici.
+        Aggrega notizie pubbliche senza garanzia di completezza o tempestività: fa fede sempre la fonte originale
+        (<a href="/termini/#responsabilita">esclusione di responsabilità</a>).</p>
+      <p>
+        Creato da <a href="https://federicodiluca.com/" rel="author noopener" target="_blank">Federico Di Luca</a> ·
+        <a href="https://federicodiluca.com/progetti/" rel="noopener" target="_blank">Guarda i miei altri progetti</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

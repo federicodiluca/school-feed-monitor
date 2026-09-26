@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /le-mie-notizie
+Disallow: /configura/esporta.json
+Sitemap: https://schoolfeedmonitor.federicodiluca.com/sitemap.xml
