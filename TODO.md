@@ -21,7 +21,8 @@ tiene solo quello che riguarda la versione in produzione; il resto è lì.
   (`https://schoolfeedmonitor.federicodiluca.com/`) e inviare la sitemap; la vecchia proprietà
   `federicodiluca.github.io/school-feed-monitor/` si lascia andare (bastano i 301)
 - [ ] **robots.txt del sito personale**: togliere la riga `Sitemap:` di School Feed Monitor
-- [ ] **Cron sulla VM**: pubblicazione oraria del sito + backup notturno (righe in
+- [ ] **Cron sulla VM**: pubblicazione oraria del sito, backup notturno e aggiornamento del
+  codice ogni 12 ore (righe in
   [docs/deploy.md](docs/deploy.md#7-automatismi))
 - [ ] **Chiudere Google Cloud**: dopo aver messo al sicuro il database, arrestare il progetto
   (IAM → Impostazioni → Arresta). Ricorda che la prova gratuita scade il **12/12/2026**

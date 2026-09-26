@@ -196,6 +196,8 @@ crontab -e
 10 * * * * cd /opt/sfm && ./scripts/publish_site.sh >> data/logs/publish.log 2>&1
 # backup del database ogni notte alle 3 (14 giorni di copie in /opt/sfm/backup)
 0 3 * * * cd /opt/sfm && sh scripts/backup.sh backup >> data/logs/backup.log 2>&1
+# aggiornamento del codice alle 4:30 e alle 16:30, solo con i test verdi (vedi «Aggiornare il codice»)
+30 4,16 * * * cd /opt/sfm && ./scripts/auto_update.sh >> data/logs/update.log 2>&1
 ```
 
 Pages ricostruisce a ogni push; il limite indicativo è ~10 build all'ora, una all'ora sta
@@ -203,6 +205,22 @@ larga. Il branch `gh-pages` viene riscritto ogni volta con **un solo commit orfa
 repository non cresce all'infinito.
 
 ## 8. Aggiornare il codice
+
+**Da solo.** Con la riga di cron qui sopra, `scripts/auto_update.sh` controlla `main` ogni 12
+ore e aggiorna solo se il job `pytest` su GitHub è verde per quel commit. Prima fa il backup
+del database (le migrazioni non tornano indietro), poi riavvia il bot e dopo un minuto
+controlla che sia ancora in piedi; se no torna al commit di prima e non lo ritenta finché su
+`main` non arriva altro. L'esito arriva su Telegram all'`ADMIN_TELEGRAM_ID`.
+
+- Si ferma senza toccare niente se sulla VM ci sono modifiche a file del repo: le impostazioni
+  stanno in `.env` e `config.json`, che git ignora.
+- Un push fatto di sera arriva in produzione al giro dopo; per le urgenze c'è il modo a mano.
+- `./scripts/auto_update.sh --dry-run` dice cosa farebbe, senza toccare niente.
+- Con systemd (senza Docker) il riavvio passa da `sudo`: da cron serve una regola senza password
+  solo per quel comando, con `sudo visudo -f /etc/sudoers.d/sfm`:
+  `TUOUTENTE ALL=(root) NOPASSWD: /usr/bin/systemctl restart sfm-bot`
+
+**A mano:**
 
 ```bash
 cd /opt/sfm && git pull && .venv/bin/pip install -r requirements.txt
