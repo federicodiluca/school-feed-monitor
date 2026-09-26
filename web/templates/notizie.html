@@ -39,9 +39,11 @@
   <input type="search" id="q" name="q" value="{{ q }}" placeholder="es. graduatorie, A041, trasferimenti" maxlength="80"></div>
   {% if not source %}
   <div class="field"><label for="fonte">Fonte</label>
-  <select id="fonte" name="fonte">
+  <select id="fonte" name="fonte" data-searchable="Cerca una provincia o un ufficio…">
     <option value="">Tutte</option>
-    {% for s in sources %}<option value="{{ s.id }}" {% if s.id == selected_source %}selected{% endif %}>{{ s.name }}</option>{% endfor %}
+    {% for label, items in source_groups %}<optgroup label="{{ label }}">
+      {% for s in items %}<option value="{{ s.id }}" {% if s.id == selected_source %}selected{% endif %}>{{ s.name }}</option>{% endfor %}
+    </optgroup>{% endfor %}
   </select></div>
   {% endif %}
   <div class="field"><label for="giorni">Periodo</label>

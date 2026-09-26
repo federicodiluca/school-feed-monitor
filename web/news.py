@@ -1,5 +1,6 @@
 """Pagine notizie: /notizie (pubblica, con filtri e pagine per fonte) e
 /le-mie-notizie (recap personale, per giorno, con le parole chiave evidenziate)."""
+import re
 from datetime import date, datetime, timedelta
 
 from flask import Blueprint, abort, redirect, render_template, request, url_for
@@ -71,6 +72,24 @@ def region_sources(region, sources=None):
     return dict(group_sources(items)).get(region, [])
 
 
+SOURCE_GROUPS = (("mim", "Ministero"), ("usr", "Uffici scolastici regionali"),
+                 ("usp", "Uffici scolastici provinciali"), ("other", "Altre fonti"))
+
+
+def source_options(sources):
+    """Le fonti del menù «Fonte», per tipo e in ordine alfabetico del luogo: «USP Bari» e
+    «UST Bergamo» vanno sotto B, senza che la sigla le separi."""
+    def key(s):
+        return slugify(re.sub(r"^(USP|UST|USR|MIM)\s+", "", s["name"]))
+    known = {k for k, _ in SOURCE_GROUPS}
+    groups = []
+    for kind, label in SOURCE_GROUPS:
+        items = [s for s in sources if (s.get("kind") if s.get("kind") in known else "other") == kind]
+        if items:
+            groups.append((label, sorted(items, key=key)))
+    return groups
+
+
 def regions_with_sources(sources=None):
     """Le regioni che hanno almeno una fonte: solo loro hanno una pagina."""
     sources = sources if sources is not None else get_sources()
@@ -90,7 +109,7 @@ def index():
     rows, total = search_news(source_ids={source_id} if source_id else None, query=q, days=days, page=page, per_page=PER_PAGE)
     if (r := _clamp_page(total, page)):
         return r
-    return render_template("notizie.html", news=rows, sources=sources, q=q, days=days, days_choices=DAYS_CHOICES,
+    return render_template("notizie.html", news=rows, sources=sources, source_groups=source_options(sources), q=q, days=days, days_choices=DAYS_CHOICES,
                            selected_source=source_id, pages=_pages(total, page), source=None,
                            noindex=bool(q or source_id))
 

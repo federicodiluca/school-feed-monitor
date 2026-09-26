@@ -197,6 +197,14 @@ form.danger { border-top: 1px solid var(--border); margin-top: var(--space-4); p
 .filters .field.grow { flex: 1 1 240px; }
 .filters label { margin: 0 0 4px; font-size: .85rem; }
 .filters .button { margin: 0; }
+.combo { position: relative; min-width: 260px; }
+.combo-list { position: absolute; z-index: 20; top: calc(100% + 4px); left: 0; right: 0; max-height: 320px; overflow-y: auto; list-style: none; margin: 0; padding: 4px 0; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); box-shadow: var(--shadow); }
+.combo-list li { padding: 7px 12px; cursor: pointer; }
+.combo-list li[aria-selected="true"] { font-weight: 600; }
+.combo-list li.active { background: var(--primary-soft); }
+.combo-list .combo-group { cursor: default; padding: 10px 12px 4px; font-size: .75rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.combo-list .combo-empty { cursor: default; color: var(--muted); }
+@media (max-width: 600px) { .filters .field:has(.combo) { flex: 1 1 100%; } .combo { min-width: 0; } }
 .count { color: var(--muted); font-size: .9rem; margin-bottom: var(--space-3); }
 .news-list { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-3); }
 .news-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-4) var(--space-5); box-shadow: var(--shadow-sm); transition: border-color .15s, box-shadow .15s; }

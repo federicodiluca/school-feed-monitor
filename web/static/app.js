@@ -38,6 +38,132 @@
     }
   });
 
+  // --- menù a tendina in cui si può scrivere (select[data-searchable]) -------------------
+  // Il <select> resta nel form, nascosto: è lui che viene inviato e che i filtri leggono.
+  // Sopra ci mettiamo un campo di testo che filtra le voci mentre scrivi ("bari", "emilia").
+  function fold(text) {
+    return (text || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  }
+
+  function searchableSelect(select) {
+    var label = document.querySelector('label[for="' + select.id + '"]');
+    var wrap = document.createElement("div");
+    var input = document.createElement("input");
+    var list = document.createElement("ul");
+    var listId = select.id + "-list";
+    wrap.className = "combo";
+    input.type = "text";
+    input.id = select.id + "-cerca";
+    input.autocomplete = "off";
+    input.spellcheck = false;
+    input.placeholder = select.dataset.searchable;
+    input.setAttribute("role", "combobox");
+    input.setAttribute("aria-autocomplete", "list");
+    input.setAttribute("aria-expanded", "false");
+    input.setAttribute("aria-controls", listId);
+    list.id = listId;
+    list.className = "combo-list";
+    list.setAttribute("role", "listbox");
+    list.hidden = true;
+    if (label) label.htmlFor = input.id;
+    select.hidden = true;
+    select.parentNode.insertBefore(wrap, select);
+    wrap.appendChild(input);
+    wrap.appendChild(list);
+    wrap.appendChild(select);
+
+    var options = Array.prototype.map.call(select.options, function (o, i) {
+      return { value: o.value, text: o.textContent.trim(), key: fold(o.textContent),
+               group: o.parentNode.tagName === "OPTGROUP" ? o.parentNode.label : "", id: listId + "-" + i };
+    });
+    var shown = [], active = -1;
+
+    function current() { return options[select.selectedIndex] || options[0]; }
+    function showCurrent() { input.value = current().value ? current().text : ""; }
+
+    function draw() {
+      var words = fold(input.value).split(/\s+/).filter(Boolean);
+      shown = options.filter(function (o) {
+        return words.every(function (w) { return o.key.indexOf(w) !== -1; });
+      });
+      var html = "", group = null;
+      shown.forEach(function (o, i) {
+        if (o.group && o.group !== group) {
+          html += '<li class="combo-group" role="presentation">' + escapeHtml(o.group) + "</li>";
+          group = o.group;
+        }
+        html += '<li role="option" id="' + o.id + '" data-i="' + i + '" aria-selected="' +
+          (o === current()) + '">' + escapeHtml(o.text) + "</li>";
+      });
+      if (!shown.length) html = '<li class="combo-empty" role="presentation">Nessuna fonte con questo nome</li>';
+      list.innerHTML = html;
+      move(shown.length ? 0 : -1);
+    }
+
+    function move(i) {
+      var old = list.querySelector(".active");
+      if (old) old.classList.remove("active");
+      active = i;
+      var el = i >= 0 && document.getElementById(shown[i].id);
+      if (el) { el.classList.add("active"); if (el.scrollIntoView) el.scrollIntoView({ block: "nearest" }); input.setAttribute("aria-activedescendant", el.id); }
+      else input.removeAttribute("aria-activedescendant");
+    }
+
+    function open() {
+      if (!list.hidden) return;
+      list.hidden = false;
+      input.setAttribute("aria-expanded", "true");
+      draw();
+    }
+
+    function close() {
+      list.hidden = true;
+      input.setAttribute("aria-expanded", "false");
+      input.removeAttribute("aria-activedescendant");
+    }
+
+    function pick(o) {
+      close();
+      if (o && o.value !== select.value) {
+        select.value = o.value;
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      showCurrent();
+    }
+
+    input.addEventListener("focus", function () { input.select(); open(); });
+    input.addEventListener("click", open);
+    input.addEventListener("input", function (e) { e.stopPropagation(); list.hidden ? open() : draw(); });
+    input.addEventListener("blur", function () {
+      if (!input.value.trim()) pick(options[0]);   // campo svuotato = «Tutte»
+      else { close(); showCurrent(); }
+    });
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        if (list.hidden) return open();
+        if (shown.length) move((active + (e.key === "ArrowDown" ? 1 : shown.length - 1)) % shown.length);
+      } else if (e.key === "Enter") {
+        if (list.hidden) return;   // a tendina chiusa, Invio invia il form come prima
+        e.preventDefault();
+        pick(shown[active]);
+      } else if (e.key === "Escape" && !list.hidden) {
+        e.preventDefault();
+        close();
+        showCurrent();
+      }
+    });
+    list.addEventListener("mousedown", function (e) { e.preventDefault(); });   // non perdere il focus
+    list.addEventListener("click", function (e) {
+      var li = e.target.closest("[data-i]");
+      if (li) { pick(shown[Number(li.dataset.i)]); input.blur(); }
+    });
+    select.addEventListener("change", showCurrent);   // se qualcuno lo cambia da codice
+    showCurrent();
+  }
+
+  document.querySelectorAll("select[data-searchable]").forEach(searchableSelect);
+
   if (!STATIC) return;
 
   // --- preferenze nei cookie (stessi nomi del server: sfm_fonti, sfm_parole) ------------

@@ -54,6 +54,18 @@ const click = (w, el) => el.dispatchEvent(new w.MouseEvent("click", { bubbles: t
     await wait(200);
     const onlyOne = Array.from(results.querySelectorAll(".news-source")).every(e => e.textContent.includes("Palermo"));
     check("il filtro per fonte funziona", onlyOne && results.querySelectorAll("li.news-card").length > 0, count.textContent);
+    const names = Array.from(sel.options).slice(1).map(o => o.textContent.replace(/^(USP|UST|USR|MIM)\s+/, ""));
+    const usp = Array.from(sel.querySelectorAll("optgroup")).find(g => /provincial/.test(g.label));
+    const uspNames = Array.from(usp.children).map(o => o.textContent.replace(/^(USP|UST)\s+/, ""));
+    check("le fonti provinciali sono in ordine alfabetico", uspNames.join() === uspNames.slice().sort((a, b) => a.localeCompare(b, "it")).join(), uspNames.slice(0, 5).join(", "));
+    const combo = doc.getElementById("fonte-cerca");
+    check("il menù Fonte è cercabile", !!combo && sel.hidden && names.length > 0);
+    combo.dispatchEvent(new w.Event("focus"));
+    combo.value = "reggio emi"; combo.dispatchEvent(new w.Event("input", { bubbles: true }));
+    const opts = doc.querySelectorAll("#fonte-list [role=option]");
+    check("la ricerca nel menù filtra le voci", opts.length === 1 && opts[0].textContent.includes("Reggio Emilia"), opts.length + " voci");
+    combo.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    check("Invio sceglie la voce", sel.options[sel.selectedIndex].textContent.includes("Reggio Emilia") && combo.value.includes("Reggio Emilia"), combo.value);
   }
 
   // --- /configura: area -> fonti -> salva -> telegram
