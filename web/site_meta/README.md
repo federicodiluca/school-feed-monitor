@@ -4,7 +4,7 @@
 pubblicazione con un `git push --force`, quindi qualunque modifica fatta qui sparisce al giro
 successivo (di solito entro un'ora).
 
-Il sito è <https://federicodiluca.github.io/school-feed-monitor>, servito da GitHub Pages a
+Il sito è <https://schoolfeedmonitor.federicodiluca.com>, servito da GitHub Pages a
 partire da questo branch (Settings → Pages → branch `gh-pages`, cartella `/ (root)`).
 
 ## Da dove arriva
@@ -42,4 +42,4 @@ cd /opt/sfm && git pull && ./scripts/publish_site.sh
 ```
 
 Il sito non raccoglie niente di chi lo visita: le scelte restano in due cookie tecnici nel
-browser. Vedi la pagina [privacy](https://federicodiluca.github.io/school-feed-monitor/privacy).
+browser. Vedi la pagina [privacy](https://schoolfeedmonitor.federicodiluca.com/privacy).

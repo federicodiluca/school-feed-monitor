@@ -96,8 +96,8 @@ nano .env
 
 ```ini
 SECRET_KEY=...                                                   # generata sopra
-APP_BASE_URL=https://federicodiluca.github.io/school-feed-monitor
-SITE_BASE_URL=https://federicodiluca.github.io/school-feed-monitor
+APP_BASE_URL=https://schoolfeedmonitor.federicodiluca.com
+SITE_BASE_URL=https://schoolfeedmonitor.federicodiluca.com
 TELEGRAM_BOT_USERNAME=IlTuoBot
 ADMIN_TELEGRAM_ID=123456789
 CONTACT_EMAIL=schoolfeedmonitor@gmail.com
@@ -134,14 +134,14 @@ HTTPS, prima: `git remote set-url origin git@github.com:federicodiluca/school-fe
 ## 4. Accendere GitHub Pages
 
 *repo → Settings → Pages → Source: Deploy from a branch → branch `gh-pages`, cartella `/ (root)`.*
-Dopo un minuto il sito è su `https://federicodiluca.github.io/school-feed-monitor`.
+Dopo un minuto il sito è su `https://schoolfeedmonitor.federicodiluca.com` (se il dominio è configurato, vedi sotto).
 
 Due dettagli:
 
 - il file `.nojekyll` (lo genera il build) evita che Pages tratti il sito come un blog Jekyll;
-- il `robots.txt` che conta per Google è quello alla **radice del dominio**, cioè nel repo
-  `federicodiluca.github.io`: aggiungi lì la riga
-  `Sitemap: https://federicodiluca.github.io/school-feed-monitor/sitemap.xml`.
+- per il dominio proprio (`schoolfeedmonitor.federicodiluca.com`) vedi
+  [deploy.md](deploy.md#dominio-personalizzato-schoolfeedmonitorfedericodilucacom); con il
+  dominio proprio vale il `robots.txt` generato dal build.
 
 ## 5. Pubblicare ogni ora
 
@@ -189,5 +189,5 @@ sudo systemctl restart sfm-bot
   quando non serve).
 - **Il sito Flask serve ancora**: in locale (`python web.py`) è il modo più comodo per
   provare le modifiche prima di generarle; in produzione non viene esposto.
-- **Se un giorno servisse un dominio**, il sito statico si sposta senza toccare la VM: cambia
-  `SITE_BASE_URL`, rigenera, e punta il DNS su Pages.
+- **Cambiare dominio** non tocca la VM: cambia `SITE_BASE_URL` e `APP_BASE_URL`, rigenera, e
+  punta il DNS su Pages.

@@ -22,7 +22,7 @@ from web import create_app
 from web.configurator import catalog_positions
 from web.news import region_url, regions_with_sources
 
-DEFAULT_BASE_URL = "https://federicodiluca.github.io/school-feed-monitor"
+DEFAULT_BASE_URL = "https://schoolfeedmonitor.federicodiluca.com"
 NEWS_IN_DATASET = 1200         # quante notizie finiscono nel JSON usato dal browser
 NEWS_DAYS = 90
 PREVIEW_CHARS = 220

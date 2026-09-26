@@ -4,7 +4,7 @@ Le notizie del mondo scuola — Ministero, Uffici Scolastici Regionali e Provinc
 da oltre cento siti, filtrate per le fonti e le parole chiave che scegli tu, e portate dove
 guardi: un sito da consultare e un bot Telegram che ti avvisa.
 
-Sito: **<https://federicodiluca.github.io/school-feed-monitor>** · Licenza: **AGPL-3.0**
+Sito: **<https://schoolfeedmonitor.federicodiluca.com>** · Licenza: **AGPL-3.0**
 
 Nasce da un problema concreto: chi lavora nella scuola deve tenere d'occhio l'USP dove
 insegna, magari quello dove punta al trasferimento, l'USR e il Ministero — ognuno con il suo

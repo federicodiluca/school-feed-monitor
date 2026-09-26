@@ -34,7 +34,7 @@ def load_env(path=None, override=False):
     return count
 
 
-DEFAULT_SITE_URL = "https://federicodiluca.github.io/school-feed-monitor"
+DEFAULT_SITE_URL = "https://schoolfeedmonitor.federicodiluca.com"
 
 
 def site_url():

@@ -75,8 +75,8 @@ nano .env
 
 ```ini
 SECRET_KEY=...                                                   # generata sopra
-APP_BASE_URL=https://federicodiluca.github.io/school-feed-monitor
-SITE_BASE_URL=https://federicodiluca.github.io/school-feed-monitor
+APP_BASE_URL=https://schoolfeedmonitor.federicodiluca.com
+SITE_BASE_URL=https://schoolfeedmonitor.federicodiluca.com
 TELEGRAM_BOT_USERNAME=IlTuoBot
 ADMIN_TELEGRAM_ID=123456789
 CONTACT_EMAIL=schoolfeedmonitor@gmail.com
@@ -161,34 +161,31 @@ cd /opt/sfm
 
 Genera il sito in `data/site` e lo spinge su `gh-pages`. Su GitHub, una volta sola:
 *repo → Settings → Pages → Deploy from a branch → `gh-pages`, cartella `/ (root)`*.
-Dopo un minuto il sito è su `https://federicodiluca.github.io/school-feed-monitor`.
-
-Due dettagli:
+Il sito sta su un dominio proprio, `schoolfeedmonitor.federicodiluca.com` (vedi sotto).
 
 - `.nojekyll` (lo genera il build) evita che Pages tratti il sito come un blog Jekyll;
-- il `robots.txt` che conta per Google è quello alla **radice del dominio**, cioè nel repo
-  `federicodiluca.github.io`: aggiungi lì la riga
-  `Sitemap: https://federicodiluca.github.io/school-feed-monitor/sitemap.xml`.
+- col dominio proprio il `robots.txt` che conta per Google è quello generato dal build, con
+  la sua riga `Sitemap:`: non serve toccare il repo del sito personale.
 
-### Dominio personalizzato (es. `school-feed-monitor.it`)
+### Dominio personalizzato (`schoolfeedmonitor.federicodiluca.com`)
 
-1. **Registra il dominio** da un registrar qualunque (servono circa 10 €/anno; non ci sono .it gratis).
-2. **DNS** del dominio, dal pannello del registrar:
-   - quattro record `A` sulla radice (`@`): `185.199.108.153`, `185.199.109.153`,
-     `185.199.110.153`, `185.199.111.153` (gli IP di GitHub Pages);
-   - un `CNAME` per `www` → `federicodiluca.github.io`.
-3. **In `.env` sulla VM**: `SITE_BASE_URL=https://school-feed-monitor.it` e
-   `APP_BASE_URL=https://school-feed-monitor.it` (la seconda serve ai link nei messaggi del bot),
-   poi riavvia il bot e pubblica. Il build scrive da solo il file `CNAME` a ogni pubblicazione
-   (senza, GitHub dimenticherebbe il dominio al primo aggiornamento).
-4. **Su GitHub**: *Settings → Pages → Custom domain* → `school-feed-monitor.it`; quando il
-   certificato è pronto spunta **Enforce HTTPS**. Conviene prima verificare il dominio
-   (*Settings del profilo → Pages → Add a domain*), così nessun altro può agganciarlo.
-5. **Dopo**: i vecchi indirizzi `federicodiluca.github.io/school-feed-monitor/...` vengono
-   rimandati da GitHub al nuovo dominio. In Search Console aggiungi la proprietà del nuovo
-   dominio, invia `https://school-feed-monitor.it/sitemap.xml` e usa «Cambio di indirizzo».
-   La riga `Sitemap:` nel `robots.txt` di `federicodiluca.github.io` si può togliere: col dominio
-   proprio vale il `robots.txt` generato.
+Il dominio `federicodiluca.com` è del sito personale (repo `federicodiluca.github.io`); School
+Feed Monitor ne usa un sottodominio. Passi, già fatti al 26/09/2026:
+
+1. **DNS** di `federicodiluca.com`, dal pannello del registrar: un record `CNAME`
+   `schoolfeedmonitor` → `federicodiluca.github.io` (per un sottodominio non servono record `A`).
+2. **In `.env` sulla VM**: `SITE_BASE_URL` e `APP_BASE_URL` a
+   `https://schoolfeedmonitor.federicodiluca.com` (la seconda serve ai link nei messaggi del bot), poi
+   riavvia il bot e pubblica. Il build scrive da solo il file `CNAME` a ogni pubblicazione (senza, GitHub
+   dimenticherebbe il dominio al primo aggiornamento, perché `gh-pages` viene riscritto).
+3. **Su GitHub**: *Settings → Pages → Custom domain* → `schoolfeedmonitor.federicodiluca.com`,
+   poi **Enforce HTTPS** quando il certificato è pronto. Conviene verificare `federicodiluca.com`
+   in *Settings del profilo → Pages → Add a domain*, così nessun altro può agganciare sottodomini.
+4. **Dopo**: i vecchi indirizzi `federicodiluca.github.io/school-feed-monitor/...` vengono
+   rimandati da GitHub al nuovo dominio con un 301. In Search Console aggiungi la proprietà
+   `https://schoolfeedmonitor.federicodiluca.com/` e invia la sitemap (lo strumento «Cambio di indirizzo» non vale
+   per una sottocartella: bastano i 301). Nel `robots.txt` del sito personale la riga
+   `Sitemap:` di School Feed Monitor va tolta.
 
 ## 7. Automatismi
 
@@ -221,5 +218,5 @@ cd /opt/sfm && git pull && docker compose up -d --build
   le modifiche prima di generarle; in produzione non viene esposto.
 - **Watchdog**: avvisa su Telegram l'`ADMIN_TELEGRAM_ID` quando una fonte smette di funzionare
   o un job non gira. Con `HEALTHCHECK_PING_URL` puoi aggiungere un monitor esterno gratuito.
-- **Se un giorno servisse un dominio**, il sito statico si sposta senza toccare la macchina:
-  cambi `SITE_BASE_URL`, rigeneri, e punti il DNS su Pages.
+- **Cambiare dominio** non tocca la macchina: cambi `SITE_BASE_URL` e `APP_BASE_URL`, rigeneri,
+  e punti il DNS su Pages.

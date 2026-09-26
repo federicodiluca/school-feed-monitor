@@ -1,8 +1,8 @@
 # TODO — School Feed Monitor
 
-**Dove siamo (23/09/2026).** In produzione c'è la versione *utility*: bot Telegram + sito
+**Dove siamo (26/09/2026).** In produzione c'è la versione *utility*: bot Telegram + sito
 statico su GitHub Pages, **senza account e senza dati dei visitatori**. La macchina è la VM
-OCI di Milano (Docker); il sito è <https://federicodiluca.github.io/school-feed-monitor>,
+OCI di Milano (Docker); il sito è <https://schoolfeedmonitor.federicodiluca.com>,
 pubblicato dal branch `gh-pages` con `scripts/publish_site.sh`.
 
 La piattaforma completa (account, email, login Google, digest via email, verifica email,
@@ -14,10 +14,13 @@ tiene solo quello che riguarda la versione in produzione; il resto è lì.
 
 ## Da fare tu (fuori dal repo)
 
-- [ ] **Dominio**: registrare `school-feed-monitor.it` (libero al 25/09/2026, ~10 €/anno) e
-  seguire [docs/deploy.md](docs/deploy.md#dominio-personalizzato-es-school-feed-monitorit)
-- [ ] **Google Search Console**: registrare la proprietà come *prefisso URL*
-  (`https://federicodiluca.github.io/school-feed-monitor/`) e inviare la sitemap
+- [ ] **`.env` sulla VM**: `APP_BASE_URL` e `SITE_BASE_URL` a
+  `https://schoolfeedmonitor.federicodiluca.com`, riavviare il bot e ripubblicare (finché non lo
+  fai, il sito sul nuovo dominio ha CSS, JS e link rotti e il giro orario cancella il `CNAME`)
+- [ ] **Google Search Console**: aggiungere la proprietà *prefisso URL*
+  (`https://schoolfeedmonitor.federicodiluca.com/`) e inviare la sitemap; la vecchia proprietà
+  `federicodiluca.github.io/school-feed-monitor/` si lascia andare (bastano i 301)
+- [ ] **robots.txt del sito personale**: togliere la riga `Sitemap:` di School Feed Monitor
 - [ ] **Cron sulla VM**: pubblicazione oraria del sito + backup notturno (righe in
   [docs/deploy.md](docs/deploy.md#7-automatismi))
 - [ ] **Chiudere Google Cloud**: dopo aver messo al sicuro il database, arrestare il progetto
@@ -78,6 +81,7 @@ tiene solo quello che riguarda la versione in produzione; il resto è lì.
 - [x] Parole da escludere (bot `/exclude` e configuratore)
 - [x] Anteprima presa dalla pagina della notizia per le fonti HTML che danno solo il titolo
 - [x] Il build scrive il `CNAME` se il sito ha un dominio proprio (passi in docs/deploy.md)
+- [x] Dominio `schoolfeedmonitor.federicodiluca.com` (DNS e GitHub Pages, 26/09/2026)
 - [x] Ponte europeo (`deploy/eu-proxy/`) per le fonti che rifiutano gli IP esteri — non serve
       finché la macchina sta in Italia, ma è pronto
 - [x] Licenza AGPL-3.0 con consenso di tutti i contributor
