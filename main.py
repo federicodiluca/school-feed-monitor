@@ -4,11 +4,9 @@ from sfm.db_news import cleanup_old_news
 from sfm.db_sources import get_source, sync_config_sources
 from sfm.news_fetcher import fetch_news, fetch_source
 from sfm.digest import run_digests
-from sfm.watchdog import JOB_DIGEST, JOB_FETCH, run_watchdog, tracked, weekly_summary
+from sfm.watchdog import JOB_DIGEST, JOB_FETCH, notify_admin, run_watchdog, tracked, weekly_summary
 from sfm.logger import log, cleanup_logs
-from sfm.telegram_commands import start_telegram_listener, build_help_message
-from sfm.telegram import send_message
-from sfm.utils import escape_html
+from sfm.telegram_commands import start_telegram_listener
 import schedule
 import time
 import traceback
@@ -45,8 +43,8 @@ schedule.every().day.at("20:30").do(lambda: cleanup_old_news(CLEANUP_DAYS))  # N
 # === Listener Telegram ===
 start_telegram_listener()
 
-# Recap di avvio agli utenti attivi (comandi + feed monitorati)
-send_message(f"🔄 Servizio avviato su <b>{escape_html(MACHINE_NAME)}</b>.\n\n{build_help_message()}", parse_mode="HTML")
+# Avviso di avvio solo all'admin (gli utenti non devono vedere i riavvii)
+notify_admin(f"🔄 Servizio avviato su {MACHINE_NAME}", [f"{n_sources} fonti da config"])
 
 # Primo fetch subito all'avvio, senza attendere il primo intervallo
 # (tracked cattura e logga eventuali errori)
@@ -59,5 +57,5 @@ while True:
     except Exception as e:
         err = traceback.format_exc()
         log(f"❌ Errore nel loop principale: {e}\n{err}")
-        send_message(f"❌ Errore nel loop principale:\n<pre>{escape_html(e)}</pre>", parse_mode="HTML")
+        notify_admin("❌ Errore nel loop principale", [str(e)])
         time.sleep(10)
