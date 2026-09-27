@@ -4,7 +4,7 @@ Ai sensi dell'art. 30 GDPR. Documento interno del titolare; da aggiornare quando
 
 | Campo | Valore |
 |---|---|
-| **Titolare** | Federico Di Luca, persona fisica — contatto: `CONTACT_EMAIL` (oggi schoolfeedmonitor@gmail.com) |
+| **Titolare** | Federico Di Luca, persona fisica — contatto: `CONTACT_EMAIL` (oggi schoolfeedmonitor@federicodiluca.com) |
 | **DPO** | Non nominato (non ricorrono i presupposti dell'art. 37) |
 | **Ultimo aggiornamento** | 2026-09-22 (versione informativa: vedi `PRIVACY_VERSION` in `web/__init__.py`) |
 

@@ -100,7 +100,7 @@ APP_BASE_URL=https://schoolfeedmonitor.federicodiluca.com
 SITE_BASE_URL=https://schoolfeedmonitor.federicodiluca.com
 TELEGRAM_BOT_USERNAME=IlTuoBot
 ADMIN_TELEGRAM_ID=123456789
-CONTACT_EMAIL=schoolfeedmonitor@gmail.com
+CONTACT_EMAIL=schoolfeedmonitor@federicodiluca.com
 PYTHON=/opt/sfm/.venv/bin/python
 SITE_OUT=data/site
 ```

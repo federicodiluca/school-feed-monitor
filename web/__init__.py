@@ -68,7 +68,7 @@ def create_app(test_config=None):
         SESSION_COOKIE_SECURE=(env("APP_BASE_URL") or "").startswith("https://"),
         MAX_CONTENT_LENGTH=64 * 1024,
         TELEGRAM_BOT_USERNAME=(env("TELEGRAM_BOT_USERNAME") or "").lstrip("@"),
-        CONTACT_EMAIL=env("CONTACT_EMAIL") or "schoolfeedmonitor@gmail.com",
+        CONTACT_EMAIL=env("CONTACT_EMAIL") or "schoolfeedmonitor@federicodiluca.com",
         # True quando le pagine vengono congelate per GitHub Pages: niente POST né
         # query string, l'interazione passa tutta da static/app.js (vedi scripts/build_site.py)
         STATIC=False,
