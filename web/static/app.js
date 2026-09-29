@@ -14,6 +14,40 @@
       navigator.serviceWorker.register(BASE + "/sw.js").catch(function () { /* niente PWA, pazienza */ });
     });
   }
+
+  // --- pulsante «Installa»: molti non sanno che il sito si installa come un'app ---------
+  // Chrome, Edge e Android offrono il loro prompt (beforeinstallprompt), che teniamo da parte
+  // finché non si tocca il pulsante. iPhone e iPad non lo hanno: lì spieghiamo i due tocchi.
+  var installItem = document.getElementById("nav-install");
+  var installBtn = document.getElementById("install-btn");
+  var installHelp = document.getElementById("install-help");
+  var installed = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
+    navigator.standalone === true;
+  if (installItem && installBtn && !installed) {
+    var installPrompt = null;
+    var ios = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);   // iPad si spaccia per Mac
+    window.addEventListener("beforeinstallprompt", function (e) {
+      e.preventDefault();
+      installPrompt = e;
+      installItem.hidden = false;
+    });
+    window.addEventListener("appinstalled", function () {
+      installPrompt = null;
+      installItem.hidden = true;
+    });
+    if (ios && installHelp) installItem.hidden = false;
+    installBtn.addEventListener("click", function () {
+      if (installPrompt) {
+        // il prompt si può mostrare una volta sola: se lo chiudono, il browser ne rimanda un altro
+        installPrompt.prompt();
+        installPrompt = null;
+        installItem.hidden = true;
+      } else if (installHelp) {
+        if (installHelp.showModal) installHelp.showModal(); else installHelp.setAttribute("open", "");
+      }
+    });
+  }
   // --- ultimo aggiornamento: "N minuti fa" e avviso se il prossimo non è arrivato -------
   // L'ora è scritta nella pagina quando viene generata: se il sito non si aggiorna, solo il
   // browser può accorgersene (vedi web/freshness.py e _freshness.html).

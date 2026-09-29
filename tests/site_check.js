@@ -146,5 +146,20 @@ const click = (w, el) => el.dispatchEvent(new w.MouseEvent("click", { bubbles: t
     check("ma non quelle con parole escluse", !titles.some(t => /Convocazione/.test(t)));
     check("e l'intro lo dice", /senza quelle che parlano di/.test(doc.getElementById("mine-intro").textContent));
   }
+  // pulsante «Installa»: nascosto finché il browser non offre il suo prompt
+  console.log("pulsante Installa");
+  { const { w, errors, doc } = open("notizie/index.html", BASE + "/notizie");
+    await wait(50);
+    const item = doc.getElementById("nav-install");
+    check("nascosto se il browser non lo propone", item && item.hidden);
+    let prompted = 0;
+    const e = new w.Event("beforeinstallprompt", { cancelable: true });
+    e.prompt = () => { prompted++; };
+    w.dispatchEvent(e);
+    check("compare quando il browser lo propone", !item.hidden && e.defaultPrevented);
+    click(w, doc.getElementById("install-btn"));
+    check("il clic apre il prompt del browser", prompted === 1 && item.hidden);
+    check("nessun errore JS", errors.length === 0, errors.join("; "));
+  }
   process.exit(ok ? 0 : 1);
 })();

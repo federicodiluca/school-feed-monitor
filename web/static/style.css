@@ -77,6 +77,12 @@ form.inline { display: inline; }
 button.link { background: none; border: 0; cursor: pointer; font: inherit; }
 button.icon { background: none; border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--fg-2); cursor: pointer; padding: 6px 8px; line-height: 0; display: inline-flex; }
 button.icon:hover { background: var(--bg-soft); }
+.site-header button.install-btn { display: inline-flex; align-items: center; gap: 6px; }
+.install-help { max-width: min(420px, calc(100vw - 32px)); padding: var(--space-5); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--fg); box-shadow: var(--shadow); }
+.install-help::backdrop { background: rgba(15, 23, 42, .5); }
+.install-help ol { padding-left: 1.3em; margin: 0 0 var(--space-3); }
+.install-help form { text-align: right; }
+.install-help .button { margin: 0; }
 
 /* footer */
 .site-footer { border-top: 1px solid var(--border); padding: var(--space-6) var(--space-4); color: var(--muted); font-size: .9rem; }

@@ -41,10 +41,22 @@
         <li><a href="{{ url_for('news.index') }}">Notizie</a></li>
         {% if has_prefs or static_mode %}<li id="nav-mine"{% if static_mode %} hidden{% endif %}><a href="{{ url_for('news.mine') }}">Le mie notizie</a></li>{% endif %}
         <li><a class="button primary" href="{{ url_for('config.show') }}"><span id="nav-config-label">{% if has_prefs %}Le mie fonti{% else %}Scegli le fonti{% endif %}</span></a></li>
-        <li><button type="button" id="theme-toggle" class="icon" aria-label="Cambia tema chiaro/scuro" title="Tema chiaro/scuro"><span class="only-light">{% from "_icons.html" import icon %}{{ icon('moon', 18) }}</span><span class="only-dark">{{ icon('sun', 18) }}</span></button></li>
+        <li id="nav-install" hidden><button type="button" id="install-btn" class="link install-btn">{% from "_icons.html" import icon %}{{ icon('download', 18) }} Installa</button></li>
+        <li><button type="button" id="theme-toggle" class="icon" aria-label="Cambia tema chiaro/scuro" title="Tema chiaro/scuro"><span class="only-light">{{ icon('moon', 18) }}</span><span class="only-dark">{{ icon('sun', 18) }}</span></button></li>
       </ul>
     </nav>
   </header>
+
+  <dialog id="install-help" class="install-help" aria-labelledby="install-help-title">
+    <h2 id="install-help-title">Installa {{ app_name }}</h2>
+    <p>Su iPhone e iPad si installa da Safari, in due tocchi:</p>
+    <ol>
+      <li>tocca <strong>Condividi</strong> (il quadrato con la freccia verso l'alto);</li>
+      <li>scegli <strong>Aggiungi alla schermata Home</strong>.</li>
+    </ol>
+    <p class="muted">Troverai l'icona tra le app, e il sito si aprirà a tutto schermo.</p>
+    <form method="dialog"><button class="button primary">Ho capito</button></form>
+  </dialog>
 
   <main id="main" class="container">
     {% with messages = get_flashed_messages(with_categories=true) %}
