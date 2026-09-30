@@ -5,6 +5,7 @@ import json
 import os
 import shutil
 import subprocess
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -12,6 +13,10 @@ from scripts.build_site import build
 from sfm.catalog import load_catalog
 from sfm.db_news import add_news
 from sfm.db_sources import get_sources, sync_config_sources
+
+# Data relativa, non fissa: il sito mostra solo le notizie degli ultimi giorni, e una data
+# scritta a mano prima o poi esce dalla finestra e fa fallire il test.
+YESTERDAY = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
 
 CHECK = os.path.join(os.path.dirname(__file__), "site_check.js")
 
@@ -32,7 +37,7 @@ def test_the_static_site_works_in_a_browser(tmp_path, monkeypatch):
     for i in range(40):
         s = sources["USP Bologna"] if i % 2 else sources["USP Palermo"]
         add_news(f"Graduatorie A041 numero {i}" if i % 3 else f"Convocazione sostegno {i}",
-                 f"https://esempio.it/n/{i}", s["name"], "2026-09-21 09:00:00",
+                 f"https://esempio.it/n/{i}", s["name"], YESTERDAY,
                  "testo con trasferimenti e graduatorie", source_id=s["id"])
 
     site = build(str(tmp_path / "site"), base_url="https://esempio.github.io/school-feed-monitor",

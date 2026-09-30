@@ -1,6 +1,7 @@
 """Generatore del sito statico per GitHub Pages."""
 import json
 import os
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -8,6 +9,10 @@ from scripts.build_site import build
 from sfm.catalog import load_catalog
 from sfm.db_news import add_news
 from sfm.db_sources import get_sources, sync_config_sources
+
+# Data relativa, non fissa: il sito mostra solo le notizie degli ultimi giorni, e una data
+# scritta a mano prima o poi esce dalla finestra e fa fallire il test.
+YESTERDAY = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
 
 BASE_URL = "https://esempio.github.io/school-feed-monitor"
 PREFIX = "/school-feed-monitor"
@@ -26,7 +31,7 @@ def site(tmp_path, monkeypatch):
     monkeypatch.setattr("web.get_config", lambda: {"sites": sites})
     sync_config_sources(sites)
     source = next(s for s in get_sources() if s["name"] == "USP Bologna")
-    add_news("Graduatorie definitive A041", "https://x/1", source["name"], "2026-09-21 09:00:00",
+    add_news("Graduatorie definitive A041", "https://x/1", source["name"], YESTERDAY,
              "testo della notizia", source_id=source["id"])
     out = build(str(tmp_path / "site"), base_url=BASE_URL, bot_username="SfmBot")
     return out
