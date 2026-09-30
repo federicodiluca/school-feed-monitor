@@ -1,4 +1,6 @@
-"""Disegna web/static/og-image.png (1200x630), l'anteprima dei link condivisi (og:image).
+"""Disegna web/static/og-image.png (1200x630), l'anteprima dei link condivisi (og:image),
+e web/static/story.png (1080x1920), l'immagine per le storie di Instagram del link
+«Condividi» nel footer.
 
 Si lancia a mano quando cambiano logo o slogan; il PNG sta nel repo, quindi Pillow non
 serve né al bot né al sito:
@@ -146,9 +148,66 @@ def main():
     for source, when, title, keyword in CARDS:
         y += card(img, 690, y, 450, source, when, title, keyword) + 20
 
-    out = os.path.join(STATIC, "og-image.png")
-    img.convert("RGB").resize((W, H), Image.LANCZOS).save(out, optimize=True)
+    save(img, "og-image.png", (W, H))
+    story()
+
+
+def save(img, name, size):
+    out = os.path.join(STATIC, name)
+    img.convert("RGB").resize(size, Image.LANCZOS).save(out, optimize=True)
     print(f"scritto {os.path.normpath(out)} ({os.path.getsize(out) // 1024} KB)")
+
+
+def background(w, h):
+    """Sfumatura dal blu del sito al blu scuro, con un alone in alto a destra."""
+    img = Image.new("RGBA", (s(w), s(h)), BLUE)
+    draw = ImageDraw.Draw(img)
+    for y in range(s(h)):
+        t = y / s(h)
+        draw.line([(0, y), (s(w), y)], fill=tuple(int(a + (b - a) * t * 0.75) for a, b in zip(BLUE, BLUE_DARK)))
+    glow(img, (w * 0.82, h * 0.16), w * 0.5, (96, 130, 230), 110)
+    return img
+
+
+def story():
+    """La storia di Instagram: 540x960 logici, salvati a 1080x1920. Instagram di una
+    condivisione prende solo l'immagine, quindi il link è scritto in grande. Il contenuto
+    importante sta tra y 125 e 835: sopra e sotto le storie coprono con barra e risposta."""
+    global SCALE
+    SCALE = 4
+    w, h = 540, 960
+    img = background(w, h)
+    draw = ImageDraw.Draw(img)
+
+    size = 92
+    logo = Image.open(os.path.join(STATIC, "android-chrome-512x512.png")).convert("RGBA").resize((s(size), s(size)), Image.LANCZOS)
+    mask = Image.new("L", logo.size, 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, logo.size[0] - 1, logo.size[1] - 1], radius=s(20), fill=255)
+    lx = (w - size) / 2
+    img.paste(logo, (s(lx), s(128)), mask)
+    draw.rounded_rectangle([s(lx), s(128), s(lx + size), s(128 + size)], radius=s(20), outline=SOFT, width=s(2))
+
+    draw.text((s(w / 2), s(262)), "School Feed Monitor", font=font("bold", 30), fill=WHITE, anchor="ms")
+    draw.text((s(w / 2), s(308)), "Le notizie della scuola,", font=font("bold", 30), fill=WHITE, anchor="ms")
+    draw.text((s(w / 2), s(346)), "filtrate per te.", font=font("bold", 30), fill=AMBER, anchor="ms")
+    draw.text((s(w / 2), s(382)), "Ministero, USR e uffici provinciali", font=font("regular", 17), fill=SOFT, anchor="ms")
+
+    y = 414
+    for source, when, title, keyword in CARDS[:2]:
+        y += card(img, 50, y, w - 100, source, when, title, keyword) + 16
+
+    draw = ImageDraw.Draw(img)
+    f = font("semibold", 15)
+    labels = ("Senza registrazione", "Anche su Telegram")
+    widths = [draw.textlength(label, font=f) + s(28) for label in labels]
+    x = (s(w) - sum(widths) - s(10)) / 2
+    for label, lw in zip(labels, widths):
+        draw.rounded_rectangle([x, s(y + 6), x + lw, s(y + 38)], radius=s(16), outline=SOFT, width=s(2))
+        draw.text((x + lw / 2, s(y + 22)), label, font=f, fill=WHITE, anchor="mm")
+        x += lw + s(10)
+
+    draw.text((s(w / 2), s(y + 86)), "schoolfeedmonitor.federicodiluca.com", font=font("bold", 21), fill=AMBER, anchor="ms")
+    save(img, "story.png", (1080, 1920))
 
 
 if __name__ == "__main__":

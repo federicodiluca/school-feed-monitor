@@ -48,6 +48,32 @@
       }
     });
   }
+  // --- «Condividi» nel footer: l'immagine per le storie di Instagram --------------------
+  // Senza JavaScript il link scarica web/static/story.png (scripts/make_og_image.py). Con il
+  // menu di condivisione del telefono la passa lì, e si sceglie Instagram → Storia. Il file
+  // si scarica quando il footer entra in vista, così al tocco è già pronto: Safari rifiuta la
+  // condivisione se tra il tocco e la chiamata c'è un'attesa di rete.
+  var shareLink = document.getElementById("share-story");
+  if (shareLink && navigator.share && navigator.canShare && window.fetch && window.IntersectionObserver) {
+    var storyFile = null;
+    var storyObserver = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      storyObserver.disconnect();
+      fetch(shareLink.href).then(function (r) { return r.ok ? r.blob() : null; }).then(function (blob) {
+        if (blob) storyFile = new File([blob], "school-feed-monitor.png", { type: "image/png" });
+      }).catch(function () { /* resta il download */ });
+    });
+    storyObserver.observe(shareLink);
+    shareLink.addEventListener("click", function (e) {
+      if (!storyFile || !navigator.canShare({ files: [storyFile] })) return;   // download normale
+      e.preventDefault();
+      navigator.share({
+        files: [storyFile],
+        text: "School Feed Monitor: le notizie della scuola, filtrate per te.\n" + location.origin + BASE + "/",
+      }).catch(function () { /* annullata */ });
+    });
+  }
+
   // --- ultimo aggiornamento: "N minuti fa" e avviso se il prossimo non è arrivato -------
   // L'ora è scritta nella pagina quando viene generata: se il sito non si aggiorna, solo il
   // browser può accorgersene (vedi web/freshness.py e _freshness.html).
