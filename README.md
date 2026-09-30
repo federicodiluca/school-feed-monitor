@@ -35,6 +35,11 @@ Tre pezzi, un solo codice:
 In produzione la macchina **non riceve connessioni**: nessuna porta aperta, nessun dominio,
 nessun certificato da rinnovare. Pubblica e basta.
 
+Il sito si può installare come app (PWA) dal pulsante «Installa», con le istruzioni passo passo
+dove il browser non offre la sua finestra. Il link «Condividi» nel footer passa al menu di
+condivisione del telefono un'immagine per le storie di Instagram (`web/static/story.png`,
+generata con `og-image.png` da `scripts/make_og_image.py`).
+
 ## Niente account, niente dati dei visitatori
 
 Il sito non ha registrazione e non salva nulla di chi lo visita: le fonti e le parole chiave
@@ -83,6 +88,7 @@ Per riempire il database senza aspettare lo scheduler: `python scripts/fetch_now
 | Comando | Cosa fa |
 |---|---|
 | `/start` | registra l'utente e mostra fonti e impostazioni |
+| `/commands` | elenco dei comandi |
 | `/start CODICE` | applica la configurazione creata sul sito |
 | `/stop` | sospende le notifiche |
 | `/setkeywords a, b` · `/removekeywords a` · `/keywords` | gestione delle parole chiave |
@@ -95,11 +101,11 @@ Per riempire il database senza aspettare lo scheduler: `python scripts/fetch_now
 ## Test
 
 ```bash
-.venv/bin/python -m pytest -q          # ~270 test
+.venv/bin/python -m pytest -q          # ~280 test
 npm install                            # facoltativo: jsdom, per la prova del sito nel browser finto
 ```
 
-La suite non tocca mai la rete (le richieste HTTP sono bloccate nei test) e usa un database
+La suite gira anche su GitHub Actions a ogni push (`.github/workflows/tests.yml`). Non tocca mai la rete (le richieste HTTP sono bloccate nei test) e usa un database
 temporaneo. Oltre ai test Python, `tests/site_check.js` carica il sito generato in un browser
 finto e verifica filtri, configuratore, cookie e link a Telegram: se `node` e `jsdom` non ci
 sono, quel test si salta.
@@ -110,7 +116,7 @@ sono, quel test si salta.
 |---|---|
 | `sfm/` | il nucleo: lettura fonti, parsing, deduplica, match delle parole chiave, digest, watchdog, catalogo |
 | `web/` | il sito Flask: notizie, configuratore, pagine legali, SEO |
-| `scripts/` | generazione e pubblicazione del sito, verifica del catalogo, backup, servizio systemd |
+| `scripts/` | generazione e pubblicazione del sito, verifica del catalogo, backup, aggiornamento automatico, servizio systemd |
 | `deploy/eu-proxy/` | ponte per leggere le fonti che bloccano gli IP esteri (serve solo se la macchina non è in Europa) |
 | `tests/` | la suite, con il controllo del sito statico in jsdom |
 | `docs/` | deploy e registro dei trattamenti |
@@ -119,7 +125,16 @@ sono, quel test si salta.
 
 Guida completa: **[docs/deploy.md](docs/deploy.md)** — vale per qualunque macchina, con o senza
 Docker. In sintesi: la VM fa girare il bot, ogni ora genera il sito e lo spinge sul branch
-`gh-pages`, GitHub Pages lo serve in HTTPS.
+`gh-pages`, GitHub Pages lo serve in HTTPS sul dominio `schoolfeedmonitor.federicodiluca.com`.
+
+**Aggiornamento automatico**: `scripts/auto_update.sh`, da cron ogni 12 ore, porta sulla VM
+i nuovi commit di `main`, ma solo quelli con i test verdi su GitHub. Fa il backup del
+database, il pull, riavvia il bot (Docker o systemd) e, se dopo un minuto il bot non è in
+piedi, torna al commit precedente. Con `--dry-run` dice cosa farebbe senza toccare niente.
+
+**Avvisi all'amministratore**: avvio del servizio, errori, esito degli aggiornamenti e
+riepilogo settimanale sulla salute delle fonti arrivano solo alla chat Telegram indicata in
+`ADMIN_TELEGRAM_ID` (in `.env`), mai agli utenti.
 
 Un'avvertenza che conta più di quanto sembri: **tienila in Europa**. Diversi siti
 istituzionali (`istruzione.calabria.it`, `uspmc.sinp.net`) lasciano cadere le connessioni
