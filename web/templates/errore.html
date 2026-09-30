@@ -3,8 +3,17 @@
 {% block robots %}<meta name="robots" content="noindex">{% endblock %}
 {% block content %}
 <div class="auth">
+{% if code == 404 %}
+<h1>404: nessuna circolare a questo indirizzo</h1>
+<p>Abbiamo controllato il Ministero, i 18 Uffici Scolastici Regionali e tutti gli uffici provinciali:
+  questa pagina non l'ha pubblicata nessuno. Nemmeno in un allegato PDF scansionato storto.</p>
+<p class="empty">Forse è stata spostata, o l'indirizzo ha un refuso.</p>
+<p><a class="button primary" href="{{ url_for('index') }}">Torna alla home</a>
+  <a class="button" href="{{ url_for('news.index') }}">Vedi le ultime notizie</a></p>
+{% else %}
 <h1>Errore {{ code }}</h1>
 <p class="empty">{{ message }}</p>
 <p><a class="button primary" href="{{ url_for('index') }}">Torna alla home</a></p>
+{% endif %}
 </div>
 {% endblock %}
