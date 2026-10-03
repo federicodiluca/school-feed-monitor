@@ -9,6 +9,7 @@
       {% else %}<span class="news-source">{{ n.source or 'Fonte' }}</span>{% endif %}
       {% if n.published_at %}<time datetime="{{ n.published_at[:10] }}">{{ n.published_at | local_datetime }}</time>{% endif %}
       {% if n.matched_keywords %}<span class="badge">{{ icon('bell', 12) }} {{ n.matched_keywords | join(', ') }}</span>{% endif %}
+      {% for t in n.tags or [] %}<span class="badge muted">{{ t }}</span>{% endfor %}
       {% if n.already_alerted %}<span class="badge muted">già segnalata</span>{% endif %}
     </div>
     <h3 class="news-title"><a href="{{ n.link }}" rel="noopener nofollow" target="_blank">{{ n.title or 'Titolo non disponibile' }}</a></h3>

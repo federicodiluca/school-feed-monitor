@@ -10,6 +10,7 @@ from sfm.db_sources import get_sources
 PUBLIC_PAGES = [
     ("index", "1.0", "daily"),
     ("news.index", "0.9", "hourly"),
+    ("news.interpelli", "0.9", "daily"),
     ("news.sources", "0.8", "weekly"),
     ("config.show", "0.8", "monthly"),
     ("about", "0.6", "monthly"),
@@ -70,7 +71,7 @@ def init_app(app):
         last = latest_per_source()
         newest = max((d or "" for d in last.values()), default="")[:10] or None
         # home e /notizie cambiano con l'ultima notizia arrivata, da qualunque fonte
-        entries = [(url_for(endpoint), prio, freq, newest if endpoint in ("index", "news.index") else None)
+        entries = [(url_for(endpoint), prio, freq, newest if endpoint in ("index", "news.index", "news.interpelli") else None)
                    for endpoint, prio, freq in PUBLIC_PAGES]
         sources = get_sources()
         for region in regions_with_sources(sources):

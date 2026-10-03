@@ -55,7 +55,8 @@
 
 <h2>Ultime notizie{% if total > news | length %} <small class="muted">({{ news | length }} delle {{ total }} degli ultimi {{ days }} giorni)</small>{% endif %}</h2>
 {% include "_news_list.html" %}
-<p class="more"><a class="button" href="{{ url_for('news.index') }}">Cerca fra tutte le notizie →</a></p>
+<p class="more"><a class="button" href="{{ url_for('news.index') }}">Cerca fra tutte le notizie →</a>
+  <a class="button" href="{{ url_for('news.interpelli') }}#{{ region | slugify }}">Gli interpelli in {{ region }} →</a></p>
 {% endblock %}
 
 {% block footer_freshness %}{% endblock %}{# già in testa alla pagina #}

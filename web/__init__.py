@@ -20,7 +20,7 @@ from sfm.db import init_db
 from sfm.db_news import search_news
 from sfm.db_sources import sync_config_sources
 from sfm.env import env, env_bool
-from sfm.utils import format_local_datetime, strip_html
+from sfm.utils import format_local_datetime, slugify, strip_html
 from web import freshness, prefs, seo, security
 from web.configurator import bp as config_bp, telegram_link
 from web.news import bp as news_bp, region_url, regions_with_sources, source_url
@@ -87,6 +87,7 @@ def create_app(test_config=None):
     app.jinja_env.filters["local_datetime"] = lambda v: format_local_datetime(v, "%d/%m/%Y %H:%M")
     app.jinja_env.filters["preview"] = lambda v, n=220: (lambda t: t[:n].rsplit(" ", 1)[0] + "…" if len(t) > n else t)(strip_html(v or ""))
     app.jinja_env.filters["giorno_it"] = giorno_it
+    app.jinja_env.filters["slugify"] = slugify
     app.jinja_env.globals["source_url"] = source_url
     app.jinja_env.globals["region_url"] = region_url
     app.jinja_env.globals["absolute_url"] = seo.absolute_url

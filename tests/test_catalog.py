@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 
 import pytest
 
-from sfm.catalog import REGIONS, load_catalog, merge_sites
+from sfm.catalog import PROVINCE_CODES, PROVINCES, REGIONS, load_catalog, merge_sites, province_codes
 from sfm.config_loader import load_config
 from sfm.db_sources import get_sources, sync_config_sources
 from sfm.source_parser import parse_html_articles
@@ -139,3 +139,12 @@ def test_provinces_offered_cover_all_of_italy():
     with_office = provinces_with_own_office(load_catalog())
     assert with_office["Emilia-Romagna"] >= {"Bologna", "Modena"}
     assert "Udine" not in with_office.get("Friuli-Venezia Giulia", set())   # solo l'USR pubblica
+
+
+def test_every_province_has_its_code():
+    provinces = {p for items in PROVINCES.values() for p in items}
+    assert provinces == set(PROVINCE_CODES) and len(set(PROVINCE_CODES.values())) == 107
+    for e in load_catalog():
+        if e["kind"] == "usp" and e["province"]:
+            assert len(province_codes(e)) == len(e["province"].split("|")), e["name"]
+    assert province_codes({"province": "Alessandria|Asti"}) == ["AL", "AT"]

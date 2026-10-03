@@ -31,6 +31,7 @@ PREVIEW_CHARS = 220
 PAGES = [
     ("/", "index.html"),
     ("/notizie", "notizie/index.html"),
+    ("/interpelli", "interpelli/index.html"),
     ("/fonti", "fonti/index.html"),
     ("/le-mie-notizie", "le-mie-notizie/index.html"),
     ("/configura", "configura/index.html"),

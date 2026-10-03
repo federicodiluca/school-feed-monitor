@@ -1,6 +1,9 @@
 {% extends "base.html" %}
-{% block title %}{% if source %}Notizie da {{ source.name }}{% else %}Ultime notizie dal mondo scuola{% endif %} — {{ app_name }}{% endblock %}
-{% block description %}{% if source %}Le ultime notizie pubblicate da {{ source.name }}, raccolte automaticamente da {{ app_name }}.{% else %}Le ultime notizie da Uffici Scolastici Regionali, Provinciali e Ministero, tutte in una pagina: graduatorie, trasferimenti, circolari, concorsi.{% endif %}{% endblock %}
+{# Pagina di una fonte: title e description dicono come la gente cerca l'ufficio (sigle, «ex
+   Provveditorato») e perché cliccare qui invece che sul sito ufficiale (tutto in una pagina,
+   l'ultima notizia con la data, gli avvisi su Telegram). #}
+{% block title %}{% if office %}{{ source.name }}{{ office.codes_label }}: ultime notizie e avvisi{% elif source %}Notizie da {{ source.name }} — {{ app_name }}{% else %}Ultime notizie dal mondo scuola — {{ app_name }}{% endif %}{% endblock %}
+{% block description %}{% if office %}{{ office.full }}{% if office.kind == 'usp' and office.places %} di {{ office.places }}{{ office.codes_label }}, ex Provveditorato{% endif %}: tutte le notizie in una pagina, aggiornate ogni ora.{% if latest %} Ultima: «{{ latest.title | truncate(70, true, '…', 0) }}»{% if latest.published_at %} del {{ (latest.published_at | local_datetime)[:10] }}{% endif %}.{% endif %} Avvisi gratis su Telegram.{% elif source %}Le ultime notizie pubblicate da {{ source.name }}, raccolte automaticamente da {{ app_name }}.{% else %}Le ultime notizie da Uffici Scolastici Regionali, Provinciali e Ministero, tutte in una pagina: graduatorie, trasferimenti, circolari, concorsi.{% endif %}{% endblock %}
 {% block robots %}{% if noindex or pages.current > 1 %}<meta name="robots" content="noindex, follow">{% endif %}{% endblock %}
 {% block jsonld %}
 <script type="application/ld+json">
@@ -10,7 +13,8 @@
   "name": {{ (("Notizie da " ~ source.name) if source else "Ultime notizie dal mondo scuola") | tojson }},
   "url": {{ canonical | tojson }},
   "inLanguage": "it-IT"{% if source %},
-  "about": {"@type": "GovernmentOrganization", "name": {{ source.name | tojson }}, "url": {{ source.url | tojson }}},
+  "about": {"@type": "GovernmentOrganization", "name": {{ source.name | tojson }}, "url": {{ source.url | tojson }}{% if office and office.aliases %},
+    "alternateName": {{ office.aliases | tojson }}{% endif %}},
   "breadcrumb": {
     "@context": "https://schema.org", "@type": "BreadcrumbList",
     "itemListElement": [
@@ -25,6 +29,10 @@
 {% block content %}
 <div class="page-head">
 <h1>{% if source %}Notizie da {{ source.name }}{% else %}Ultime notizie dal mondo scuola{% endif %}</h1>
+{% if office and office.kind == 'usp' and office.places %}
+<p>Le notizie dell'{{ office.full }} di {{ office.places }}{{ office.codes_label }}, cioè l'Ambito Territoriale
+  (già Provveditorato agli Studi e CSA), raccolte dal sito ufficiale ogni ora: nomine, graduatorie, interpelli, avvisi.</p>
+{% endif %}
 <p>
   {% if source %}<a href="{{ source.url }}" rel="noopener nofollow">Sito ufficiale</a>{% if source.region and source.kind in ('usr', 'usp') %} · <a href="{{ region_url(source.region) }}">Tutte le notizie di {{ source.region }}</a>{% endif %} · <a href="{{ url_for('news.sources') }}">Tutte le fonti</a> · <a href="{{ url_for('news.index') }}">Tutte le notizie</a>
   {% else %}Questo è quello che {{ app_name }} raccoglie ogni giorno da <a href="{{ url_for('news.sources') }}">{{ sources | length }} fonti</a>.

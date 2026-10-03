@@ -52,7 +52,8 @@
 <section class="section">
   <h2>Ultime notizie raccolte</h2>
   {% set news = latest %}{% include "_news_list.html" %}
-  <p class="more"><a class="button" href="{{ url_for('news.index') }}">Tutte le notizie, con filtri →</a></p>
+  <p class="more"><a class="button" href="{{ url_for('news.index') }}">Tutte le notizie, con filtri →</a>
+    <a class="button" href="{{ url_for('news.interpelli') }}">Tutti gli interpelli →</a></p>
 </section>
 {% endif %}
 

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Interpelli supplenze docenti e ATA: tutti gli USP in una pagina{% endblock %}
+{% block description %}Gli interpelli per supplenze pubblicati da Uffici Scolastici Provinciali, Regionali e scuole negli ultimi {{ days }} giorni, per regione e con la classe di concorso in evidenza. Aggiornati ogni ora.{% endblock %}
+{% block robots %}{% if not total %}<meta name="robots" content="noindex, follow">{% endif %}{% endblock %}
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "name": "Interpelli supplenze docenti e ATA",
+      "url": {{ canonical | tojson }},
+      "inLanguage": "it-IT"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": {{ app_name | tojson }}, "item": {{ absolute_url(url_for('index')) | tojson }}},
+        {"@type": "ListItem", "position": 2, "name": "Interpelli", "item": {{ canonical | tojson }}}
+      ]
+    }
+  ]
+}
+</script>
+{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Interpelli per supplenze: tutti gli uffici in una pagina</h1>
+  <p>Gli interpelli escono provincia per provincia, ognuno sul sito del suo ufficio. Qui trovi quelli
+    pubblicati negli ultimi {{ days }} giorni da tutti gli Uffici Scolastici che leggiamo, divisi per regione e con
+    la classe di concorso in evidenza. Ogni interpello rimanda al sito ufficiale: le scadenze sono spesso di
+    pochi giorni, controllale lì.</p>
+  {% include "_freshness.html" %}
+</div>
+
+{% if total %}
+<section class="card">
+  <h2>Per regione</h2>
+  <ul class="region-links">
+    {% for region, items in groups %}<li><a href="#{{ region | slugify }}">{{ region }}</a> <small class="muted">{{ items | length }}</small></li>{% endfor %}
+  </ul>
+  {% if classes %}
+  <h2>Classi di concorso citate</h2>
+  <p>{% for code, n in classes %}<span class="badge muted">{{ code }} · {{ n }}</span> {% endfor %}</p>
+  {% endif %}
+  <p class="muted">Vuoi saperlo appena esce un interpello? <a href="{{ url_for('config.show') }}">Scegli le tue province</a>
+    e aggiungi la parola chiave «interpello» o la tua classe di concorso: ti avvisiamo su Telegram.</p>
+</section>
+
+{% if total > shown %}<p class="count">I {{ shown }} più recenti dei {{ total }} degli ultimi {{ days }} giorni.</p>{% endif %}
+{% for region, news in groups %}
+<section class="section" id="{{ region | slugify }}">
+  <h2>Interpelli {{ region if region == 'Nazionali' else 'in ' ~ region }}</h2>
+  {% include "_news_list.html" %}
+</section>
+{% endfor %}
+{% else %}
+<p class="empty">Nessun interpello negli ultimi {{ days }} giorni.</p>
+{% endif %}
+<p class="more"><a class="button" href="{{ url_for('news.index') }}">Cerca fra tutte le notizie →</a></p>
+{% endblock %}
+
+{% block footer_freshness %}{% endblock %}{# già in testa alla pagina #}

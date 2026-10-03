@@ -271,3 +271,53 @@ def test_region_pages_are_linked_and_in_the_sitemap(client, catalog_db):
     page = client.get(f"/notizie/fonte/{source['id']}/usp-palermo").get_data(as_text=True)
     assert 'href="/notizie/regione/sicilia">Tutte le notizie di Sicilia</a>' in page
     assert "<loc>https://sfm.example/notizie/regione/sicilia</loc>" in client.get("/sitemap.xml").get_data(as_text=True)
+
+
+def _meta(html, name):
+    return re.search(rf'name="{name}" content="(.*?)"', html, re.S).group(1)
+
+
+def test_source_page_speaks_the_words_people_search_for(client, catalog_db):
+    from sfm.db_news import add_news
+    source = catalog_db["USP Alessandria e Asti"]
+    add_news("Nomine GPS bollettino n.8", "https://x/al", source["name"], "2026-09-20 08:00:00", "c", source_id=source["id"])
+    html = client.get(f"/notizie/fonte/{source['id']}/usp-alessandria-e-asti").get_data(as_text=True)
+    assert "<title>USP Alessandria e Asti (AL, AT): ultime notizie e avvisi</title>" in html
+    description = _meta(html, "description")
+    assert "Ufficio Scolastico Provinciale di Alessandria e Asti (AL, AT), ex Provveditorato" in description
+    assert "Ultima: «Nomine GPS bollettino n.8» del 20/09/2026" in description
+    assert '"USP AL"' in html and "Ambito Territoriale di Alessandria e Asti" in html
+    usr = catalog_db["USR Sicilia"]
+    html = client.get(f"/notizie/fonte/{usr['id']}/usr-sicilia").get_data(as_text=True)
+    assert "<title>USR Sicilia: ultime notizie e avvisi</title>" in html
+    assert _meta(html, "description").startswith("Ufficio Scolastico Regionale Sicilia: tutte le notizie")
+
+
+def test_source_page_starts_from_thirty_days(client, catalog_db):
+    from datetime import datetime, timedelta
+    from sfm.db_news import add_news
+    source = catalog_db["USP Siracusa"]
+    when = (datetime.now() - timedelta(days=12)).strftime("%Y-%m-%d %H:%M:%S")
+    add_news("Decreto di due settimane fa", "https://x/sr", source["name"], when, "c", source_id=source["id"])
+    html = client.get(f"/notizie/fonte/{source['id']}/usp-siracusa").get_data(as_text=True)
+    assert 'href="https://x/sr"' in html and '<option value="30" selected>' in html
+    html = client.get(f"/notizie/fonte/{source['id']}/usp-siracusa?giorni=7").get_data(as_text=True)
+    assert 'href="https://x/sr"' not in html
+
+
+def test_interpelli_page_collects_them_by_region_with_the_class(client, catalog_db):
+    from datetime import datetime
+    from sfm.db_news import add_news
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    assert 'content="noindex, follow"' in client.get("/interpelli").get_data(as_text=True)   # vuota
+    pa, bo = catalog_db["USP Palermo"], catalog_db["USP Bologna"]
+    add_news("Interpello supplenza classe di concorso A-22", "https://x/i1", pa["name"], now, "posto ADSS", source_id=pa["id"])
+    add_news("INTERPELLO AM56 Liceo", "https://x/i2", bo["name"], now, "", source_id=bo["id"])
+    add_news("Graduatorie GPS", "https://x/g", bo["name"], now, "", source_id=bo["id"])
+    html = client.get("/interpelli").get_data(as_text=True)
+    assert "noindex" not in html and "<title>Interpelli supplenze docenti e ATA" in html
+    assert 'id="sicilia"' in html and 'id="emilia-romagna"' in html and html.index('id="emilia-romagna"') < html.index('id="sicilia"')
+    assert '<span class="badge muted">A022</span>' in html and '<span class="badge muted">ADSS</span>' in html
+    assert "AM56 · 1" in html and "Graduatorie GPS" not in html
+    assert "<loc>https://sfm.example/interpelli</loc>" in client.get("/sitemap.xml").get_data(as_text=True)
+    assert 'href="/interpelli"' in client.get("/").get_data(as_text=True)
