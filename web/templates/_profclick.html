@@ -1,13 +1,18 @@
 {#- ProfClick, l'altro strumento per i docenti dello stesso autore. Il link è senza nofollow
     (a differenza di quelli alle fonti): deve passare a ProfClick l'autorità del sito.
-    Uso: {% from "_profclick.html" import profclick_box %}  {{ profclick_box('interpelli') }} -#}
+    Uso: {% from "_profclick.html" import profclick_box %}  {{ profclick_box('interpelli') }}
+    compact=True: una riga sola (logo, titolo, bottone), per stare sopra un elenco senza spingerlo giù. -#}
 {% from "_icons.html" import icon %}
 {% set profclick_url = "https://profclick.federicodiluca.com/" %}
 
-{% macro profclick_box(where='notizie') -%}
-<aside class="profclick" aria-labelledby="profclick-title">
-  <img src="{{ url_for('static', filename='profclick.svg') }}" alt="" width="56" height="56" class="profclick-logo">
+{% macro profclick_box(where='notizie', compact=False) -%}
+<aside class="profclick{% if compact %} compact{% endif %}" aria-labelledby="profclick-title">
+  <img src="{{ url_for('static', filename='profclick.svg') }}" alt="" width="{{ 40 if compact else 56 }}" height="{{ 40 if compact else 56 }}" class="profclick-logo">
   <div class="profclick-body">
+    {% if compact %}
+    <h2 id="profclick-title">Per pianificare le lezioni: ProfClick</h2>
+    <p>Il piano di lavoro del docente, lezione per lezione. Gratis, senza registrazione.</p>
+    {% else %}
     <p class="profclick-eyebrow">ProfClick · dallo stesso autore</p>
     {% if where == 'interpelli' %}
     <h2 id="profclick-title">Preso l'incarico? Pianifica le lezioni con ProfClick</h2>
@@ -21,6 +26,7 @@
       <li>{{ icon('check', 14) }} Se una lezione salta, il piano slitta da solo</li>
       <li>{{ icon('check', 14) }} I dati restano tuoi</li>
     </ul>
+    {% endif %}
   </div>
   <a class="button" href="{{ profclick_url }}" rel="noopener" target="_blank">Prova ProfClick</a>
 </aside>

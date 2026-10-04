@@ -61,10 +61,11 @@
   <button type="submit" class="button">Filtra</button>
 </form>
 
+{% from "_profclick.html" import profclick_box %}{{ profclick_box(compact=True) }}
+
 <p class="count" id="news-count">{{ pages.total }} notizie{% if pages.last > 1 and not static_mode %} · pagina {{ pages.current }} di {{ pages.last }}{% endif %}</p>
 <div id="news-results">{% include "_news_list.html" %}</div>
 {% if static_mode %}<p class="center"><button type="button" class="button" id="news-more">Carica altre notizie</button></p>{% endif %}
-{% from "_profclick.html" import profclick_box %}{{ profclick_box() }}
 
 {% if pages.last > 1 and not static_mode %}
 <nav class="pagination" aria-label="Pagine">

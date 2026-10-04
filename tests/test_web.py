@@ -326,7 +326,8 @@ def test_interpelli_page_collects_them_by_region_with_the_class(client, catalog_
 def test_profclick_is_promoted_with_a_followed_link(client, catalog_db):
     link = 'href="https://profclick.federicodiluca.com/" rel="noopener"'
     news = client.get("/notizie").get_data(as_text=True)
-    assert 'class="profclick"' in news and "Per pianificare le lezioni: ProfClick</h2>" in news
+    assert 'class="profclick compact"' in news and "Per pianificare le lezioni: ProfClick</h2>" in news
+    assert news.index('class="profclick compact"') < news.index('id="news-results"')   # sopra la lista, non in fondo
     interpelli = client.get("/interpelli").get_data(as_text=True)
     assert "Preso l'incarico? Pianifica le lezioni con ProfClick" in interpelli and link in interpelli
     home = client.get("/").get_data(as_text=True)

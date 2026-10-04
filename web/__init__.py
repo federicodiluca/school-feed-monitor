@@ -11,7 +11,10 @@ Configurazione via ambiente / .env:
     TELEGRAM_BOT_USERNAME   username del bot (senza @) per i link "apri il bot"
     CONTACT_EMAIL           email pubblica di contatto (pagina Chi siamo, privacy)
 """
+import hashlib
+import os
 import secrets
+from functools import lru_cache
 
 from flask import Flask, render_template, request
 
@@ -45,6 +48,13 @@ class SiteFlask(Flask):
     def url_for(self, endpoint, *args, **values):
         url = super().url_for(endpoint, *args, **values)
         return seo.page_path(url) if self.config.get("STATIC") else url
+
+
+@lru_cache(maxsize=64)
+def _asset_version(path, _mtime):
+    """Impronta corta del contenuto di un file statico (la data di modifica fa da chiave della cache)."""
+    with open(path, "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()[:10]
 
 
 def create_app(test_config=None):
@@ -123,6 +133,17 @@ def create_app(test_config=None):
     @app.errorhandler(403)
     def forbidden(_e):
         return render_template("errore.html", code=403, message="Richiesta non valida o scaduta: ricarica la pagina e riprova."), 403
+
+    # CSS e JS hanno nell'indirizzo un'impronta del contenuto (?v=...): GitHub Pages li fa
+    # tenere in cache 10 minuti, e dopo una pubblicazione la pagina nuova arrivava col CSS
+    # vecchio. L'impronta cambia solo se cambia il file, quindi la cache resta utile.
+    @app.url_defaults
+    def static_version(endpoint, values):
+        name = values.get("filename") or ""
+        if endpoint == "static" and name.endswith((".css", ".js")) and "v" not in values:
+            path = os.path.join(app.static_folder, name)
+            if os.path.isfile(path):
+                values["v"] = _asset_version(path, os.path.getmtime(path))
 
     @app.context_processor
     def inject_globals():

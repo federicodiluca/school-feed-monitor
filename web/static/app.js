@@ -27,14 +27,26 @@
     var installPrompt = null;
     var ios = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
       (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);   // iPad si spaccia per Mac
+    // theme.js mostra «Installa» già al primo disegno (classe can-install) se il browser
+    // l'aveva proposto in una pagina precedente: qui si tiene aggiornato quel ricordo.
+    var rememberInstallable = function (yes) {
+      document.documentElement.classList.toggle("can-install", yes || ios);
+      try { if (yes) localStorage.setItem("sfm-installable", "1"); else localStorage.removeItem("sfm-installable"); } catch (e) {}
+    };
     window.addEventListener("beforeinstallprompt", function (e) {
       e.preventDefault();
       installPrompt = e;
       installItem.hidden = false;
+      rememberInstallable(true);
     });
     window.addEventListener("appinstalled", function () {
       installPrompt = null;
       installItem.hidden = true;
+      rememberInstallable(false);
+    });
+    // il browser non lo propone più (per esempio l'app è già installata): via il pulsante
+    window.addEventListener("load", function () {
+      setTimeout(function () { if (!installPrompt && !ios) rememberInstallable(false); }, 5000);
     });
     if (ios && installHelp) installItem.hidden = false;
     installBtn.addEventListener("click", function () {
@@ -360,11 +372,9 @@
 
   // --- navigazione: le voci che dipendono dalle preferenze ------------------------------
   function updateNav() {
+    // le voci le mostra il CSS in base alla classe, che theme.js mette già prima del disegno
     var has = prefs.sources().length || prefs.keywords().length;
-    var mine = document.getElementById("nav-mine");
-    if (mine) mine.hidden = !has;
-    var label = document.getElementById("nav-config-label");
-    if (label) label.textContent = has ? "Le mie fonti" : "Scegli le fonti";
+    document.documentElement.classList.toggle("has-prefs", !!has);
   }
 
   function flash(message, kind) {

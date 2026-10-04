@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it"{% if has_prefs %} class="has-prefs"{% endif %}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -40,10 +40,10 @@
       {% set here = request.endpoint %}
       <ul class="nav-pages">
         <li><a href="{{ url_for('news.index') }}"{% if here in ('news.index', 'news.by_source') %} aria-current="page"{% endif %}>Notizie</a></li>
-        {% if has_prefs or static_mode %}<li id="nav-mine"{% if static_mode %} hidden{% endif %}><a href="{{ url_for('news.mine') }}"{% if here == 'news.mine' %} aria-current="page"{% endif %}>Le mie notizie</a></li>{% endif %}
+        {% if has_prefs or static_mode %}<li id="nav-mine" class="nav-mine"><a href="{{ url_for('news.mine') }}"{% if here == 'news.mine' %} aria-current="page"{% endif %}>Le mie notizie</a></li>{% endif %}
         <li><a href="{{ url_for('news.interpelli') }}"{% if here == 'news.interpelli' %} aria-current="page"{% endif %}>Interpelli</a></li>
         <li><a href="{{ url_for('news.sources') }}"{% if here in ('news.sources', 'news.by_region') %} aria-current="page"{% endif %}>Fonti</a></li>
-        <li class="nav-cta"><a class="button primary" href="{{ url_for('config.show') }}"><span id="nav-config-label">{% if has_prefs %}Le mie fonti{% else %}Scegli le fonti{% endif %}</span></a></li>
+        <li class="nav-cta"><a class="button primary" href="{{ url_for('config.show') }}"><span id="nav-config-label"><span class="label-prefs">Le mie fonti</span><span class="label-noprefs">Scegli le fonti</span></span></a></li>
       </ul>
       <ul class="nav-actions">
         <li id="nav-install" hidden><button type="button" id="install-btn" class="link install-btn" aria-label="Installa">{% from "_icons.html" import icon %}{{ icon('download', 18) }} <span class="install-label">Installa</span></button></li>

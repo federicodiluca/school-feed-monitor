@@ -76,6 +76,13 @@ code { font-family: var(--mono); background: var(--surface-2); padding: 1px 6px;
 .site-header li a, .site-header button.link { display: inline-block; padding: 8px 12px; border-radius: var(--radius-sm); color: var(--fg-2); text-decoration: none; font-weight: 500; font-size: .95rem; }
 .site-header li a:not(.button):hover, .site-header button.link:hover { background: var(--bg-soft); color: var(--fg); }
 .site-header ul.nav-actions { margin-left: 0; }
+/* Voci che dipendono da preferenze e installazione: le classi su <html> le mette theme.js
+   prima del disegno, così il menù non salta a ogni pagina */
+.nav-mine, .label-prefs { display: none; }
+.has-prefs .nav-mine { display: list-item; }
+.has-prefs .label-prefs { display: inline; }
+.has-prefs .label-noprefs { display: none; }
+.can-install #nav-install { display: list-item; }
 .site-header .nav-cta { margin-left: var(--space-2); }
 .site-header li a[aria-current="page"] { color: var(--primary); background: var(--primary-soft); font-weight: 600; }
 /* Telefono: logo, Installa e tema sulla prima riga; pagine e «Scegli le fonti» sulla seconda.
@@ -309,5 +316,11 @@ details.source-group .sources { padding: 4px 12px 10px 28px; }
 .profclick .button:hover, .profclick .button:focus-visible { background: var(--pc-chalk); border-color: var(--pc-chalk); color: var(--pc-wood-fg); }
 .profclick .button:focus-visible { box-shadow: 0 0 0 3px var(--pc-chalk-2); }
 @media (max-width: 600px) { .profclick { flex-wrap: wrap; } .profclick-logo { width: 44px; height: 44px; } .profclick .button { width: 100%; } }
+/* Versione su una riga, sopra l'elenco delle notizie */
+.profclick.compact { gap: var(--space-3) var(--space-4); margin: 0 0 var(--space-4); padding: var(--space-3) var(--space-4); }
+.profclick.compact .profclick-logo { width: 40px; height: 40px; border-radius: 10px; }
+.profclick.compact h2 { margin: 0; font-size: 1.02rem; }
+.profclick.compact .profclick-body > p { font-size: .88rem; }
+@media (max-width: 600px) { .profclick.compact .profclick-body { flex: 1 1 0; } .profclick.compact .button { padding: 8px 14px; } }
 .profclick-footer { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
 .profclick-footer img { border-radius: 4px; }

@@ -39,6 +39,8 @@
   </aside>
 </section>
 
+{% from "_profclick.html" import profclick_box %}{{ profclick_box() }}
+
 <section class="section">
   <h2>Come funziona</h2>
   <div class="grid cols-3">
@@ -57,7 +59,6 @@
 </section>
 {% endif %}
 
-{% from "_profclick.html" import profclick_box %}{{ profclick_box() }}
 
 {% if regions %}
 <section class="section">

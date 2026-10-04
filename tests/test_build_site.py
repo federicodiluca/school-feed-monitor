@@ -53,7 +53,7 @@ def test_every_public_page_becomes_a_file(site):
 def test_links_and_canonical_carry_the_pages_prefix(site):
     html = read(site, "index.html")
     assert f'<link rel="canonical" href="{BASE_URL}/">' in html
-    assert f'href="{PREFIX}/notizie/"' in html and f'href="{PREFIX}/static/style.css"' in html
+    assert f'href="{PREFIX}/notizie/"' in html and f'href="{PREFIX}/static/style.css?v=' in html
     assert 'data-base="/school-feed-monitor"' in html and 'data-static="1"' in html
     # niente riferimenti alla radice del dominio, che su Pages è di un altro sito
     assert 'href="/notizie"' not in html and 'src="/static/' not in html
@@ -76,7 +76,7 @@ def test_page_urls_end_with_a_slash_like_github_pages_wants(site):
     assert "/usp-bologna/</loc>" in xml and "/sitemap.xml/" not in xml
     home = read(site, "index.html")
     assert f'"url": "{BASE_URL}/"' in home          # JSON-LD senza il prefisso doppio
-    assert f'href="{PREFIX}/static/style.css"' in home and f'href="{PREFIX}/privacy/"' in home
+    assert f'href="{PREFIX}/static/style.css?v=' in home and f'href="{PREFIX}/privacy/"' in home
 
 
 def test_source_pages_are_generated_and_indexable(site):

@@ -53,9 +53,10 @@
   <p><a class="button primary" href="{{ url_for('config.show') }}">Ricevi solo le notizie che ti interessano</a></p>
 </section>
 
+{% from "_profclick.html" import profclick_box %}{{ profclick_box() }}
+
 <h2>Ultime notizie{% if total > news | length %} <small class="muted">({{ news | length }} delle {{ total }} degli ultimi {{ days }} giorni)</small>{% endif %}</h2>
 {% include "_news_list.html" %}
-{% from "_profclick.html" import profclick_box %}{{ profclick_box() }}
 <p class="more"><a class="button" href="{{ url_for('news.index') }}">Cerca fra tutte le notizie →</a>
   <a class="button" href="{{ url_for('news.interpelli') }}#{{ region | slugify }}">Gli interpelli in {{ region }} →</a></p>
 {% endblock %}
