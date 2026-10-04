@@ -3,7 +3,7 @@
 Il sito non ha account: gli unici "utenti" sono le chat Telegram che hanno avviato
 il bot (identificativo, eventuale username, parole chiave, fonti seguite).
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sfm.db import get_conn
 
@@ -64,6 +64,17 @@ def get_users(active_only=True):
     rows = conn.execute(sql + " ORDER BY id").fetchall()
     conn.close()
     return [_row_to_user(r) for r in rows]
+
+
+def user_counts(new_days=7):
+    """Numeri per il recap dell'admin: iscritti, attivi (ricevono gli avvisi) e nuovi negli
+    ultimi `new_days` giorni. Solo conteggi: nessun dato dei singoli utenti."""
+    since = (datetime.now() - timedelta(days=new_days)).isoformat()
+    conn = get_conn()
+    row = conn.execute("SELECT COUNT(*), COALESCE(SUM(active), 0), COALESCE(SUM(created_at >= ?), 0) FROM users",
+                       (since,)).fetchone()
+    conn.close()
+    return {"total": row[0], "active": row[1], "new": row[2]}
 
 
 def user_id_for_telegram(telegram_id):

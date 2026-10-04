@@ -46,6 +46,37 @@ def test_unknown_command_replies(sent_messages):
 
 # --- /start /stop ---------------------------------------------------------
 
+def test_utenti_gives_the_admin_only_the_counts(sent_messages, monkeypatch):
+    monkeypatch.setenv("ADMIN_TELEGRAM_ID", "99")
+    for chat in (1, 2, 3):
+        tc.handle_update(update("/start", chat_id=chat))
+    tc.handle_update(update("/stop", chat_id=3))
+    sent_messages.clear()
+    tc.handle_update(update("/utenti", chat_id=99))
+    text = sent_messages[-1]["text"]
+    assert sent_messages[-1]["chat_id"] == 99
+    assert "Iscritti: <b>3</b>" in text and "Attivi (ricevono gli avvisi): <b>2</b>" in text
+    assert "Sospesi con /stop: 1" in text and "Nuovi negli ultimi 7 giorni: 3" in text
+    assert "alice" not in text   # niente dati dei singoli
+
+
+def test_utenti_does_not_exist_for_everyone_else(sent_messages, monkeypatch):
+    monkeypatch.setenv("ADMIN_TELEGRAM_ID", "99")
+    tc.handle_update(update("/utenti", chat_id=1))
+    assert "non riconosciuto" in sent_messages[-1]["text"]
+    monkeypatch.delenv("ADMIN_TELEGRAM_ID")
+    tc.handle_update(update("/utenti", chat_id=99))
+    assert "non riconosciuto" in sent_messages[-1]["text"]
+
+
+def test_start_shows_utenti_only_to_the_admin(sent_messages, monkeypatch):
+    monkeypatch.setenv("ADMIN_TELEGRAM_ID", "99")
+    tc.handle_update(update("/start", chat_id=99))
+    assert "/utenti" in sent_messages[-1]["text"]
+    tc.handle_update(update("/start", chat_id=1))
+    assert "/utenti" not in sent_messages[-1]["text"]
+
+
 def test_start_registers_user_and_sends_help(sent_messages):
     tc.handle_update(update("/start"))
     user = get_user(1)

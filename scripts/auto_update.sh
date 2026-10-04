@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Aggiorna da solo il codice sulla VM, ma solo con commit che hanno passato i test su GitHub.
 #
-#   ./scripts/auto_update.sh            # da cron, ogni 12 ore (righe in docs/deploy.md)
+#   ./scripts/auto_update.sh            # da cron, ogni ora prima di publish_site.sh (docs/deploy.md)
 #   ./scripts/auto_update.sh --dry-run  # dice cosa farebbe, senza toccare niente
 #
 # Passi: fetch di main → se è cambiato e il job "pytest" su GitHub è verde → backup del
@@ -30,6 +30,7 @@ main() {
   [ "${1:-}" = "--dry-run" ] && dry_run=1
 
   local skip_file="data/.auto_update_skip"   # commit che ha già fallito: non si ritenta
+  stuck_file="data/.auto_update_stuck"       # ultimo avviso «fermo» mandato: non si ripete ogni ora
   local branch="main"
   local wait="${AUTO_UPDATE_WAIT:-60}"
 
@@ -46,17 +47,19 @@ main() {
   new="$(git rev-parse "origin/$branch")"
 
   if ! git diff --quiet HEAD; then
-    notify "⚠️ Aggiornamento automatico fermo: sulla VM ci sono modifiche locali a file del repo (git status). Serve un intervento a mano."
+    notify_once "⚠️ Aggiornamento automatico fermo: sulla VM ci sono modifiche locali a file del repo (git status). Serve un intervento a mano."
     return 1
   fi
   if [ "$old" = "$new" ]; then
+    rm -f "$stuck_file"
     log "già aggiornato (${old:0:7})"
     return 0
   fi
   if ! git merge-base --is-ancestor "$old" "$new"; then
-    notify "⚠️ Aggiornamento automatico fermo: la VM ha commit che main non ha (${old:0:7}). Serve un intervento a mano."
+    notify_once "⚠️ Aggiornamento automatico fermo: la VM ha commit che main non ha (${old:0:7}). Serve un intervento a mano."
     return 1
   fi
+  rm -f "$stuck_file"
   if [ -f "$skip_file" ] && [ "$(cat "$skip_file")" = "$new" ]; then
     log "${new:0:7} ha già fallito una volta, aspetto un commit nuovo"
     return 0
@@ -106,6 +109,17 @@ $changes"
 }
 
 log() { echo "[auto_update $(date '+%Y-%m-%d %H:%M')] $*"; }
+
+# Come notify, ma lo stesso messaggio parte una volta sola: col giro orario un blocco che dura
+# un giorno manderebbe 24 avvisi uguali. Nel log finisce comunque a ogni giro.
+notify_once() {
+  if [ -f "$stuck_file" ] && [ "$(cat "$stuck_file")" = "$1" ]; then
+    log "$1 (già segnalato)"
+    return 0
+  fi
+  printf '%s' "$1" > "$stuck_file"
+  notify "$1"
+}
 
 # Esito del job "pytest" (workflow Test) per il commit: success, failure, pending, none...
 # Repo pubblico: l'API di GitHub risponde senza token (60 richieste l'ora, ce ne basta una).

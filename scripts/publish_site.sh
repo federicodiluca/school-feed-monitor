@@ -26,6 +26,16 @@ BRANCH="gh-pages"
 WORKTREE="${SITE_WORKTREE:-/tmp/sfm-gh-pages}"
 TMPBRANCH="sfm-publish-$$"    # ramo usa-e-getta: quello vero vive solo su GitHub
 
+# Il sito esce con il codice di questa copia: se main è più avanti, le novità non sono online.
+# origin/main lo tiene aggiornato auto_update.sh (cinque minuti prima, da cron).
+HEAD_SHA="$(git rev-parse --short HEAD)"
+MAIN_SHA="$(git rev-parse --short origin/main 2>/dev/null || echo '?')"
+if [ "$HEAD_SHA" = "$MAIN_SHA" ]; then
+  echo "[publish_site] pubblico il codice di $HEAD_SHA"
+else
+  echo "[publish_site] ATTENZIONE: pubblico il codice di $HEAD_SHA, ma main è a $MAIN_SHA: la VM è indietro (vedi data/logs/update.log)" >&2
+fi
+
 if [ -n "${SITE_BUILD_CMD:-}" ]; then
   eval "$SITE_BUILD_CMD"           # es. dentro il container Docker
 else

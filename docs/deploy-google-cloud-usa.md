@@ -151,8 +151,8 @@ crontab -e
 10 * * * * cd /opt/sfm && ./scripts/publish_site.sh >> data/logs/publish.log 2>&1
 # backup del database ogni notte alle 3 (14 giorni di copie in /opt/sfm/backup)
 0 3 * * * cd /opt/sfm && sh scripts/backup.sh backup >> data/logs/backup.log 2>&1
-# aggiornamento del codice alle 4:30 e alle 16:30, solo con i test verdi (vedi «Aggiornare il codice»)
-30 4,16 * * * cd /opt/sfm && ./scripts/auto_update.sh >> data/logs/update.log 2>&1
+# aggiornamento del codice ogni ora, 5 minuti prima della pubblicazione, solo con i test verdi
+5 * * * * cd /opt/sfm && ./scripts/auto_update.sh >> data/logs/update.log 2>&1
 ```
 
 Pages ricostruisce a ogni push; il limite indicativo è ~10 build all'ora, una all'ora sta
@@ -161,8 +161,8 @@ repository non cresce all'infinito.
 
 ## 6. Aggiornare il codice
 
-**Da solo.** Con la riga di cron qui sopra, `scripts/auto_update.sh` controlla `main` ogni 12
-ore e aggiorna solo se il job `pytest` su GitHub è verde per quel commit. Prima fa il backup
+**Da solo.** Con la riga di cron qui sopra, `scripts/auto_update.sh` controlla `main` ogni
+ora e aggiorna solo se il job `pytest` su GitHub è verde per quel commit. Prima fa il backup
 del database (le migrazioni non tornano indietro), poi riavvia il bot e dopo un minuto
 controlla che sia ancora in piedi; se no torna al commit di prima e non lo ritenta finché su
 `main` non arriva altro. L'esito arriva su Telegram all'`ADMIN_TELEGRAM_ID`.

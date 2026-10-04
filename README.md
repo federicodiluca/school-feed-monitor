@@ -97,6 +97,7 @@ Per riempire il database senza aspettare lo scheduler: `python scripts/fetch_now
 | `/addsource URL [nome]` · `/removesource n` | fonti aggiunte da te |
 | `/latest [n]` · `/fetch` · `/report` | ultime notizie, aggiornamento manuale, riepilogo |
 | `/dati` · `/cancellami` | cosa conservo su di te · cancella tutto |
+| `/utenti` | solo per l'admin (`ADMIN_TELEGRAM_ID`): quanti iscritti, attivi, sospesi e nuovi in settimana |
 
 ## Test
 
@@ -127,7 +128,7 @@ Guida completa: **[docs/deploy.md](docs/deploy.md)** — vale per qualunque macc
 Docker. In sintesi: la VM fa girare il bot, ogni ora genera il sito e lo spinge sul branch
 `gh-pages`, GitHub Pages lo serve in HTTPS sul dominio `schoolfeedmonitor.federicodiluca.com`.
 
-**Aggiornamento automatico**: `scripts/auto_update.sh`, da cron ogni 12 ore, porta sulla VM
+**Aggiornamento automatico**: `scripts/auto_update.sh`, da cron ogni ora (5 minuti prima della pubblicazione), porta sulla VM
 i nuovi commit di `main`, ma solo quelli con i test verdi su GitHub. Fa il backup del
 database, il pull, riavvia il bot (Docker o systemd) e, se dopo un minuto il bot non è in
 piedi, torna al commit precedente. Con `--dry-run` dice cosa farebbe senza toccare niente.

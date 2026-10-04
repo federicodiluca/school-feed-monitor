@@ -10,6 +10,7 @@ from sfm.db_user import (
     set_excluded,
     set_keywords,
     update_keywords,
+    user_counts,
     user_id_for_telegram,
 )
 from sfm import config_link
@@ -32,7 +33,7 @@ from sfm.source_parser import SourceError, detect_source
 from sfm.report_generator import generate_report
 from sfm.logger import log
 from sfm.config_loader import get_config
-from sfm.env import site_url
+from sfm.env import env, site_url
 from sfm.utils import cleanHTMLPreview, escape_html, format_local_datetime, parse_keywords
 import requests
 import time
@@ -70,6 +71,7 @@ def build_help_message(telegram_id=None):
     if not sources:
         feed_summary = "⚠️ nessuna fonte configurata."
     site = site_url()
+    admin_line = "\n/utenti — quanti iscritti e quanti attivi (solo admin)" if telegram_id is not None and is_admin(telegram_id) else ""
     return f"""
 🤖 <b>School Feed Monitor</b> — servizio attivo.
 
@@ -91,7 +93,7 @@ def build_help_message(telegram_id=None):
 /removesource n — rimuovi una fonte aggiunta da te
 /start CODICE — applica la configurazione creata sul sito
 /dati — cosa conservo su di te · /cancellami — cancella tutto
-/commands — elenco rapido comandi
+/commands — elenco rapido comandi{admin_line}
 
 🌐 <b>Sito</b>: {site} — tutte le notizie, ricerca e configuratore delle fonti
 
@@ -737,6 +739,27 @@ def cmd_unknown(telegram_id, args, command=None):
     send_message(f"❓ Comando /{command} non riconosciuto. Usa /commands per l'elenco.", chat_id=telegram_id)
 
 
+def is_admin(telegram_id):
+    admin = (env("ADMIN_TELEGRAM_ID") or "").strip()
+    return bool(admin) and admin == str(telegram_id)
+
+
+def cmd_utenti(telegram_id, args):
+    """Solo per l'admin: quanti iscritti e quanti attivi, senza dati dei singoli.
+    Per gli altri è un comando che non esiste."""
+    if not is_admin(telegram_id):
+        cmd_unknown(telegram_id, args, command="utenti")
+        return
+    n = user_counts()
+    send_message(
+        "👥 <b>Utenti del bot</b>\n"
+        f"• Iscritti: <b>{n['total']}</b>\n"
+        f"• Attivi (ricevono gli avvisi): <b>{n['active']}</b>\n"
+        f"• Sospesi con /stop: {n['total'] - n['active']}\n"
+        f"• Nuovi negli ultimi 7 giorni: {n['new']}",
+        parse_mode="HTML", chat_id=telegram_id)
+
+
 HANDLERS = {
     "start": cmd_start,
     "stop": cmd_stop,
@@ -757,6 +780,7 @@ HANDLERS = {
     "removesource": cmd_removesource,
     "dati": cmd_dati,
     "cancellami": cmd_cancellami,
+    "utenti": cmd_utenti,   # solo admin
 }
 
 
