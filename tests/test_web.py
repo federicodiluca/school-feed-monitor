@@ -321,3 +321,14 @@ def test_interpelli_page_collects_them_by_region_with_the_class(client, catalog_
     assert "AM56 · 1" in html and "Graduatorie GPS" not in html
     assert "<loc>https://sfm.example/interpelli</loc>" in client.get("/sitemap.xml").get_data(as_text=True)
     assert 'href="/interpelli"' in client.get("/").get_data(as_text=True)
+
+
+def test_profclick_is_promoted_with_a_followed_link(client, catalog_db):
+    link = 'href="https://profclick.federicodiluca.com/" rel="noopener"'
+    news = client.get("/notizie").get_data(as_text=True)
+    assert 'class="profclick"' in news and "Per pianificare le lezioni: ProfClick</h2>" in news
+    interpelli = client.get("/interpelli").get_data(as_text=True)
+    assert "Preso l'incarico? Pianifica le lezioni con ProfClick" in interpelli and link in interpelli
+    home = client.get("/").get_data(as_text=True)
+    assert 'class="profclick"' not in home and 'class="profclick-footer"' in home and link in home
+    assert "nofollow" not in home[home.index('class="profclick-footer"'):home.index("</footer>")]

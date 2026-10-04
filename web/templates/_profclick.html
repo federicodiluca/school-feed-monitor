@@ -1,0 +1,32 @@
+{#- ProfClick, l'altro strumento per i docenti dello stesso autore. Il link è senza nofollow
+    (a differenza di quelli alle fonti): deve passare a ProfClick l'autorità del sito.
+    Uso: {% from "_profclick.html" import profclick_box %}  {{ profclick_box('interpelli') }} -#}
+{% from "_icons.html" import icon %}
+{% set profclick_url = "https://profclick.federicodiluca.com/" %}
+
+{% macro profclick_box(where='notizie') -%}
+<aside class="profclick" aria-labelledby="profclick-title">
+  <img src="{{ url_for('static', filename='profclick.svg') }}" alt="" width="56" height="56" class="profclick-logo">
+  <div class="profclick-body">
+    <p class="profclick-eyebrow">ProfClick · dallo stesso autore</p>
+    {% if where == 'interpelli' %}
+    <h2 id="profclick-title">Preso l'incarico? Pianifica le lezioni con ProfClick</h2>
+    <p>Metti l'orario e il programma della classe: ProfClick ricava le lezioni fino a fine anno e ogni settimana ti dice cosa fare.</p>
+    {% else %}
+    <h2 id="profclick-title">Per pianificare le lezioni: ProfClick</h2>
+    <p>Metti l'orario e il programma delle tue classi: ricava le lezioni dell'anno e ogni settimana ti dice cosa fare in ogni classe.</p>
+    {% endif %}
+    <ul class="profclick-points">
+      <li>{{ icon('check', 14) }} Gratis, senza registrazione</li>
+      <li>{{ icon('check', 14) }} Se una lezione salta, il piano slitta da solo</li>
+      <li>{{ icon('check', 14) }} I dati restano tuoi</li>
+    </ul>
+  </div>
+  <a class="button" href="{{ profclick_url }}" rel="noopener" target="_blank">Prova ProfClick</a>
+</aside>
+{%- endmacro %}
+
+{% macro profclick_footer() -%}
+<p class="profclick-footer"><img src="{{ url_for('static', filename='profclick.svg') }}" alt="" width="18" height="18">
+  Per pianificare le lezioni: <a href="{{ profclick_url }}" rel="noopener" target="_blank">ProfClick, il piano di lavoro del docente</a></p>
+{%- endmacro %}

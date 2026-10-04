@@ -25,6 +25,7 @@
 </script>
 {% endblock %}
 {% block content %}
+{% from "_profclick.html" import profclick_box %}
 <div class="page-head">
   <h1>Interpelli per supplenze: tutti gli uffici in una pagina</h1>
   <p>Gli interpelli escono provincia per provincia, ognuno sul sito del suo ufficio. Qui trovi quelli
@@ -47,6 +48,7 @@
   <p class="muted">Vuoi saperlo appena esce un interpello? <a href="{{ url_for('config.show') }}">Scegli le tue province</a>
     e aggiungi la parola chiave «interpello» o la tua classe di concorso: ti avvisiamo su Telegram.</p>
 </section>
+{{ profclick_box('interpelli') }}
 
 {% if total > shown %}<p class="count">I {{ shown }} più recenti dei {{ total }} degli ultimi {{ days }} giorni.</p>{% endif %}
 {% for region, news in groups %}
@@ -57,6 +59,7 @@
 {% endfor %}
 {% else %}
 <p class="empty">Nessun interpello negli ultimi {{ days }} giorni.</p>
+{{ profclick_box('interpelli') }}
 {% endif %}
 <p class="more"><a class="button" href="{{ url_for('news.index') }}">Cerca fra tutte le notizie →</a></p>
 {% endblock %}

@@ -82,6 +82,7 @@
         <a id="share-story" href="{{ url_for('static', filename='story.png') }}" download="school-feed-monitor.png"
            title="Immagine per le storie di Instagram, con il link al sito">Condividi</a>
       </nav>
+      {% from "_profclick.html" import profclick_footer %}{{ profclick_footer() }}
       {% block footer_freshness %}{% include "_freshness.html" %}{% endblock %}
       <p>{{ app_name }} è un progetto indipendente, non affiliato al Ministero dell'Istruzione e del Merito né agli Uffici Scolastici.
         Aggrega notizie pubbliche senza garanzia di completezza o tempestività: fa fede sempre la fonte originale

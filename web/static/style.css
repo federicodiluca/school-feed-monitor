@@ -9,6 +9,7 @@
   --primary: #1e3a8a; --primary-hover: #172e6e; --primary-soft: #e8edfb; --on-primary: #ffffff;
   --accent: #f59e0b; --accent-soft: #fff4dc; --accent-fg: #92400e;
   --danger: #b91c1c; --danger-soft: #fee2e2; --success-soft: #dcfce7; --info-soft: #dbeafe;
+  --pc-board: #2f5b4f; --pc-chalk: #f4efe3; --pc-chalk-2: #cfe0d8; --pc-wood: #f3d9b1; --pc-wood-fg: #1f3d35;  /* ProfClick */
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06); --shadow: 0 6px 24px -8px rgba(15, 23, 42, .18);
   --radius: 12px; --radius-sm: 8px; --radius-pill: 999px;
   --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 72px;
@@ -24,6 +25,7 @@
     --primary: #8fb0ff; --primary-hover: #a9c2ff; --primary-soft: #1a2a4f; --on-primary: #0b1220;
     --accent: #fbbf24; --accent-soft: #3a2a08; --accent-fg: #fcd34d;
     --danger: #fca5a5; --danger-soft: #4a1515; --success-soft: #0f3d2a; --info-soft: #14305a;
+    --pc-board: #1f4038; --pc-chalk: #eef3ef; --pc-chalk-2: #b9d2c7;
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4); --shadow: 0 10px 30px -10px rgba(0, 0, 0, .6);
     --focus: 0 0 0 3px rgba(143, 176, 255, .35);
     color-scheme: dark;
@@ -35,6 +37,7 @@
   --primary: #8fb0ff; --primary-hover: #a9c2ff; --primary-soft: #1a2a4f; --on-primary: #0b1220;
   --accent: #fbbf24; --accent-soft: #3a2a08; --accent-fg: #fcd34d;
   --danger: #fca5a5; --danger-soft: #4a1515; --success-soft: #0f3d2a; --info-soft: #14305a;
+  --pc-board: #1f4038; --pc-chalk: #eef3ef; --pc-chalk-2: #b9d2c7;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4); --shadow: 0 10px 30px -10px rgba(0, 0, 0, .6);
   --focus: 0 0 0 3px rgba(143, 176, 255, .35);
   color-scheme: dark;
@@ -275,3 +278,19 @@ details.source-group .sources { padding: 4px 12px 10px 28px; }
 .region-links { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .region-links a { display: inline-block; padding: var(--space-1) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); text-decoration: none; }
 .region-links a:hover { border-color: var(--primary); }
+
+/* ProfClick: box con i suoi colori (lavagna, gesso, il legno della matita) in Notizie, Interpelli e regioni */
+.profclick { display: flex; gap: var(--space-4) var(--space-5); align-items: center; margin: var(--space-5) 0; padding: var(--space-5); border-radius: var(--radius); background: var(--pc-board); color: var(--pc-chalk); }
+.profclick-logo { flex: none; border-radius: 14px; box-shadow: 0 0 0 1px rgba(255, 255, 255, .12); }
+.profclick-body { flex: 1; min-width: 0; }
+.profclick-eyebrow { margin: 0; font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--pc-chalk-2); }
+.profclick h2 { margin: 2px 0 var(--space-1); font-size: 1.15rem; color: var(--pc-chalk); }
+.profclick-body > p:not(.profclick-eyebrow) { margin: 0; color: var(--pc-chalk-2); font-size: .95rem; }
+.profclick-points { list-style: none; display: flex; flex-wrap: wrap; gap: 2px var(--space-4); margin: var(--space-2) 0 0; padding: 0; font-size: .85rem; }
+.profclick-points .ico-svg { color: var(--pc-wood); }
+.profclick .button { flex: none; background: var(--pc-wood); border-color: var(--pc-wood); color: var(--pc-wood-fg); box-shadow: none; }
+.profclick .button:hover, .profclick .button:focus-visible { background: var(--pc-chalk); border-color: var(--pc-chalk); color: var(--pc-wood-fg); }
+.profclick .button:focus-visible { box-shadow: 0 0 0 3px var(--pc-chalk-2); }
+@media (max-width: 600px) { .profclick { flex-wrap: wrap; } .profclick-logo { width: 44px; height: 44px; } .profclick .button { width: 100%; } }
+.profclick-footer { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.profclick-footer img { border-radius: 4px; }
