@@ -57,6 +57,8 @@
 </section>
 {% endif %}
 
+{% from "_profclick.html" import profclick_box %}{{ profclick_box() }}
+
 {% if regions %}
 <section class="section">
   <h2>Notizie per regione</h2>

@@ -75,6 +75,23 @@ code { font-family: var(--mono); background: var(--surface-2); padding: 1px 6px;
 .site-header ul { list-style: none; margin: 0 0 0 auto; padding: 0; display: flex; gap: var(--space-1); align-items: center; flex-wrap: wrap; }
 .site-header li a, .site-header button.link { display: inline-block; padding: 8px 12px; border-radius: var(--radius-sm); color: var(--fg-2); text-decoration: none; font-weight: 500; font-size: .95rem; }
 .site-header li a:not(.button):hover, .site-header button.link:hover { background: var(--bg-soft); color: var(--fg); }
+.site-header ul.nav-actions { margin-left: 0; }
+.site-header .nav-cta { margin-left: var(--space-2); }
+.site-header li a[aria-current="page"] { color: var(--primary); background: var(--primary-soft); font-weight: 600; }
+/* Telefono: logo, Installa e tema sulla prima riga; pagine e «Scegli le fonti» sulla seconda.
+   Se le pagine non ci stanno scorrono, e il bottone resta fermo a destra. */
+@media (max-width: 640px) {
+  .site-header nav { gap: var(--space-2); padding-bottom: var(--space-2); }
+  .site-header ul.nav-actions { order: 2; margin-left: auto; }
+  .site-header .install-label { display: none; }
+  .site-header ul.nav-pages { order: 3; flex: 1 1 100%; margin: 0; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .site-header ul.nav-pages::-webkit-scrollbar { display: none; }
+  .site-header ul.nav-pages a { white-space: nowrap; padding: 6px 10px; }
+  .site-header ul.nav-pages li:first-child a { padding-left: 0; }
+  .site-header ul.nav-pages li:first-child a[aria-current="page"] { padding-left: 10px; }
+  .site-header .nav-cta { position: sticky; right: 0; margin-left: auto; padding-left: var(--space-2); background: var(--surface); }
+  .site-header .nav-cta a.button { padding: 6px 12px; }
+}
 .site-header li a.button { padding: 8px 14px; box-shadow: none; }  /* stile: vedi .button.primary */
 form.inline { display: inline; }
 button.link { background: none; border: 0; cursor: pointer; font: inherit; }

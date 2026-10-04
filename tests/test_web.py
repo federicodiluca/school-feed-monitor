@@ -330,5 +330,12 @@ def test_profclick_is_promoted_with_a_followed_link(client, catalog_db):
     interpelli = client.get("/interpelli").get_data(as_text=True)
     assert "Preso l'incarico? Pianifica le lezioni con ProfClick" in interpelli and link in interpelli
     home = client.get("/").get_data(as_text=True)
-    assert 'class="profclick"' not in home and 'class="profclick-footer"' in home and link in home
+    assert 'class="profclick"' in home and 'class="profclick-footer"' in home and link in home
     assert "nofollow" not in home[home.index('class="profclick-footer"'):home.index("</footer>")]
+
+
+def test_menu_links_every_section_and_marks_the_current_one(client, catalog_db):
+    html = client.get("/interpelli").get_data(as_text=True)
+    menu = html[html.index('class="nav-pages"'):html.index("</ul>", html.index('class="nav-pages"'))]
+    assert 'href="/notizie"' in menu and 'href="/fonti"' in menu
+    assert 'href="/interpelli" aria-current="page"' in menu and menu.count("aria-current") == 1
