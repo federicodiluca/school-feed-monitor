@@ -37,6 +37,13 @@ else
 fi
 
 if [ -n "${SITE_BUILD_CMD:-}" ]; then
+  # Con Docker il sito si genera dall'immagine, che ha la copia del codice fatta al suo build:
+  # dopo un git pull senza rebuild uscirebbe il sito vecchio. Si ricostruisce sempre; se il
+  # codice non è cambiato Docker usa la cache (data/ è escluso dal build) e ci mette pochi secondi.
+  # Il bot in esecuzione non viene toccato: lo riavvia auto_update.sh.
+  case "$SITE_BUILD_CMD" in
+    *"docker compose"*) docker compose build -q ;;
+  esac
   eval "$SITE_BUILD_CMD"           # es. dentro il container Docker
 else
   "${PYTHON:-python3}" -m scripts.build_site --out "$OUT"

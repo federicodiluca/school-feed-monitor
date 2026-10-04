@@ -92,9 +92,11 @@ SITE_BUILD_CMD=docker compose run --rm -T bot python -m scripts.build_site --out
 ```
 
 Il valore può restare senza virgolette: `.env` lo leggono sia Python sia gli script, e
-prendono tutto quello che segue il primo `=`. Ricorda però che `docker compose run` usa
-**l'immagine già costruita**: dopo ogni `git pull` rifai `docker compose up -d --build`,
-altrimenti generi il sito con il codice vecchio.
+prendono tutto quello che segue il primo `=`. `docker compose run` usa **l'immagine già
+costruita**, che contiene una copia del codice: per questo `publish_site.sh` rifà il build
+dell'immagine prima di generare il sito (con la cache, se il codice non è cambiato, bastano
+pochi secondi). Il bot invece gira con il codice del suo ultimo avvio: dopo un `git pull` a
+mano riavvialo con `docker compose up -d --build`.
 
 ## 4. Il database
 
