@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Logo di ProfClick (profclick/public/favicon.svg): la matita rossa e blu sulla lavagna -->
+  <rect x="2" y="2" width="60" height="60" rx="15" fill="#2f5b4f"/>
+  <g transform="rotate(-45 32 32)">
+    <rect x="17" y="26" width="15" height="12" fill="#3f6fd8"/>
+    <rect x="32" y="26" width="15" height="12" fill="#e5483b"/>
+    <path d="M17 26 8 32l9 6Z" fill="#f3d9b1"/>
+    <path d="M47 26l9 6-9 6Z" fill="#f3d9b1"/>
+    <path d="M8 32l3.4-2.3v4.6Z" fill="#3f6fd8"/>
+    <path d="M56 32l-3.4-2.3v4.6Z" fill="#e5483b"/>
+    <path d="M32 26v12" stroke="#2f5b4f" stroke-width="1.5" opacity=".35"/>
+  </g>
+</svg>
