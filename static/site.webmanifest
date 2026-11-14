@@ -1,0 +1,38 @@
+{
+  "name": "School Feed Monitor",
+  "short_name": "SFM",
+  "description": "Le notizie di USR, USP e Ministero filtrate per te. Senza registrazione.",
+  "start_url": "/le-mie-notizie",
+  "display": "standalone",
+  "lang": "it",
+  "theme_color": "#1e3a8a",
+  "background_color": "#f8fafc",
+  "icons": [
+    {
+      "src": "/static/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "orientation": "portrait",
+  "scope": "/",
+  "shortcuts": [
+    {
+      "name": "Le mie notizie",
+      "url": "/le-mie-notizie"
+    },
+    {
+      "name": "Tutte le notizie",
+      "url": "/notizie"
+    },
+    {
+      "name": "Scegli le fonti",
+      "url": "/configura"
+    }
+  ]
+}
