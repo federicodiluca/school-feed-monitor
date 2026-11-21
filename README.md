@@ -49,7 +49,7 @@ link** di Telegram (`sfm/config_link.py`), impacchettata in meno di 64 caratteri
 
 Gli unici dati personali trattati sono quelli di chi usa il bot: identificativo della chat,
 fonti e parole chiave. Il bot risponde a `/dati` (cosa è memorizzato) e `/cancellami`
-(cancellazione immediata). Dettagli in [docs/registro-trattamenti.md](docs/registro-trattamenti.md).
+(cancellazione immediata). Dettagli nell'[informativa privacy](https://schoolfeedmonitor.federicodiluca.com/privacy/).
 
 ## Le fonti
 

@@ -32,3 +32,9 @@ sfm/config.json
 # prove del sito in jsdom
 node_modules/
 package-lock.json
+
+# materiale promozionale (post, messaggi, storie): solo in locale
+/social/
+# appunti personali e documenti interni: solo in locale
+/TODO.md
+/docs/registro-trattamenti.md
